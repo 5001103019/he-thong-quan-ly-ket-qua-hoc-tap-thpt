@@ -1,0 +1,13 @@
+.vs/
+*.user
+*.suo
+node_modules/
+*.log
+.env
+.env.*
+!.env.example
+dist/
+build/
+coverage/
+bin/
+obj/
