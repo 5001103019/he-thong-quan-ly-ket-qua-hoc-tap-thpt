@@ -589,6 +589,55 @@ VT5:
 VT4-01 cung cap ban thiet ke de xuat cho module quan ly diem cua he thong.
 
 Thiet ke tuan thu cac yeu cau nghiep vu trong bao cao khao sat va quy uoc ky thuat cua nhom.
+## 10. Bo sung dong bo voi VT3-01
+
+### 10.1. Noi dung da doi chieu
+
+Da doi chieu voi ban cap nhat VT3-01, commit 35b10fa, bao gom cac Business Rules BR-59 den BR-67.
+
+Thong nhat ve mat dinh huong thiet ke:
+
+- ScoreRecord tham chieu enrollment_id va subject_id.
+- ScoreComponent tham chieu score_record_id.
+- Bao toan ScoreRecord va ScoreComponent da phat sinh khi hoc sinh chuyen lop.
+- Giu nguyen lich su diem cua nien khoa cu khi hoc sinh chuyen nien khoa.
+- Khong tu dong sao chep hoac chuyen diem sang Enrollment moi neu chua co quy tac duoc phe duyet.
+- Khong tu dong mo khoa, xoa khoa hoac bo qua trang thai khoa diem khi chuyen lop.
+- Thao tac thay doi Enrollment phai dam bao tinh nhat quan du lieu.
+
+### 10.2. Noi dung can xac nhan truoc khi chot schema
+
+- VT1: Xac nhan khoa ngoai, UNIQUE, migration va co che version.
+- VT3 va VT4: Thong nhat cach su dung diem lop cu tai lop moi.
+- VT4 va VT1: Xac nhan cach tinh diem tong ket khi chuyen lop.
+- VT5: Xac nhan anh huong cua chuyen lop den khoa diem va AuditLog.
+- Nhom: Xac nhan co quan ly diem theo hoc ky hay khong. Neu co, can xem xet bo sung hoc ky vao pham vi dinh danh ScoreRecord.
+
+### 10.3. Theo doi phe duyet quy tac diem
+
+| Noi dung | Phuong an hien tai | Trang thai |
+|---|---|---|
+| Mien diem | De xuat 0 den 10 | CHO XAC NHAN |
+| So chu so thap phan | Chua chot | CHO XAC NHAN |
+| Cong thuc tong ket | Chua co cong thuc duoc duyet | CHO PHE DUYET |
+| He so tung cot | Chua chot | CHO PHE DUYET |
+| Quy tac lam tron | Chua chot | CHO PHE DUYET |
+| Xu ly thieu diem | Khong tinh khi thieu diem bat buoc | DA MO TA |
+| Xu ly vang, mien | Chua chot | CHO XAC NHAN |
+| Diem khi chuyen lop | Bao toan lich su, chua chot cach su dung lai | CHO XAC NHAN |
+| Trang thai khoa diem | Tich hop voi VT5 | CHO XAC NHAN |
+
+Khi co quyet dinh chinh thuc, can cap nhat cong thuc, he so, quy tac lam tron, nguoi phe duyet va thoi diem phe duyet.
+
+### 10.4. Ket luan ban giao
+
+Da hoan thanh ban thiet ke de xuat VT4-01 va bo sung doi chieu voi thiet ke VT3-01.
+
+Tai lieu da co schema diem, API Contract, Business Rules va danh sach cac quy tac chua duoc phe duyet.
+
+Trang thai: HOAN THANH BAN THIET KE DE XUAT - CHO VT1 REVIEW VA NHOM XAC NHAN.
+
+Chua xem cac quy tac dang cho phe duyet la schema hoac cong thuc chinh thuc.
 
 Cac quy tac chua duoc phe duyet duoc ghi ro va khong mac dinh la quy tac chinh thuc.
 
