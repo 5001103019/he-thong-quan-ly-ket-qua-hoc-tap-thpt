@@ -409,6 +409,86 @@ Ket luan:
 Day la thiet ke quan he de xuat cua VT3-01.
 Can VT1, VT4 va VT5 xem xet truoc khi chot schema database.
 
+### 4.10. Phan hoi VT4 - Lien ket du lieu diem
+
+#### 4.10.1. Phuong an lien ket
+
+Theo phan hoi thiet ke VT4-01, de xuat cac quan he:
+
+| Thuc the cha | Thuc the con | Quan he | Khoa ngoai |
+|---|---|---|---|
+| Enrollment | ScoreRecord | 1 - N | ScoreRecord.enrollment_id |
+| Subject | ScoreRecord | 1 - N | ScoreRecord.subject_id |
+| ScoreRecord | ScoreComponent | 1 - N | ScoreComponent.score_record_id |
+
+Giai thich:
+- ScoreRecord tham chieu enrollment_id de xac dinh lan phan lop cua hoc sinh.
+- ScoreRecord tham chieu subject_id de xac dinh mon hoc.
+- ScoreComponent tham chieu score_record_id de luu diem thanh phan.
+- Cac thanh phan diem gom QT1, QT2, QT3, GK va CK.
+- Student, Class va AcademicYear duoc xac dinh thong qua Enrollment.
+- Khong can thay doi student_id khi hoc sinh chuyen lop.
+
+#### 4.10.2. Rang buoc khoa ngoai de xuat
+
+- ScoreRecord.enrollment_id tham chieu Enrollment.enrollment_id.
+- ScoreRecord.subject_id tham chieu Subject.subject_id.
+- ScoreComponent.score_record_id tham chieu ScoreRecord.score_record_id.
+- Khong xoa cung Enrollment neu da co ScoreRecord tham chieu.
+- Khong xoa cung Subject neu da co ScoreRecord tham chieu.
+- Khong xoa ScoreRecord hoac ScoreComponent chi vi hoc sinh chuyen lop.
+- Can thong nhat quy tac UNIQUE cho ScoreRecord theo pham vi bang diem thuc te.
+- Neu quan ly diem theo hoc ky, can xac dinh them hoc ky trong khoa dinh danh phu hop.
+- Khong tu y chot cau truc bang diem thay VT4.
+
+#### 4.10.3. Bao toan diem khi chuyen lop
+
+Vi du:
+- HS0001 dang hoc lop 10A1 trong nien khoa 2025-2026.
+- Hoc sinh da co diem mon Toan tai lop 10A1.
+- Hoc sinh chuyen sang lop 10A2 trong cung nien khoa.
+
+Phuong an bao toan du lieu:
+1. Giu nguyen Student va student_id.
+2. Ket thuc Enrollment cua lop 10A1.
+3. Tao Enrollment moi cho lop 10A2.
+4. Giu nguyen ScoreRecord da lien ket voi Enrollment cu.
+5. Giu nguyen cac ScoreComponent da phat sinh.
+6. Khong tu dong chuyen khoa ngoai enrollment_id cua diem cu sang Enrollment moi.
+7. Khong tu dong sao chep hoac ghi de diem cu.
+8. Viec su dung diem cu tai lop moi can nhom thong nhat.
+9. Phai xem xet trang thai khoa diem truoc khi cho phep sua.
+10. Thao tac chuyen lop phai bao dam tinh nhat quan du lieu.
+
+#### 4.10.4. Bao toan diem khi chuyen nien khoa
+
+- Tao Enrollment moi cho nien khoa moi.
+- Giu nguyen Enrollment va ScoreRecord cua nien khoa truoc.
+- Khong tu dong sao chep diem cua nien khoa cu sang nien khoa moi.
+- Hoc sinh van co the tra cuu ket qua hoc tap lich su theo quyen.
+- Cach tinh tong ket phai dua tren quy tac duoc nhom phe duyet.
+
+#### 4.10.5. Noi dung can VT1, VT4 va VT5 xac nhan
+
+VT1:
+- Xac nhan cac khoa ngoai va migration.
+- Xac nhan rang buoc UNIQUE cua ScoreRecord.
+- Xac nhan transaction khi chuyen lop.
+
+VT4:
+- Xac nhan cau truc ScoreRecord va ScoreComponent.
+- Xac nhan cach su dung diem lop cu tai lop moi.
+- Xac nhan cach tinh diem tong ket khi chuyen lop.
+
+VT5:
+- Xac nhan trang thai khoa diem cua lop cu.
+- Xac nhan co che khoa diem tai lop moi.
+- Xac nhan viec chuyen lop khong vuot qua kiem tra khoa diem.
+
+Ket luan:
+VT3 ghi nhan va dong y ve mat dinh huong voi de xuat lien ket cua VT4.
+Cac quan he va quy tac chua duoc xem la schema chinh thuc cho den khi nhom phe duyet.
+
 
 ## 5. Quy tac nghiep vu
 
@@ -549,6 +629,31 @@ Bo quy tac nghiep vu nay la co so de:
 - VT2 thiet ke giao dien quan ly phu hop voi cac trang thai du lieu.
 
 Day la ban de xuat VT3-01, can duoc nhom review truoc khi chot.
+
+### 5.11. Bo sung Business Rules theo phan hoi VT4
+
+BR-59: ScoreRecord phai tham chieu den Enrollment hop le.
+
+BR-60: ScoreRecord phai tham chieu den Subject hop le.
+
+BR-61: ScoreComponent phai lien ket voi ScoreRecord tuong ung.
+
+BR-62: Khi hoc sinh chuyen lop, khong xoa hoac ghi de diem da phat sinh tai Enrollment cu.
+
+BR-63: Khi hoc sinh chuyen nien khoa, giu nguyen lich su phan lop va ket qua hoc tap cu.
+
+BR-64: Khong tu dong sao chep diem sang Enrollment moi neu chua co quy tac duoc nhom phe duyet.
+
+BR-65: Viec su dung diem lop cu khi tinh tong ket tai lop moi phai theo quy tac do VT1 va VT4 thong nhat.
+
+BR-66: Viec chuyen lop khong duoc tu dong mo khoa, xoa khoa hoac bo qua trang thai khoa diem.
+
+BR-67: Cac thao tac anh huong den Enrollment va du lieu diem phai dam bao tinh nhat quan va khong lam mat lich su.
+
+Ghi chu:
+- BR-59 den BR-67 la cac quy tac de xuat.
+- Cac quy tac lien quan den diem va khoa diem can VT1, VT4, VT5 xac nhan.
+- VT3 khong tu y trien khai thay phan nghiep vu cua VT4 hoac VT5.
 
 
 ## 6. Hop dong API
@@ -761,6 +866,34 @@ Luu y:
 - Quy tac chuyen khac khoi va chuyen giua nien khoa
   can nhom xac nhan.
 
+#### 6.7.1. Bo sung xu ly diem khi chuyen lop
+
+Endpoint:
+POST /students/:id/transfers
+
+Quy tac bo sung:
+- Kiem tra hoc sinh, Enrollment cu va lop dich.
+- Kiem tra rang buoc phan lop va nien khoa.
+- Kiem tra anh huong den diem va trang thai khoa diem.
+- Ket thuc Enrollment cu va tao Enrollment moi.
+- Khong xoa hoac thay doi ScoreRecord da phat sinh.
+- Khong thay doi ScoreComponent cua Enrollment cu.
+- Khong tu dong chuyen diem sang Enrollment moi.
+- Khong tu dong mo khoa diem cua lop cu hoac lop moi.
+- Neu co loi trong giao dich, phai rollback.
+
+Can xac nhan truoc khi trien khai:
+- Diem lop cu co duoc su dung de tinh tong ket tai lop moi khong?
+- Neu co, he thong se truy van va tong hop diem theo quy tac nao?
+- Truong hop diem da khoa thi xu ly ra sao?
+- Co can ghi AuditLog khi chuyen lop hay khong?
+
+Ghi chu:
+API nay van thuoc phan nghiep vu cua VT3.
+Xu ly diem do VT4 phu trach.
+Xu ly khoa diem va AuditLog do VT5 phu trach.
+Cac quy tac tren can VT1 phe duyet.
+
 ### 6.8. Cau truc JSON thanh cong
 
 Theo quy chuan VT1:
@@ -913,3 +1046,30 @@ Ket luan:
 VT3-01 da hoan thanh ban thiet ke de xuat.
 Schema va API can duoc nhom review, thong nhat
 truoc khi trien khai database va backend.
+
+### 7.6. Ghi nhan phan hoi thiet ke VT4-01
+
+Nguon phan hoi:
+VT4 - Lien ket du lieu diem voi thiet ke VT3-01.
+
+Noi dung da tiep thu:
+1. De xuat ScoreRecord tham chieu enrollment_id.
+2. De xuat ScoreRecord tham chieu subject_id.
+3. ScoreComponent lien ket voi ScoreRecord.
+4. Bao toan diem khi hoc sinh chuyen lop va chuyen nien khoa.
+5. Khong xoa, ghi de hoac tu dong di chuyen diem lich su.
+6. Bo sung cac quy tac can VT1, VT4 va VT5 xac nhan.
+
+Noi dung cho thong nhat:
+- Quy tac su dung diem lop cu tai lop moi.
+- Cach tinh diem tong ket khi hoc sinh chuyen lop.
+- Rang buoc UNIQUE cua ScoreRecord.
+- Anh huong cua chuyen lop den trang thai khoa diem.
+- Quy tac xu ly AuditLog va transaction.
+
+Ket luan:
+VT3 da tiep thu phan hoi so bo cua VT4.
+Da bo sung phuong an lien ket du lieu diem vao tai lieu.
+Schema chinh thuc can duoc VT1, VT4 va VT5 xac nhan.
+
+Trang thai: Da cap nhat theo phan hoi VT4 - Cho thong nhat schema.
