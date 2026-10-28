@@ -144,7 +144,9 @@ Rang buoc de xuat:
 - score_value co the la NULL neu chua nhap diem.
 - Diem 0 la gia tri hop le va khac NULL.
 - De xuat mien diem tu 0 den 10.
-- So chu so thap phan va kieu NUMERIC cu the can nhom xac nhan.
+- QT1, QT2, QT3 chi chap nhan diem nguyen; neu nhap so co phan thap phan thi bao loi, khong tu dong lam tron.
+- Rang buoc de xuat cho cot QT: `CHECK (component_type NOT IN ('QT1', 'QT2', 'QT3') OR score_value IS NULL OR score_value = TRUNC(score_value))`.
+- So chu so thap phan duoc phep nhap cho GK va CK, va kieu NUMERIC cu the, van can duoc thong nhat.
 - Khong duoc tu dong chuyen NULL thanh 0.
 
 Vi du:
@@ -160,7 +162,7 @@ Vi du:
 Luu y:
 
 - Cac gia tri 8 va 7.5 chi la du lieu minh hoa.
-- Khong tu y ap dung quy tac lam tron khi chua duoc phe duyet.
+- Quy tac DTK lam tron 2 chu so sau dau phay da duoc nhom thong nhat; khong tu dong lam tron diem QT khi nhap.
 - Truong hop vang kiem tra, mien kiem tra hoac trang thai dac biet can thiet ke theo quy tac rieng sau khi nhom xac nhan.
 - Khong tu y quy doi cac trang thai dac biet thanh diem so.
 
@@ -184,7 +186,7 @@ BR-S02: Moi ScoreRecord co toi da 5 thanh phan diem: QT1, QT2, QT3, GK, CK.
 
 BR-S03: Moi loai thanh phan diem chi duoc xuat hien mot lan trong cung ScoreRecord.
 
-BR-S04: Gia tri diem phai dap ung mien gia tri va quy tac so chu so thap phan duoc nhom thong nhat. De xuat mien diem tu 0 den 10; can xac nhan truoc khi chot schema.
+BR-S04: QT1, QT2, QT3 chi duoc nhap diem nguyen, khong tu dong lam tron gia tri thap phan. GK va CK su dung he so lan luot 2 va 3; so chu so thap phan duoc phep nhap cho GK, CK chua chot. De xuat mien diem tu 0 den 10, can xac nhan truoc khi chot schema.
 
 BR-S05: Diem 0 la gia tri hop le. Gia tri NULL bieu thi diem chua duoc nhap.
 
@@ -212,9 +214,9 @@ BR-S14: Diem tong ket chi duoc tinh khi co day du cac thanh phan diem bat buoc v
 
 BR-S15: Neu con thieu diem, he thong khong tinh diem tong ket va phai thong bao du lieu chua day du.
 
-BR-S16: Cong thuc, he so va quy tac lam tron phai duoc nhom thong nhat va giang vien phe duyet.
+BR-S16: Nhom da thong nhat cong thuc DTK = (QT1 + QT2 + QT3 + 2 * GK + 3 * CK) / 8, trong do QT1, QT2, QT3 he so 1, GK he so 2, CK he so 3. DTK duoc lam tron 2 chu so sau dau phay. Ghi nhan trang thai phe duyet cua giang vien neu chua co xac nhan.
 
-BR-S17: Khi cong thuc chua duoc phe duyet, he thong khong duoc tu dong ap dung cong thuc khac.
+BR-S17: Khong tu y ap dung cong thuc, he so hoac quy tac lam tron khac voi quy tac da duoc nhom thong nhat; khi co thay doi duoc phe duyet phai cap nhat tai lieu va he thong.
 
 BR-S18: Khi diem thanh phan duoc chinh sua hop le, diem tong ket phai duoc xac dinh lai dua tren du lieu moi nhat.
 
@@ -271,13 +273,41 @@ BR-S35: Chi duoc ghi nhan du lieu hop le sau khi nguoi dung xac nhan theo quy tr
 - Khi diem thanh phan thay doi hop le, ket qua tong ket phai phan anh du lieu moi nhat.
 - He thong phai hien thi ro cong thuc va cac gia tri duoc su dung de tinh.
 
-### 5.2. Cong thuc
+### 5.2. Cong thuc tinh diem tong ket
 
-Trang thai: CHUA DUOC PHE DUYET.
+Quy tac tinh diem duoc cap nhat:
 
-Cong thuc tinh diem tong ket, he so, quy tac lam tron va cach xu ly trang thai dac biet chua duoc xac dinh cu the trong bao cao khao sat.
+- QT1: He so 1, chi chap nhan so nguyen.
+- QT2: He so 1, chi chap nhan so nguyen.
+- QT3: He so 1, chi chap nhan so nguyen.
+- GK: He so 2.
+- CK: He so 3.
 
-Khong tu y ap dung cong thuc khi chua duoc nhom va giang vien xac nhan.
+Tong he so: 1 + 1 + 1 + 2 + 3 = 8.
+
+Cong thuc:
+
+DTK = (QT1 + QT2 + QT3 + 2 * GK + 3 * CK) / 8
+
+Quy tac lam tron:
+- Diem tong ket duoc lam tron 2 chu so sau dau phay.
+- Cac diem QT1, QT2, QT3 phai la so nguyen.
+- Khong tu dong lam tron diem QT co phan thap phan khi nhap.
+- Diem 0 la gia tri hop le.
+- Neu thieu bat ky diem bat buoc nao thi khong tinh DTK.
+
+Vi du:
+
+QT1 = 8
+QT2 = 9
+QT3 = 10
+GK = 7.5
+CK = 8
+
+DTK = (8 + 9 + 10 + 2 * 7.5 + 3 * 8) / 8
+DTK = 8.25
+
+Trang thai: DA THONG NHAT TRONG NHOM.
 
 ### 5.3. Xu ly du lieu thieu
 
@@ -293,7 +323,7 @@ Neu mot hoac nhieu thanh phan diem bat buoc chua co du lieu:
 
 Tai lieu thiet ke can ghi nhan:
 
-- Cong thuc duoc de xuat.
+- Cong thuc da duoc nhom thong nhat (muc 5.2).
 - He so cua tung thanh phan.
 - Quy tac lam tron.
 - Cach xu ly diem dac biet.
@@ -495,12 +525,19 @@ Cau truc JSON bao loi tuan thu docs/api-conventions.md.
 
 ### 7.2. Quy tac diem
 
-1. Xac nhan mien gia tri diem.
-2. Xac nhan so chu so thap phan.
-3. Xac nhan cach xu ly diem vang, mien hoac trang thai dac biet.
-4. Xac nhan cong thuc tinh tong ket.
-5. Xac nhan he so va quy tac lam tron.
-6. Xac nhan trang thai phe duyet cong thuc.
+Da thong nhat trong nhom:
+
+- QT1, QT2, QT3 he so 1, chi nhan diem nguyen.
+- GK he so 2; CK he so 3.
+- DTK = (QT1 + QT2 + QT3 + 2 * GK + 3 * CK) / 8.
+- Lam tron DTK 2 chu so sau dau phay; khong tinh khi thieu diem bat buoc.
+
+Noi dung con can xac nhan:
+
+1. Mien gia tri diem chinh thuc (hien de xuat 0 den 10).
+2. So chu so thap phan duoc phep nhap cho GK va CK.
+3. Xu ly vang, mien hoac trang thai dac biet.
+4. Trang thai phe duyet cua giang vien, nguoi va thoi diem phe duyet neu co.
 
 ### 7.3. Lich su hoc tap
 
@@ -589,6 +626,7 @@ VT5:
 VT4-01 cung cap ban thiet ke de xuat cho module quan ly diem cua he thong.
 
 Thiet ke tuan thu cac yeu cau nghiep vu trong bao cao khao sat va quy uoc ky thuat cua nhom.
+
 ## 10. Bo sung dong bo voi VT3-01
 
 ### 10.1. Noi dung da doi chieu
@@ -618,29 +656,27 @@ Thong nhat ve mat dinh huong thiet ke:
 | Noi dung | Phuong an hien tai | Trang thai |
 |---|---|---|
 | Mien diem | De xuat 0 den 10 | CHO XAC NHAN |
-| So chu so thap phan | Chua chot | CHO XAC NHAN |
-| Cong thuc tong ket | Chua co cong thuc duoc duyet | CHO PHE DUYET |
-| He so tung cot | Chua chot | CHO PHE DUYET |
-| Quy tac lam tron | Chua chot | CHO PHE DUYET |
+| QT1, QT2, QT3 | Chi nhan diem nguyen | DA THONG NHAT TRONG NHOM |
+| So chu so thap phan GK, CK | Chua chot | CHO XAC NHAN |
+| Cong thuc tong ket | (QT1 + QT2 + QT3 + 2 * GK + 3 * CK) / 8 | DA THONG NHAT TRONG NHOM |
+| He so tung cot | QT1, QT2, QT3: 1; GK: 2; CK: 3 | DA THONG NHAT TRONG NHOM |
+| Quy tac lam tron | DTK lam tron 2 chu so sau dau phay | DA THONG NHAT TRONG NHOM |
 | Xu ly thieu diem | Khong tinh khi thieu diem bat buoc | DA MO TA |
 | Xu ly vang, mien | Chua chot | CHO XAC NHAN |
 | Diem khi chuyen lop | Bao toan lich su, chua chot cach su dung lai | CHO XAC NHAN |
 | Trang thai khoa diem | Tich hop voi VT5 | CHO XAC NHAN |
+| Phe duyet cua GV | Chua co thong tin xac nhan trong tai lieu | CAN GHI NHAN KHI CO |
 
-Khi co quyet dinh chinh thuc, can cap nhat cong thuc, he so, quy tac lam tron, nguoi phe duyet va thoi diem phe duyet.
+Khong yeu cau nhom xac nhan lai cong thuc, he so va quy tac lam tron da thong nhat. Khi co xac nhan cua GV, cap nhat nguoi phe duyet va thoi diem phe duyet neu co.
 
 ### 10.4. Ket luan ban giao
 
-Da hoan thanh ban thiet ke de xuat VT4-01 va bo sung doi chieu voi thiet ke VT3-01.
+Da hoan thanh ban thiet ke de xuat VT4-01 va doi chieu voi VT3-01.
 
-Tai lieu da co schema diem, API Contract, Business Rules va danh sach cac quy tac chua duoc phe duyet.
+Tai lieu da co schema diem, API Contract, Business Rules va cong thuc tinh diem da thong nhat trong nhom: QT1, QT2, QT3 he so 1 va chi nhan so nguyen; GK he so 2; CK he so 3; DTK lam tron 2 chu so sau dau phay.
 
-Trang thai: HOAN THANH BAN THIET KE DE XUAT - CHO VT1 REVIEW VA NHOM XAC NHAN.
+Cac noi dung chua chot (mien diem chinh thuc, so thap phan GK/CK, xu ly vang/mien, diem khi chuyen lop, tich hop khoa diem va schema thuc te) duoc ghi ro de thanh vien phu trach xac nhan.
 
-Chua xem cac quy tac dang cho phe duyet la schema hoac cong thuc chinh thuc.
+Trang thai: HOAN THANH BAN THIET KE DE XUAT VT4-01 - DA BAN GIAO; CHO VT1 REVIEW VA MERGE PR.
 
-Cac quy tac chua duoc phe duyet duoc ghi ro va khong mac dinh la quy tac chinh thuc.
-
-Trang thai: BAN THIET KE DE XUAT - CHO NHOM REVIEW.
-
-Chi chot database va trien khai API thuc te sau khi cac phan phu thuoc duoc thong nhat.
+Chua xem nhung quy tac chua duoc thong nhat hoac chua duoc GV phe duyet (neu bat buoc) la chinh thuc. Chi chot database va trien khai API thuc te sau khi cac phan phu thuoc duoc thong nhat.
