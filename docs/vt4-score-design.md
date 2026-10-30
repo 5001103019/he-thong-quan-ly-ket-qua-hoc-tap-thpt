@@ -1,4 +1,4 @@
-# VT4-01 - THIET KE DU LIEU DIEM VA API CONTRACT
+# THIET KE DU LIEU DIEM VA API CONTRACT
 
 ## 1. Muc tieu
 
@@ -18,7 +18,7 @@ Thiet ke phai bao dam:
 - Ho tro xem, nhap va chinh sua diem.
 - Phan biet diem 0 voi diem chua nhap.
 - Ho tro tinh diem tong ket theo cong thuc duoc phe duyet.
-- Tich hop kiem tra trang thai khoa diem cua VT5.
+- Tich hop kiem tra trang thai khoa diem qua module LockStatus.
 - Ghi nhan lich su thay doi diem theo yeu cau nghiep vu.
 - Bao toan ket qua hoc tap khi hoc sinh chuyen lop, nghi hoc hoac chuyen truong.
 - Ho tro nhap du lieu diem tu CSV va phat hien du lieu khong hop le.
@@ -48,9 +48,8 @@ Tai lieu tuan thu quy chuan cua nhom tai docs/api-conventions.md.
 - UC13: Hoc sinh xem ket qua hoc tap cua chinh minh.
 - docs/vt3-data-model.md.
 - docs/api-conventions.md.
-- Bang phan cong cong viec VT4-01.
-
-Trang thai: Ban thiet ke de xuat, cho VT1 va cac thanh vien lien quan review, xac nhan.
+- Bang phan cong cong viec cua nhom.
+Trang thai: Ban thiet ke de xuat, duoc quan ly va cap nhat tren Pull Request #3.
 
 ## 2. Cac thuc the
 
@@ -58,10 +57,12 @@ Trang thai: Ban thiet ke de xuat, cho VT1 va cac thanh vien lien quan review, xa
 
 1. ScoreRecord - Ban ghi diem theo lan phan lop va mon hoc.
 2. ScoreComponent - Thanh phan diem QT1, QT2, QT3, GK, CK.
+Bang cau hinh bo sung:
 
+- ScoreFormulaPolicy: Luu cong thuc, he so, quy tac lam tron, phien ban va thong tin phe duyet.
 ### 2.2. Cac thuc the lien quan
 
-Su dung cac thuc the do VT3-01 thiet ke:
+Su dung cac thuc the thuoc module quan ly hoc sinh, lop va mon hoc:
 
 - AcademicYear: Nien khoa.
 - Grade: Khoi lop.
@@ -70,12 +71,12 @@ Su dung cac thuc the do VT3-01 thiet ke:
 - Enrollment: Lich su phan lop.
 - Subject: Mon hoc.
 
-Su dung cac thuc the do VT5 thiet ke:
+Su dung cac thuc the thuoc module khoa diem va nhat ky thao tac:
 
 - LockStatus: Trang thai khoa diem.
 - AuditLog: Lich su thao tac.
 
-Khong tu y thay doi schema cua VT3 va VT5.
+Khong tu y thay doi schema cua cac module lien quan.
 
 ### 2.3. Quan he du lieu de xuat
 
@@ -92,8 +93,7 @@ Enrollment -> ScoreRecord -> ScoreComponent
 
 Subject -> ScoreRecord
 
-Viec lien ket khoa diem va AuditLog se duoc thong nhat voi VT5.
-
+Viec lien ket khoa diem va AuditLog tuan theo thiet ke cua cac module lien quan.
 ## 3. Thiet ke thuoc tinh va rang buoc
 
 ### 3.1. ScoreRecord
@@ -134,7 +134,7 @@ Muc dich: Luu gia tri tung thanh phan diem cua ScoreRecord.
 | score_record_id | BIGINT | NOT NULL, FOREIGN KEY | Tham chieu ScoreRecord |
 | component_type | VARCHAR(10) | NOT NULL | QT1, QT2, QT3, GK, CK |
 | score_value | NUMERIC | Cho phep NULL | Gia tri diem |
-
+| score_status | VARCHAR(15) | NOT NULL, DEFAULT 'NOT_ENTERED' | Trang thai diem: NOT_ENTERED, SCORED, ABSENT, EXEMPT |
 Rang buoc de xuat:
 
 - score_component_id la khoa chinh.
@@ -143,12 +143,15 @@ Rang buoc de xuat:
 - component_type IN ('QT1', 'QT2', 'QT3', 'GK', 'CK').
 - score_value co the la NULL neu chua nhap diem.
 - Diem 0 la gia tri hop le va khac NULL.
-- De xuat mien diem tu 0 den 10.
+- Mien diem hop le tu 0 den 10, bao gom ca 0 va 10.
 - QT1, QT2, QT3 chi chap nhan diem nguyen; neu nhap so co phan thap phan thi bao loi, khong tu dong lam tron.
 - Rang buoc de xuat cho cot QT: `CHECK (component_type NOT IN ('QT1', 'QT2', 'QT3') OR score_value IS NULL OR score_value = TRUNC(score_value))`.
-- So chu so thap phan duoc phep nhap cho GK va CK, va kieu NUMERIC cu the, van can duoc thong nhat.
+- GK va CK chi chap nhan diem tu 0 den 10 theo buoc 0.25. Du lieu khong hop le phai bi tu choi, khong tu dong lam tron.
 - Khong duoc tu dong chuyen NULL thanh 0.
-
+- Rang buoc trang thai: `CHECK (score_status IN ('NOT_ENTERED', 'SCORED', 'ABSENT', 'EXEMPT'))`.
+- Rang buoc gia tri va trang thai: `CHECK ((score_status = 'SCORED' AND score_value IS NOT NULL) OR (score_status IN ('NOT_ENTERED', 'ABSENT', 'EXEMPT') AND score_value IS NULL))`.
+- Rang buoc mien diem: `CHECK (score_value IS NULL OR score_value BETWEEN 0 AND 10)`.
+- Rang buoc GK/CK: `CHECK (component_type NOT IN ('GK', 'CK') OR score_value IS NULL OR MOD(score_value * 4, 1) = 0)`.
 Vi du:
 
 | Thanh phan | Gia tri | Y nghia |
@@ -156,15 +159,15 @@ Vi du:
 | QT1 | 0 | Da nhap diem, gia tri bang 0 |
 | QT2 | 8 | Da nhap diem, gia tri bang 8 |
 | QT3 | NULL | Chua nhap diem |
-| GK | 7.5 | Diem minh hoa, phu thuoc quy tac thap phan duoc duyet |
+| GK | 7.5 |  Diem hop le theo buoc 0.25 |
 | CK | NULL | Chua nhap diem |
 
 Luu y:
 
 - Cac gia tri 8 va 7.5 chi la du lieu minh hoa.
 - Quy tac DTK lam tron 2 chu so sau dau phay da duoc nhom thong nhat; khong tu dong lam tron diem QT khi nhap.
-- Truong hop vang kiem tra, mien kiem tra hoac trang thai dac biet can thiet ke theo quy tac rieng sau khi nhom xac nhan.
-- Khong tu y quy doi cac trang thai dac biet thanh diem so.
+- NOT_ENTERED, ABSENT va EXEMPT co score_value = NULL; SCORED co score_value hop le tu 0 den 10.
+- Khong quy doi ABSENT hoac EXEMPT thanh diem 0. Khong tinh DTK khi co thanh phan ABSENT hoac EXEMPT.
 
 ### 3.3. Quy tac toan ven du lieu
 
@@ -186,9 +189,9 @@ BR-S02: Moi ScoreRecord co toi da 5 thanh phan diem: QT1, QT2, QT3, GK, CK.
 
 BR-S03: Moi loai thanh phan diem chi duoc xuat hien mot lan trong cung ScoreRecord.
 
-BR-S04: QT1, QT2, QT3 chi duoc nhap diem nguyen, khong tu dong lam tron gia tri thap phan. GK va CK su dung he so lan luot 2 va 3; so chu so thap phan duoc phep nhap cho GK, CK chua chot. De xuat mien diem tu 0 den 10, can xac nhan truoc khi chot schema.
+BR-S04: Tat ca thanh phan diem nhan gia tri tu 0 den 10. QT1, QT2, QT3 co he so 1 va chi nhan so nguyen; GK co he so 2, CK co he so 3, nhan diem theo buoc 0.25. Du lieu nhap khong hop le phai bi tu choi, khong tu dong lam tron.
 
-BR-S05: Diem 0 la gia tri hop le. Gia tri NULL bieu thi diem chua duoc nhap.
+BR-S05: Diem 0 la gia tri hop le va khac NULL. Gia tri NULL duoc phan biet thanh chua nhap, vang hoac mien dua tren score_status.
 
 BR-S06: Khong duoc tu dong thay the diem chua nhap bang diem 0.
 
@@ -196,7 +199,7 @@ BR-S06: Khong duoc tu dong thay the diem chua nhap bang diem 0.
 
 BR-S07: Chi tai khoan co role KHAO_THI moi duoc nhap va chinh sua diem.
 
-BR-S08: He thong phai kiem tra du lieu hop le truoc khi luu.
+BR-S08: Backend phai kiem tra mien diem, kieu du lieu, buoc diem, score_status va tinh nhat quan voi score_value truoc khi luu.
 
 BR-S09: Khi chinh sua diem da co, phai cung cap ly do chinh sua.
 
@@ -210,11 +213,11 @@ BR-S13: Viec cap nhat diem va ghi nhat ky bat buoc phai dam bao tinh nhat quan. 
 
 ### 4.3. Quy tac tinh diem tong ket
 
-BR-S14: Diem tong ket chi duoc tinh khi co day du cac thanh phan diem bat buoc va du lieu hop le.
+BR-S14: Diem tong ket chi duoc tinh khi ca 5 thanh phan diem deu co score_status = SCORED va gia tri diem hop le. Neu thieu diem hoac co trang thai ABSENT, EXEMPT thi khong tinh DTK.
 
 BR-S15: Neu con thieu diem, he thong khong tinh diem tong ket va phai thong bao du lieu chua day du.
 
-BR-S16: Nhom da thong nhat cong thuc DTK = (QT1 + QT2 + QT3 + 2 * GK + 3 * CK) / 8, trong do QT1, QT2, QT3 he so 1, GK he so 2, CK he so 3. DTK duoc lam tron 2 chu so sau dau phay. Ghi nhan trang thai phe duyet cua giang vien neu chua co xac nhan.
+BR-S16: Cong thuc DTK = (QT1 + QT2 + QT3 + 2 * GK + 3 * CK) / 8. QT1, QT2, QT3 he so 1; GK he so 2; CK he so 3. DTK lam tron 2 chu so sau dau phay. Thong tin phe duyet cong thuc duoc luu tap trung trong ScoreFormulaPolicy, khong luu lap lai trong ScoreComponent.
 
 BR-S17: Khong tu y ap dung cong thuc, he so hoac quy tac lam tron khac voi quy tac da duoc nhom thong nhat; khi co thay doi duoc phe duyet phai cap nhat tai lieu va he thong.
 
@@ -248,7 +251,7 @@ BR-S28: Khong duoc chinh sua diem thuoc cot dang khoa neu chua thuc hien quy tri
 
 BR-S29: Sau khi mo khoa, chinh sua va kiem tra hoan tat, cot diem phai duoc khoa lai theo quy trinh cua nhom.
 
-BR-S30: Co che khoa diem va ghi nhat ky can duoc phoi hop voi VT5. Khong tu y trien khai tu dong khoa theo thoi han neu chua co xac nhan thay doi pham vi.
+BR-S30: Co che khoa diem va ghi nhat ky tuan theo thiet ke cua module LockStatus va AuditLog. Khong tu dong khoa diem theo thoi han neu chuc nang nay khong thuoc pham vi SRS.
 
 ### 4.7. Quy tac import CSV
 
@@ -280,8 +283,8 @@ Quy tac tinh diem duoc cap nhat:
 - QT1: He so 1, chi chap nhan so nguyen.
 - QT2: He so 1, chi chap nhan so nguyen.
 - QT3: He so 1, chi chap nhan so nguyen.
-- GK: He so 2.
-- CK: He so 3.
+- GK: He so 2, diem tu 0 den 10 theo buoc 0.25.
+- CK: He so 3, diem tu 0 den 10 theo buoc 0.25.
 
 Tong he so: 1 + 1 + 1 + 2 + 3 = 8.
 
@@ -307,7 +310,7 @@ CK = 8
 DTK = (8 + 9 + 10 + 2 * 7.5 + 3 * 8) / 8
 DTK = 8.25
 
-Trang thai: DA THONG NHAT TRONG NHOM.
+Trang thai: Cong thuc tinh DTK, he so cua tung thanh phan va quy tac lam tron 2 chu so sau dau phay da duoc nhom thong nhat.
 
 ### 5.3. Xu ly du lieu thieu
 
@@ -321,17 +324,39 @@ Neu mot hoac nhieu thanh phan diem bat buoc chua co du lieu:
 
 ### 5.4. Trang thai phe duyet cong thuc
 
-Tai lieu thiet ke can ghi nhan:
+Thong tin cong thuc va phe duyet duoc luu tap trung trong bang cau hinh `ScoreFormulaPolicy`, khong luu lap lai trong `ScoreComponent`.
 
-- Cong thuc da duoc nhom thong nhat (muc 5.2).
-- He so cua tung thanh phan.
-- Quy tac lam tron.
-- Cach xu ly diem dac biet.
-- Nguoi hoac ben xac nhan.
-- Trang thai duyet.
-- Thoi diem duyet.
+| Thuoc tinh | Kieu PostgreSQL | Rang buoc | Mo ta |
+|---|---|---|---|
+| formula_policy_id | BIGSERIAL | PRIMARY KEY | Ma chinh sach tinh diem |
+| formula_expression | TEXT | NOT NULL | Cong thuc tinh DTK |
+| weight_qt1 | SMALLINT | NOT NULL, DEFAULT 1 | He so QT1 |
+| weight_qt2 | SMALLINT | NOT NULL, DEFAULT 1 | He so QT2 |
+| weight_qt3 | SMALLINT | NOT NULL, DEFAULT 1 | He so QT3 |
+| weight_gk | SMALLINT | NOT NULL, DEFAULT 2 | He so GK |
+| weight_ck | SMALLINT | NOT NULL, DEFAULT 3 | He so CK |
+| rounding_digits | SMALLINT | NOT NULL, DEFAULT 2 | So chu so lam tron |
+| version | INTEGER | NOT NULL, UNIQUE, CHECK (version >= 1) | Phien ban cong thuc |
+| approval_status | VARCHAR(10) | NOT NULL, DEFAULT 'PENDING' | Trang thai phe duyet |
+| approved_by | VARCHAR(150) | Cho phep NULL | Thong tin nguoi phe duyet |
+| approved_at | TIMESTAMPTZ | Cho phep NULL | Thoi diem phe duyet |
 
-Hinh thuc luu cac thong tin nay trong database hoac tai lieu cau hinh can duoc VT1 xac nhan.
+Rang buoc bo sung:
+
+- `CHECK (approval_status IN ('PENDING', 'APPROVED', 'REJECTED'))`.
+- `CHECK ((approval_status = 'APPROVED' AND approved_by IS NOT NULL AND approved_at IS NOT NULL) OR (approval_status IN ('PENDING', 'REJECTED') AND approved_by IS NULL AND approved_at IS NULL))`.
+- He so QT1, QT2, QT3 bang 1; GK bang 2; CK bang 3; rounding_digits bang 2 theo cong thuc hien tai.
+Quy tac:
+
+- `PENDING`: Chua co thong tin phe duyet.
+- `APPROVED`: Da duoc phe duyet.
+- `REJECTED`: Khong duoc phe duyet.
+- `approval_status` chi nhan PENDING, APPROVED hoac REJECTED.
+- Khi APPROVED, approved_by va approved_at bat buoc co gia tri.
+- Khi PENDING hoac REJECTED, approved_by va approved_at de NULL theo thiet ke nay.
+- Chi ghi nhan APPROVED khi co thong tin phe duyet thuc te.
+- Moi phien ban cong thuc duoc luu rieng de bao toan lich su thay doi.
+- Khong xay dung chuc nang hoac API phe duyet rieng trong pham vi cong viec nay.
 
 ## 6. Hop dong API (API Contract)
 
@@ -349,10 +374,10 @@ Quy uoc:
 - Endpoint su dung chu thuong va kebab-case.
 - JSON su dung camelCase.
 - Cac API quan ly diem yeu cau role KHAO_THI.
-- Hoc sinh xem diem ca nhan qua API /me/scores do VT1 phu trach xac thuc.
+- Hoc sinh xem diem ca nhan qua API /me/scores; viec xac thuc va phan quyen do module xac thuc xu ly.
 - Backend phai kiem tra quyen va trang thai khoa truoc khi ghi diem.
 
-Cac endpoint duoi day la de xuat, can VT1, VT2 va VT5 xac nhan truoc khi lap trinh.
+Cac endpoint duoi day mo ta API Contract cua module quan ly diem va cac yeu cau tich hop lien quan.
 
 ### 6.2. Danh sach API de xuat
 
@@ -383,9 +408,9 @@ Chuc nang:
 - Tra ve QT1, QT2, QT3, GK, CK.
 - Tra ve diem 0 dung gia tri.
 - Tra ve NULL neu chua nhap diem.
-- Hien thi trang thai khoa cua tung cot diem khi da tich hop VT5.
+- Tra ve trang thai khoa cua tung cot diem thong qua module LockStatus.
 - Hien thi canh bao neu con thieu diem.
-
+- Tra ve scoreStatus cua tung thanh phan diem de phan biet trang thai chua nhap, vang va mien.
 Quyen truy cap:
 
 KHAO_THI.
@@ -408,8 +433,9 @@ Moi components gom:
 
 - componentType.
 - scoreValue.
+- scoreStatus.
 
-Cau truc JSON chi tiet can duoc VT1 va VT2 xac nhan.
+Cau truc JSON tuan thu quy uoc trong docs/api-conventions.md.
 
 ### 6.5. API nhap va chinh sua diem
 
@@ -420,6 +446,7 @@ PATCH /score-records/:id/components/:type
 Du lieu gui len du kien:
 
 - scoreValue: Gia tri diem.
+- scoreStatus: NOT_ENTERED, SCORED, ABSENT hoac EXEMPT; phai phu hop voi scoreValue.
 - expectedVersion: Phien ban du lieu ma nguoi dung da doc.
 - reason: Ly do chinh sua diem da co, khi bat buoc.
 
@@ -429,9 +456,9 @@ Xu ly:
 2. Kiem tra role KHAO_THI.
 3. Kiem tra ScoreRecord ton tai.
 4. Kiem tra thanh phan diem hop le.
-5. Kiem tra gia tri diem.
+5. Kiem tra scoreValue, scoreStatus va cac rang buoc mien diem, so nguyen, buoc 0.25 va 0/NULL.
 6. Kiem tra ly do neu sua diem da co.
-7. Kiem tra trang thai khoa qua module VT5.
+7. Kiem tra trang thai khoa qua module LockStatus.
 8. Kiem tra xung dot du lieu.
 9. Luu diem va nhat ky bat buoc trong transaction.
 10. Cap nhat version neu thao tac thanh cong.
@@ -440,7 +467,7 @@ Xu ly:
 Luu y:
 
 - expectedVersion va cach cap nhat version la phuong an de xuat.
-- Can thong nhat voi VT1 va VT5 ve cach kiem tra khoa va ghi AuditLog.
+- Kiem tra trang thai khoa va ghi AuditLog theo hop dong tich hop cua cac module lien quan.
 - Khong duoc luu diem neu khong luu duoc nhat ky bat buoc.
 
 ### 6.6. API diem tong ket
@@ -492,12 +519,12 @@ Chuc nang:
 
 Luu y:
 
-- Dinh dang file, cach dinh danh lan preview va hinh thuc xac nhan can thong nhat voi parser CSV cua VT3.
+- Dinh dang file, cach dinh danh lan preview va hinh thuc xac nhan tuan theo quy uoc cua parser CSV dung chung.
 - API import diem phai su dung chung quy tac validation va khoa diem voi API nhap diem truc tiep.
 
 ### 6.8. Quy uoc ma loi
 
-Su dung ma loi chung do VT1 da quy dinh:
+Su dung ma loi chung theo docs/api-conventions.md:
 
 | HTTP | Error code | Y nghia |
 |---|---|---|
@@ -521,7 +548,7 @@ Cau truc JSON bao loi tuan thu docs/api-conventions.md.
 2. Xac nhan lien ket enrollment_id va subject_id.
 3. Xac nhan rang buoc UNIQUE va FOREIGN KEY.
 4. Xac nhan cach su dung truong version.
-5. Xac nhan cach lien ket voi LockStatus va AuditLog cua VT5.
+5. Xac dinh lien ket du lieu diem voi LockStatus va AuditLog.
 
 ### 7.2. Quy tac diem
 
@@ -532,12 +559,12 @@ Da thong nhat trong nhom:
 - DTK = (QT1 + QT2 + QT3 + 2 * GK + 3 * CK) / 8.
 - Lam tron DTK 2 chu so sau dau phay; khong tinh khi thieu diem bat buoc.
 
-Noi dung con can xac nhan:
+Noi dung da thiet ke:
 
-1. Mien gia tri diem chinh thuc (hien de xuat 0 den 10).
-2. So chu so thap phan duoc phep nhap cho GK va CK.
-3. Xu ly vang, mien hoac trang thai dac biet.
-4. Trang thai phe duyet cua giang vien, nguoi va thoi diem phe duyet neu co.
+1. Mien diem tu 0 den 10.
+2. QT1, QT2, QT3 nhan so nguyen; GK, CK theo buoc 0.25.
+3. Vang, mien duoc bieu dien qua score_status, khong quy doi thanh diem 0.
+4. Thong tin phe duyet cong thuc luu trong ScoreFormulaPolicy; khong tu dong gan trang thai APPROVED.
 
 ### 7.3. Lich su hoc tap
 
@@ -548,18 +575,17 @@ Noi dung con can xac nhan:
 
 ### 7.4. Tich hop API
 
-1. VT1 xac nhan endpoint va quy uoc JSON.
-2. VT1 xac nhan middleware KHAO_THI.
-3. VT2 xac nhan du lieu can hien thi tren giao dien.
-4. VT3 xac nhan lien ket Enrollment va Subject.
-5. VT5 xac nhan co che kiem tra khoa, mo khoa va AuditLog.
-6. Nhom xac nhan pham vi khoa diem truoc khi lap trinh.
+1. Endpoint va JSON tuan thu docs/api-conventions.md.
+2. API nhap va chinh sua diem yeu cau role KHAO_THI.
+3. Du lieu tra ve phuc vu hien thi 5 thanh phan diem va DTK.
+4. ScoreRecord lien ket dung Enrollment va Subject.
+5. API cap nhat diem phai kiem tra LockStatus va ghi AuditLog.
+6. Quy tac khoa diem va pham vi ap dung tuan theo module quan ly khoa diem.
 
-## 8. Noi dung ban giao VT4-01
+## 8. Noi dung ban giao thiet ke du lieu diem va API Contract
 
 ### 8.1. Thong tin cong viec
 
-- Ma cong viec: VT4-01.
 - Du an: He thong quan ly ket qua hoc tap hoc sinh THPT.
 - Ten tai lieu: vt4-score-design.md.
 - Duong dan: docs/vt4-score-design.md.
@@ -569,69 +595,44 @@ Noi dung con can xac nhan:
 
 1. Xac dinh hai thuc the ScoreRecord va ScoreComponent.
 2. De xuat thuoc tinh, kieu du lieu va rang buoc.
-3. Xac dinh quan he voi Enrollment va Subject cua VT3.
+3. Xac dinh quan he voi Enrollment va Subject trong mo hinh du lieu hoc sinh.
 4. Xay dung Business Rules quan ly diem.
 5. Xac dinh quy tac 0/NULL, validation va bao toan lich su.
 6. Mo ta nguyen tac tinh diem tong ket.
 7. Thiet ke API Contract de xuat.
-8. Xac dinh cac noi dung can VT1, VT2, VT3 va VT5 xac nhan.
+8. Xac dinh cac yeu cau tich hop voi mo hinh du lieu, giao dien, khoa diem va AuditLog.
 
-### 8.3. Noi dung ban giao cho cac thanh vien
+### 8.3. Noi dung ban giao ky thuat
 
-VT1:
-
-- Su dung schema ScoreRecord va ScoreComponent de tong hop ERD.
-- Review khoa chinh, khoa ngoai va rang buoc.
-- Xac nhan API Contract.
-- Xac nhan co che transaction va version.
-- Tong hop cac quy tac can phe duyet.
-
-VT2:
-
-- Su dung API Contract de thiet ke bang diem theo Figma.
-- Thiet ke giao dien hien thi 5 thanh phan diem.
-- Hien thi diem 0, diem chua nhap va canh bao.
-- Hien thi trang thai khoa va loi nhap diem.
-- Thiet ke giao dien diem tong ket va import CSV.
-
-VT3:
-
-- Xac nhan lien ket Enrollment va Subject.
-- Thong nhat xu ly diem khi hoc sinh chuyen lop.
-- Bao toan lich su hoc tap theo nien khoa.
-- Ban giao parser CSV cho cong viec VT4-05.
-
-VT5:
-
-- Xac nhan pham vi khoa diem theo nien khoa, lop, mon hoc va thanh phan.
-- Thong nhat co che kiem tra khoa truoc khi ghi diem.
-- Thong nhat transaction va AuditLog.
-- Kiem tra quy tac mo khoa, chinh sua va khoa lai.
-
-### 8.4. Tieu chi hoan thanh VT4-01
+- Schema ScoreRecord, ScoreComponent va ScoreFormulaPolicy.
+- Business Rules ve nhap diem, tinh DTK va phe duyet cong thuc.
+- API Contract quan ly diem va diem tong ket.
+- Quan he du lieu diem voi Enrollment va Subject.
+- Yeu cau tich hop LockStatus, AuditLog va kiem tra quyen.
+### 8.4. Tieu chi hoan thanh thiet ke
 
 - Da thiet ke ScoreRecord va ScoreComponent.
-- Da mo ta quan he voi du lieu VT3.
+- Da mo ta quan he voi mo hinh du lieu hoc sinh.
 - Da de xuat cac rang buoc PostgreSQL.
 - Da xay dung Business Rules.
 - Da mo ta quy tac tinh diem tong ket.
 - Da thiet ke API Contract de xuat.
-- Da ghi ro cac noi dung chua duoc phe duyet.
+- Da mo ta trang thai phe duyet cong thuc va cac rang buoc lien quan.
 - Tai lieu duoc dua len branch rieng.
-- Pull Request duoc tao de VT1 review.
+- Pull Request duoc tao de review va merge theo quy trinh Git.
 - Tai lieu duoc ban giao cho cac thanh vien lien quan.
 
 ## 9. Ket luan
 
-VT4-01 cung cap ban thiet ke de xuat cho module quan ly diem cua he thong.
+Tai lieu cung cap thiet ke du lieu diem, Business Rules va API Contract cho module quan ly diem cua he thong.
 
 Thiet ke tuan thu cac yeu cau nghiep vu trong bao cao khao sat va quy uoc ky thuat cua nhom.
 
-## 10. Bo sung dong bo voi VT3-01
+## 10. Dong bo voi mo hinh du lieu hoc sinh
 
 ### 10.1. Noi dung da doi chieu
 
-Da doi chieu voi ban cap nhat VT3-01, commit 35b10fa, bao gom cac Business Rules BR-59 den BR-67.
+Da doi chieu voi ban cap nhat mo hinh du lieu hoc sinh, commit 35b10fa, bao gom cac Business Rules BR-59 den BR-67.
 
 Thong nhat ve mat dinh huong thiet ke:
 
@@ -645,38 +646,34 @@ Thong nhat ve mat dinh huong thiet ke:
 
 ### 10.2. Noi dung can xac nhan truoc khi chot schema
 
-- VT1: Xac nhan khoa ngoai, UNIQUE, migration va co che version.
-- VT3 va VT4: Thong nhat cach su dung diem lop cu tai lop moi.
-- VT4 va VT1: Xac nhan cach tinh diem tong ket khi chuyen lop.
-- VT5: Xac nhan anh huong cua chuyen lop den khoa diem va AuditLog.
-- Nhom: Xac nhan co quan ly diem theo hoc ky hay khong. Neu co, can xem xet bo sung hoc ky vao pham vi dinh danh ScoreRecord.
-
+- Bao dam khoa ngoai, UNIQUE va version cua ScoreRecord.
+- Bao toan du lieu diem lich su khi chuyen lop.
+- Khong tu dong sao chep diem sang Enrollment moi.
+- Tich hop kiem tra khoa diem va ghi AuditLog.
+- HK1/HK2 la pham vi bo sung trong SRS, khong phai yeu cau MUST cua de goc. Neu trien khai, ScoreRecord, API va LockStatus phai thong nhat theo hoc ky.
 ### 10.3. Theo doi phe duyet quy tac diem
 
-| Noi dung | Phuong an hien tai | Trang thai |
+| Noi dung | Phuong an thiet ke | Trang thai |
 |---|---|---|
-| Mien diem | De xuat 0 den 10 | CHO XAC NHAN |
-| QT1, QT2, QT3 | Chi nhan diem nguyen | DA THONG NHAT TRONG NHOM |
-| So chu so thap phan GK, CK | Chua chot | CHO XAC NHAN |
-| Cong thuc tong ket | (QT1 + QT2 + QT3 + 2 * GK + 3 * CK) / 8 | DA THONG NHAT TRONG NHOM |
-| He so tung cot | QT1, QT2, QT3: 1; GK: 2; CK: 3 | DA THONG NHAT TRONG NHOM |
-| Quy tac lam tron | DTK lam tron 2 chu so sau dau phay | DA THONG NHAT TRONG NHOM |
-| Xu ly thieu diem | Khong tinh khi thieu diem bat buoc | DA MO TA |
-| Xu ly vang, mien | Chua chot | CHO XAC NHAN |
-| Diem khi chuyen lop | Bao toan lich su, chua chot cach su dung lai | CHO XAC NHAN |
-| Trang thai khoa diem | Tich hop voi VT5 | CHO XAC NHAN |
-| Phe duyet cua GV | Chua co thong tin xac nhan trong tai lieu | CAN GHI NHAN KHI CO |
+| Mien diem | Tu 0 den 10 | DA QUY DINH |
+| QT1, QT2, QT3 | So nguyen, he so 1 | DA THONG NHAT |
+| GK, CK | Buoc 0.25, he so 2 va 3 | DA QUY DINH |
+| Cong thuc DTK | (QT1 + QT2 + QT3 + 2 * GK + 3 * CK) / 8 | DA THONG NHAT |
+| Lam tron DTK | 2 chu so thap phan | DA THONG NHAT |
+| Thieu diem | Khong tinh DTK | DA QUY DINH |
+| Vang, mien | Quan ly qua score_status, khong quy doi thanh 0 | DA THIET KE |
+| Chuyen lop | Bao toan lich su, khong tu dong sao chep diem | DA MO TA |
+| Khoa diem | Tich hop LockStatus | YEU CAU TICH HOP |
+| Phe duyet cong thuc | Luu trong ScoreFormulaPolicy | DA THIET KE |
+| HK1/HK2 | Pham vi bo sung trong SRS | KHONG PHAI MUST |
 
-Khong yeu cau nhom xac nhan lai cong thuc, he so va quy tac lam tron da thong nhat. Khi co xac nhan cua GV, cap nhat nguoi phe duyet va thoi diem phe duyet neu co.
 
 ### 10.4. Ket luan ban giao
 
-Da hoan thanh ban thiet ke de xuat VT4-01 va doi chieu voi VT3-01.
+Tai lieu da mo ta schema diem, Business Rules, API Contract, cong thuc DTK va rang buoc du lieu.
 
-Tai lieu da co schema diem, API Contract, Business Rules va cong thuc tinh diem da thong nhat trong nhom: QT1, QT2, QT3 he so 1 va chi nhan so nguyen; GK he so 2; CK he so 3; DTK lam tron 2 chu so sau dau phay.
+Thong tin phe duyet cong thuc duoc thiet ke luu tap trung trong ScoreFormulaPolicy. Khong mac dinh cong thuc da duoc giang vien phe duyet khi chua co du lieu xac nhan thuc te.
 
-Cac noi dung chua chot (mien diem chinh thuc, so thap phan GK/CK, xu ly vang/mien, diem khi chuyen lop, tich hop khoa diem va schema thuc te) duoc ghi ro de thanh vien phu trach xac nhan.
+Cac yeu cau tich hop voi mo hinh du lieu hoc sinh, khoa diem va AuditLog duoc mo ta o muc lien quan.
 
-Trang thai: HOAN THANH BAN THIET KE DE XUAT VT4-01 - DA BAN GIAO; CHO VT1 REVIEW VA MERGE PR.
-
-Chua xem nhung quy tac chua duoc thong nhat hoac chua duoc GV phe duyet (neu bat buoc) la chinh thuc. Chi chot database va trien khai API thuc te sau khi cac phan phu thuoc duoc thong nhat.
+Trang thai: Tai lieu thiet ke du lieu diem va API Contract duoc cap nhat tren Pull Request #3.
