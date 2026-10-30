@@ -1,10 +1,10 @@
-# THIET KE KHOA DIEM VA AUDIT LOG (VT5-01)
+# THIET KE KHOA DIEM, MO KHOA VA AUDIT LOG
 
 ## 1. Muc tieu
 
 ### 1.1. Muc tieu thiet ke
 
-Thiet ke co che khoa diem va nhat ky kiem toan (Audit Log) cho he thong quan ly ket qua hoc tap THPT:
+Thiet ke co che khoa diem va Audit Log cho he thong quan ly ket qua hoc tap THPT:
 
 - Khoa va mo khoa doc lap theo tung thanh phan diem: QT1, QT2, QT3, GK, CK.
 - Khoa theo tung nien khoa, lop va mon hoc.
@@ -12,13 +12,13 @@ Thiet ke co che khoa diem va nhat ky kiem toan (Audit Log) cho he thong quan ly 
 - Chan backend tuyet doi khong cho them, sua, xoa diem khi cot diem dang o trang thai khoa (LOCKED).
 - Mo khoa bat buoc nhap nguoi yeu cau (requested_by) va ly do giai trinh (unlock_reason).
 - Sau khi sua diem xong thi can bo khao thi phai thuc hien khoa lai (RELOCK) cot diem.
-- Ghi nhat ky kiem toan bat bien (Audit Log) cho moi thao tac khoa, mo khoa, sua diem va khoa lai.
+- Ghi Audit Log bat bien cho moi thao tac khoa, mo khoa, sua diem va khoa lai.
 - Hoan thien bang AuditLog: truong `performed_by` va `requested_by` tham chieu chinh xac den bang `User` (`user_id`) thong qua middleware xac thuc (JWT/Session).
 - Bao dam truy vet day du: nguoi khoa, nguoi mo khoa, nguoi sua diem cung thoi diem thuc hien chinh xac (TIMESTAMPTZ).
 - Tich hop ham kiem tra khoa va ghi log trong cung mot database transaction voi thao tac sua diem de bao dam toan ven du lieu.
 - Tach biet ro rang giua trang thai Khoa diem va Cong bo diem: hai trang thai doc lap hoan toan, khong tu dong cong bo khi khoa diem; ghi ro quy tac tu dong khoa chua duoc chot trong pham vi hien tai va khong tu y bo sung co che xu ly khac.
 - Bổ sung so do Activity Diagram the hien day du luong nghiep vu va cac truong hop tu choi thao tac (403, 400, 409).
-- Cung cap day du dac ta thuc the, rang buoc va API Contract de VT1 tong hop ERD va Data Dictionary.
+- Cung cap day du dac ta thuc the, rang buoc va API Contract de phuc vu tong hop ERD he thong va Data Dictionary.
 
 ### 1.2. Cong nghe va quy uoc
 
@@ -34,7 +34,7 @@ Thiet ke co che khoa diem va nhat ky kiem toan (Audit Log) cho he thong quan ly 
 
 - Bao cao khao sat va dac ta Use Case cua Nhom 5.
 - UC08: Khoa diem.
-- UC09: Mo khoa diem va ghi nhan nhat ky.
+- UC09: Mo khoa diem va ghi nhan Audit Log.
 - UC13: Hoc sinh xem ket qua hoc tap cua chinh minh.
 - docs/vt3-data-model.md (module quan ly hoc sinh va lop hoc).
 - docs/vt4-score-design.md (module quan ly diem).
@@ -45,24 +45,24 @@ Thiet ke co che khoa diem va nhat ky kiem toan (Audit Log) cho he thong quan ly 
 
 ## 2. Cac thuc the
 
-### 2.1. Danh sach thuc the do VT5 thiet ke
+### 2.1. Danh sach thuc the thiet ke
 
 1. **LockStatus**: Quan ly trang thai khoa theo nien khoa, lop, mon va thanh phan diem.
-2. **AuditLog**: Nhat ky kiem toan luu vet lich su bat bien ve cac thao tac khoa, mo khoa, sua diem va import diem.
+2. **AuditLog**: Luu vet lich su bat bien ve cac thao tac khoa, mo khoa, sua diem va import diem.
 
 ### 2.2. Cac thuc the lien quan trong he thong
 
-Su dung thuc the quan ly tai khoan va nguoi dung (do VT1 / Auth quan ly):
+Su dung thuc the quan ly tai khoan va nguoi dung (Module Xac thuc va phan quyen):
 - **User** (bang `app_user` hoac `users`): Luu thong tin tai khoan nguoi dung (`user_id`, `username`, `role`, `full_name`, `email`, ...). Day la bang nguon de tham chieu khoa ngoai cho `performed_by`, `requested_by`, `locked_by`, `unlocked_by`.
 
-Su dung cac thuc the do VT3-01 thiet ke (module quan ly hoc sinh va lop hoc):
+Su dung cac thuc the cua module quan ly hoc sinh va lop hoc:
 - **AcademicYear**: Nien khoa.
 - **Class**: Lop hoc.
 - **Subject**: Mon hoc.
 - **Student**: Hoc sinh.
 - **Enrollment**: Lich su phan lop cua hoc sinh.
 
-Su dung cac thuc the do VT4-01 thiet ke (module quan ly diem):
+Su dung cac thuc the cua module quan ly diem:
 - **ScoreRecord**: Ban ghi diem theo hoc sinh/enrollment va mon hoc.
 - **ScoreComponent**: Thanh phan diem cu the (QT1, QT2, QT3, GK, CK).
 
@@ -129,11 +129,11 @@ Luu y ky thuat:
 
 ### 3.2. AuditLog
 
-Muc dich: Luu nhat ky kiem toan bat bien (Append-Only) cho moi thao tac khoa, mo khoa, sua diem va import diem phuc vu cong tac thanh tra, giai trinh.
+Muc dich: Luu Audit Log bat bien (Append-Only) cho moi thao tac khoa, mo khoa, sua diem va import diem phuc vu cong tac thanh tra, giai trinh.
 
 | Thuoc tinh | Kieu PostgreSQL | Rang buoc de xuat | Mo ta |
 |---|---|---|---|
-| audit_log_id | BIGSERIAL | PRIMARY KEY | Ma ban ghi nhat ky |
+| audit_log_id | BIGSERIAL | PRIMARY KEY | Ma ban ghi Audit Log |
 | action_type | VARCHAR(50) | NOT NULL | LOCK, UNLOCK, RELOCK, SCORE_EDIT, SCORE_IMPORT |
 | performed_by | BIGINT | NOT NULL, FOREIGN KEY | Tham chieu app_user(user_id) - Nguoi thuc hien (xac dinh qua JWT/Session middleware) |
 | requested_by | BIGINT | Cho phep NULL, FOREIGN KEY | Tham chieu app_user(user_id) - Nguoi yeu cau thao tac |
@@ -151,7 +151,7 @@ Muc dich: Luu nhat ky kiem toan bat bien (Append-Only) cho moi thao tac khoa, mo
 | reason | TEXT | Cho phep NULL | Ly do mo khoa hoac ly do sua diem de giai trinh |
 | related_log_id | BIGINT | Cho phep NULL, FOREIGN KEY | Tham chieu audit_log(audit_log_id) |
 | result | VARCHAR(20) | NOT NULL, DEFAULT 'SUCCESS' | Ket qua: SUCCESS, REJECTED, FAILED |
-| created_at | TIMESTAMPTZ | NOT NULL, DEFAULT CURRENT_TIMESTAMP | Thoi diem ghi nhat ky bat bien |
+| created_at | TIMESTAMPTZ | NOT NULL, DEFAULT CURRENT_TIMESTAMP | Thoi diem ghi Audit Log bat bien |
 
 Rang buoc de xuat cho AuditLog:
 - `audit_log_id` la khoa chinh.
@@ -180,7 +180,7 @@ De bao dam truy vet day du, chinh xac nguoi thuc hien va thoi diem thao tac:
 ### 3.4. Quy tac toan ven giao dich (Transaction Integrity)
 
 - Moi thao tac sua diem (du sua le 1 diem hay import CSV) va thao tac ghi ban ghi AuditLog tuong ung **bat buoc phai thuc thi trong cung mot Database Transaction**.
-- Neu ghi log kiem toan gap loi hoac that bai, toan bo transaction phai duoc `ROLLBACK` ngay lap tuc. Diem so khong duoc phep cap nhat neu khong co nhat ky kiem toan di kem.
+- Neu ghi Audit Log gap loi hoac that bai, toan bo transaction phai duoc `ROLLBACK` ngay lap tuc. Diem so khong duoc phep cap nhat neu khong co Audit Log di kem.
 - Truoc khi sua diem, backend phai thuc hien goi ham hook kiem tra cot diem co dang o trang thai `LOCKED` hay khong. Neu bi khoa, transaction phai lap tuc bi huy va tra ve loi `409 SCORE_LOCKED`.
 
 ---
@@ -200,7 +200,7 @@ De bao dam truy vet day du, chinh xac nguoi thuc hien va thoi diem thao tac:
 - **BR-L06**: Khi mo khoa (UNLOCK), bat buoc phai cung cap nguoi yeu cau (`requested_by`) va ly do giai trinh mo khoa (`reason`).
 - **BR-L07**: Ly do mo khoa khong duoc de trong, phai ghi ro rang noi dung de phuc vu giai trinh voi ban giam hieu va doan thanh tra.
 - **BR-L08**: Sau khi sua diem hoan tat trong phien mo khoa, can bo khao thi phai chu dong thuc hien thao tac khoa lai (`RELOCK`) de dong bang cot diem tro lai.
-- **BR-L09**: Moi lan sua diem trong thoi gian cot diem duoc mo khoa bat buoc phai ghi ro gia tri diem cu (`old_value`), gia tri diem moi (`new_value`), nguoi sua (`performed_by`), ly do sua va lien ket dung voi ma nhat ky cua lan mo khoa truoc do (`related_log_id`).
+- **BR-L09**: Moi lan sua diem trong thoi gian cot diem duoc mo khoa bat buoc phai ghi ro gia tri diem cu (`old_value`), gia tri diem moi (`new_value`), nguoi sua (`performed_by`), ly do sua va lien ket dung voi ban ghi Audit Log cua lan mo khoa truoc do (`related_log_id`).
 
 ### 4.3. Quy tac chan sua khi cot da khoa
 
@@ -208,13 +208,13 @@ De bao dam truy vet day du, chinh xac nguoi thuc hien va thoi diem thao tac:
 - **BR-L11**: Khi bi chan do cot dang khoa, he thong tra ve ma loi nghiep vu `SCORE_LOCKED` kem ma HTTP `409 Conflict`.
 - **BR-L12**: Khi import diem tu tap tin CSV, he thong kiem tra trang thai khoa cua tung thanh phan diem tuong ung voi tung dong. Dong nao thuoc cot dang `LOCKED` thi he thong tu choi cap nhat dong do va bao loi chi tiet tren dong, khong ghi de len du lieu da duoc khoa.
 
-### 4.4. Quy tac nhat ky kiem toan (Audit Log)
+### 4.4. Quy tac Audit Log
 
-- **BR-A01**: AuditLog la du lieu bat bien (Append-Only), he thong khong cung cap bat ky API nao cho phep sua, cap nhat hoac xoa ban ghi nhat ky.
+- **BR-A01**: AuditLog la du lieu bat bien (Append-Only), he thong khong cung cap bat ky API nao cho phep sua, cap nhat hoac xoa ban ghi Audit Log.
 - **BR-A02**: Moi thao tac LOCK, UNLOCK, RELOCK, SCORE_EDIT va SCORE_IMPORT deu phai tao dung 1 ban ghi tuong ung vao AuditLog.
 - **BR-A03**: Diem 0 va NULL phai duoc luu chinh xac trong log; tuyet doi khong tu dong quy doi NULL thanh 0 hoac nguoc lai.
 - **BR-A04**: Chi tai khoan co vai tro `KHAO_THI` moi co quyen xem danh sach, tra cuu va loc du lieu AuditLog.
-- **BR-A05**: Nhat ky kiem toan bat buoc phai luu tham chieu den tai khoan thuc hien tu bang User (`performed_by`), nguoi yeu cau (`requested_by`), va thoi diem chinh xac xay ra thao tac (`created_at` TIMESTAMPTZ).
+- **BR-A05**: Audit Log bat buoc phai luu tham chieu den tai khoan thuc hien tu bang User (`performed_by`), nguoi yeu cau (`requested_by`), va thoi diem chinh xac xay ra thao tac (`created_at` TIMESTAMPTZ).
 
 ### 4.5. Quy tac phan quyen
 
@@ -267,7 +267,7 @@ Quy uoc ky thuat:
 | POST | `/locks/lock` | KHAO_THI | Khoa chu dong 1 cot diem (co canh bao neu thieu diem) |
 | POST | `/locks/unlock` | KHAO_THI | Mo khoa 1 cot diem (bat buoc nhap nguoi yeu cau va ly do) |
 | POST | `/locks/relock` | KHAO_THI | Khoa lai cot diem sau khi sua xong |
-| GET | `/audit-logs` | KHAO_THI | Xem va tra cuu, loc danh sach nhat ky kiem toan |
+| GET | `/audit-logs` | KHAO_THI | Xem va tra cuu, loc danh sach Audit Log |
 
 ### 5.3. Chi tiet cac API
 
@@ -540,7 +540,7 @@ Phan hoi thanh cong (HTTP 200 OK):
 }
 ```
 
-### 5.4. Hook noi bo kiem tra khoa va ghi log cho module quan ly diem (VT4)
+### 5.4. Hook noi bo kiem tra khoa va ghi log cho module quan ly diem
 
 Module quan ly diem khi thuc hien cap nhat diem (API PATCH hoac Import CSV) se goi 2 ham hook noi bo:
 
@@ -557,7 +557,7 @@ await assertComponentNotLocked({
 }, { tx });
 
 /**
- * 2. Ghi nhat ky AuditLog trong cung Database Transaction voi thao tac cap nhat diem.
+ * 2. Ghi Audit Log trong cung Database Transaction voi thao tac cap nhat diem.
  * Neu ghi log loi, transaction se bi rollback toan bo.
  */
 await writeAuditLog({
@@ -626,8 +626,8 @@ stateDiagram-v2
 ```mermaid
 sequenceDiagram
     actor KT as Can bo Khao thi
-    participant API as Score API (VT4)
-    participant Hook as Lock & Audit Hook (VT5)
+    participant API as Score API (Module Quan ly diem)
+    participant Hook as Lock & Audit Hook (Module Khoa & Audit)
     participant DB as PostgreSQL Database
 
     KT->>API: Yeu cau sua diem (PATCH /score-records/:id/components/:type)
@@ -709,7 +709,7 @@ flowchart TD
     WriteAuditScore --> CheckAuditOk{"Ghi AuditLog\nthanh cong khong?"}
     CheckAuditOk -- "Gap loi DB/Log" --> RbAudit["ROLLBACK Transaction toan bo\nTra ve 500 INTERNAL_ERROR\n(Bao dam tinh toan ven du lieu)"]
     CheckAuditOk -- "Thanh cong" --> CommitTx["COMMIT Database Transaction"]
-    CommitTx --> EditScoreDone([Sua diem va ghi nhat ky thanh cong: 200 OK])
+    CommitTx --> EditScoreDone([Sua diem va ghi Audit Log thanh cong: 200 OK])
 
     %% --- LUONG 5: KHOA LAI (RELOCK) ---
     EditScoreDone --> ReqRelock["Khao thi gui yeu cau khoa lai cot diem:\nPOST /locks/relock"]
@@ -724,9 +724,9 @@ flowchart TD
 
 ---
 
-## 7. Tong hop du lieu ban giao cho VT1 (ERD & Data Dictionary)
+## 7. Tong hop du lieu (ERD & Data Dictionary)
 
-Bang duoi day tong hop toan bo cac thuc the, truong du lieu, khoa ngoai va rang buoc de VT1 tong hop vao ERD tong the va tao Migration Database:
+Bang duoi day tong hop toan bo cac thuc the, truong du lieu, khoa ngoai va rang buoc de phuc vu tong hop ERD he thong va tao Migration Database:
 
 ### 7.1. Bang `lock_status`
 
@@ -773,22 +773,22 @@ Bang duoi day tong hop toan bo cac thuc the, truong du lieu, khoa ngoai va rang 
 | `reason` | TEXT | NULL | - | Ly do giai trinh |
 | `related_log_id` | BIGINT | NULL | `audit_log(audit_log_id)` | Lien ket ban ghi UNLOCK |
 | `result` | VARCHAR(20) | NOT NULL, DEFAULT 'SUCCESS' | CHECK (result IN ('SUCCESS','REJECTED','FAILED')) | Ket qua thao tac |
-| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT CURRENT_TIMESTAMP | - | Thoi diem ghi nhat ky bat bien |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT CURRENT_TIMESTAMP | - | Thoi diem ghi Audit Log bat bien |
 
 *Ghi chu dac biet ve bang `audit_log`*:
 - Bang bat bien (Append-Only): Chi cho phep quyen `INSERT`, cam tuyet doi `UPDATE` va `DELETE`.
 
 ### 7.3. Danh muc trang thai cac quy tac dong bo lien module
 
-| Noi dung | Trang thai | Nguoi chiu trach nhiem |
+| Noi dung | Trang thai | Module / Pham vi phu trach |
 |---|---|---|
-| Khoa doc lap theo nien khoa, lop, mon, thanh phan | DA THONG NHAT | VT5, VT4, VT1 |
-| Canh bao khi thieu diem nhung van cho phep khoa | DA THONG NHAT | VT5, VT2, VT1 |
-| Mo khoa bat buoc co requested_by va reason | DA THONG NHAT | VT5, VT2, VT1 |
-| Ghi AuditLog bat bien va rollback neu ghi log loi | DA THONG NHAT | VT5, VT4, VT1 |
-| Khoa diem doc lap voi Cong bo diem (Lock != Publish) | DA THONG NHAT | VT5, VT1, Nhom |
-| Hoc sinh chi xem diem khi da den gio/lich cong bo | DA THONG NHAT | VT5, VT1, Nhom |
-| Tham chieu performed_by, requested_by qua User ID | DA THONG NHAT | VT5, VT1 |
-| Truy vet nguoi khoa, nguoi mo khoa, nguoi sua diem cung TIMESTAMPTZ | DA THONG NHAT | VT5, VT1 |
-| Quy tac tu dong khoa diem (Auto-lock / Cronjob) | CHUA CHOT (Khong tu y bo sung) | Can xac nhan GV/Nhom |
-| Quy tac cong bo diem chi tiet (Lich / Co che Publish) | CHO VT1 XAC NHAN | VT1 phu trach |
+| Khoa doc lap theo nien khoa, lop, mon, thanh phan | DA THONG NHAT | Khoa diem, Quan ly diem, Database |
+| Canh bao khi thieu diem nhung van cho phep khoa | DA THONG NHAT | Khoa diem, Giao dien UI, Database |
+| Mo khoa bat buoc co requested_by va reason | DA THONG NHAT | Khoa diem, Giao dien UI, Database |
+| Ghi AuditLog bat bien va rollback neu ghi log loi | DA THONG NHAT | Khoa diem, Quan ly diem, Database |
+| Khoa diem doc lap voi Cong bo diem (Lock != Publish) | DA THONG NHAT | Khoa diem, Kien truc he thong |
+| Hoc sinh chi xem diem khi da den gio/lich cong bo | DA THONG NHAT | Khoa diem, Kien truc he thong |
+| Tham chieu performed_by, requested_by qua User ID | DA THONG NHAT | Khoa diem, Kien truc Database |
+| Truy vet nguoi khoa, nguoi mo khoa, nguoi sua diem cung TIMESTAMPTZ | DA THONG NHAT | Khoa diem, Database |
+| Quy tac tu dong khoa diem (Auto-lock / Cronjob) | CHUA CHOT (Khong tu y bo sung) | Cho nha truong / GVHD xac nhan |
+| Quy tac cong bo diem chi tiet (Lich / Co che Publish) | CHO XAC NHAN | Kien truc he thong phu trach |
