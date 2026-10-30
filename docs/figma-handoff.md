@@ -90,10 +90,10 @@ kiem tra dong loi va xac nhan nhap.
 - Cap nhat Figma neu thay doi thiet ke lon.
 - Luu anh minh chung Figma va Web.
 
-## 8. Noi dung can nhom xac nhan
-- Cong thuc tinh diem tong ket.
+## 8. Cac van de chua duoc thong nhat
+
 - Quy tac khoa diem khi thieu du lieu.
 - Pham vi tu dong khoa va cong bo diem.
-- Danh sach man hinh theo UC/FR.
 
+Cac quy tac tren can duoc nhom thong nhat truoc khi trien khai chuc nang lien quan. 
 Khong tu y lap trinh cac quy tac chua duoc duyet.

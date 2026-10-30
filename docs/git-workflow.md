@@ -12,11 +12,11 @@
 
 ## 2. Phan cong thanh vien
 
-- VT1: Kien truc, database, auth, tich hop.
-- VT2: Figma va frontend.
-- VT3: Quan ly nien khoa, lop, hoc sinh, mon.
-- VT4: Quan ly diem va tinh tong ket.
-- VT5: Khoa diem, mo khoa va Audit Log.
+- Giang: Kien truc, database, auth, tich hop.
+- Yen: Figma va frontend.
+- Ngoc: Quan ly nien khoa, lop, hoc sinh, mon.
+- Chau: Quan ly diem va tinh tong ket.
+- Uyen: Khoa diem, mo khoa va Audit Log.
 
 ## 3. Quy tac dat ten nhanh
 
