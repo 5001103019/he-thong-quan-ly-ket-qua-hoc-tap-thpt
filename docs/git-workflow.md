@@ -8,7 +8,7 @@
 - Moi thanh vien lam viec tren nhanh rieng.
 - Khong tu y push code truc tiep len main.
 - Moi thay doi can duoc kiem tra truoc khi merge.
-- VT1 phu trach review va tich hop code.
+- Giang phu trach review va tich hop code.
 
 ## 2. Phan cong thanh vien
 
@@ -22,14 +22,14 @@
 
 Cau truc:
 
-feature/vtX-YY-ten-cong-viec
+feature/tentv-YY-ten-cong-viec
 
 Vi du:
-- feature/vt1-01-setup
-- feature/vt2-01-figma
-- feature/vt3-02-academic-api
-- feature/vt4-02-score-api
-- feature/vt5-02-lock-api
+- feature/Giang-01-setup
+- feature/Yen-01-figma
+- feature/Ngoc-02-academic-api
+- feature/Chau-02-score-api
+- feature/Uyen-02-lock-api
 
 Moi cong viec nen co nhanh rieng.
 
@@ -42,7 +42,7 @@ git pull origin main
 
 Buoc 2: Tao nhanh moi.
 
-git switch -c feature/vtX-YY-ten-cong-viec
+git switch -c feature/tentv-YY-ten-cong-viec
 
 Buoc 3: Lap trinh va kiem tra.
 
@@ -68,14 +68,14 @@ Buoc 6: Tao Pull Request tren GitHub.
 
 Buoc 7: Review.
 
-- VT1 kiem tra code, API va cau truc.
-- Neu PR do VT1 tao, can thanh vien khac review.
+- Giang kiem tra code, API va cau truc.
+- Neu PR do Giang tao, can thanh vien khac review.
 - Neu co loi, yeu cau sua truoc khi merge.
 
 Buoc 8: Merge.
 
 - Chi merge PR da duoc review va kiem tra.
-- VT1 chiu trach nhiem tich hop main.
+- Giang chiu trach nhiem tich hop main.
 - Neu co conflict, xu ly va test lai.
 
 ## 5. Quy tac commit
@@ -113,7 +113,7 @@ Khong commit:
 
 ## 8. Quy trinh ban giao
 
-Moi thanh vien gui cho VT1:
+Moi thanh vien gui cho Giang:
 - Ma cong viec.
 - Ten branch.
 - Link Pull Request.
@@ -122,4 +122,4 @@ Moi thanh vien gui cho VT1:
 - Ket qua test.
 - Anh minh chung neu co.
 
-VT1 kiem tra va tich hop vao main.
+Giang kiem tra va tich hop vao main.

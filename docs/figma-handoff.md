@@ -4,8 +4,8 @@
 ## 1. Thong tin du an
 Ten: He thong quan ly ket qua hoc tap hoc sinh THPT
 
-Nguoi phu trach kien truc: TV1
-Nguoi phu trach Figma: TV2
+Nguoi phu trach kien truc: Giang 
+Nguoi phu trach Figma: Yen 
 
 Figma phai duoc nhom duyet truoc khi lap trinh UI.
 
@@ -84,8 +84,8 @@ kiem tra dong loi va xac nhan nhap.
 - Co sitemap va wireframe.
 - Co components/styles dung chung.
 - Co day du man hinh va trang thai.
-- VT3, VT4, VT5 gop y nghiep vu.
-- TV1 kiem tra doi chieu UC/FR.
+- Ngoc, Chau, Uyen gop y nghiep vu.
+- Giang kiem tra doi chieu UC/FR.
 - Nhom duyet Figma truoc khi code UI.
 - Cap nhat Figma neu thay doi thiet ke lon.
 - Luu anh minh chung Figma va Web.
