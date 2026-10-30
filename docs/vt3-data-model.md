@@ -1,10 +1,12 @@
 
-# VT3-01 - THIET KE DU LIEU QUAN LY HOC SINH THPT
+# THIET KE DU LIEU QUAN LY HOC SINH THPT
 
 ## 1. Muc tieu
+
 Thiet ke du lieu quan ly nien khoa, khoi, lop, hoc sinh, phan lop va mon hoc.
 
 ## 2. Cac thuc the
+
 1. AcademicYear - Nien khoa
 2. Grade - Khoi lop
 3. Class - Lop hoc
@@ -27,19 +29,20 @@ Muc dich: Luu thong tin cac nien khoa trong he thong.
 | status | VARCHAR(20) | NOT NULL | PLANNED, ACTIVE hoac CLOSED |
 
 Quy tac du lieu du kien:
+
 - Moi nien khoa co mot ma duy nhat.
 - end_year = start_year + 1.
 - Ma nien khoa phai khop voi start_year va end_year.
 - Khong cho phep tao hai nien khoa trung ma.
 - Khong xoa cung nien khoa da co lop, hoc sinh hoac diem lien quan.
-- Cac gia tri status la de xuat, can VT1 xac nhan truoc khi tao database.
+- Cac gia tri status can duoc nhom thong nhat truoc khi tao database.
 
 Du lieu minh hoa:
+
 - 2025-2026 | 2025 | 2026 | CLOSED
 - 2026-2027 | 2026 | 2027 | ACTIVE
 
 Luu y: Trang thai minh hoa can duoc nhom xac nhan.
-
 
 ### 3.2. Grade - Khoi lop
 
@@ -51,6 +54,7 @@ Muc dich: Luu thong tin cac khoi lop 10, 11, 12 trong truong THPT.
 | grade_number | SMALLINT | NOT NULL, UNIQUE, CHECK (grade_number IN (10, 11, 12)) | So khoi: 10, 11 hoac 12 |
 
 Quy tac du lieu du kien:
+
 - He thong chi quan ly 3 khoi: 10, 11 va 12.
 - Moi khoi co mot ma dinh danh duy nhat.
 - Khong cho phep tao hai khoi co cung grade_number.
@@ -60,13 +64,12 @@ Quy tac du lieu du kien:
 - Bang Class se lien ket voi Grade va AcademicYear.
 
 Du lieu minh hoa:
+
 - grade_id = 1 | grade_number = 10
 - grade_id = 2 | grade_number = 11
 - grade_id = 3 | grade_number = 12
 
-Luu y: Day la schema de xuat cho VT3-01, can VT1 xac nhan truoc khi tao database.
-
-
+Luu y: Cau truc bang va cac rang buoc can duoc thong nhat truoc khi tao database.
 
 ### 3.3. Class - Lop hoc
 
@@ -82,6 +85,7 @@ Muc dich: Luu thong tin cac lop hoc theo tung nien khoa va khoi lop.
 | status | VARCHAR(20) | NOT NULL, DEFAULT 'ACTIVE' | Trang thai lop |
 
 Rang buoc du lieu du kien:
+
 - academic_year_id tham chieu academic_year(academic_year_id).
 - grade_id tham chieu grade(grade_id).
 - UNIQUE (academic_year_id, code).
@@ -91,10 +95,13 @@ Rang buoc du lieu du kien:
 - Cho phep trung ma lop o hai nien khoa khac nhau.
 - Ma lop phai phu hop voi khoi lop duoc chon.
 - Khong xoa cung lop da co hoc sinh, lich su phan lop hoac diem lien quan.
+- Khong thay doi academic_year_id hoac grade_id cua Class da co Enrollment/diem, tru khi co quy trinh dieu chinh duoc phe duyet.
+- UNIQUE (class_id, academic_year_id) duoc de xuat de ho tro FOREIGN KEY kep tu Enrollment (bo sung tuy class_id da la PRIMARY KEY).
 - Khi hoc sinh chuyen lop, khong ghi de lich su lop cu.
 - Quan he hoc sinh va lop duoc quan ly qua bang Enrollment.
 
 Du lieu minh hoa:
+
 - 2025-2026 | 10 | 10A1 | Lop 10A1 | ACTIVE
 - 2025-2026 | 11 | 11A1 | Lop 11A1 | ACTIVE
 - 2025-2026 | 12 | 12A1 | Lop 12A1 | ACTIVE
@@ -103,12 +110,11 @@ Du lieu minh hoa:
 - 2026-2027 | 12 | 12A1 | Lop 12A1 | ACTIVE
 
 Luu y:
-- Day la schema de xuat cho VT3-01.
-- Gia tri status va quy tac chuyen lop can VT1 xac nhan.
+
+- Day la cau truc du lieu de xuat.
+- Gia tri status va quy tac chuyen lop can duoc thong nhat truoc khi trien khai.
 - Pham vi demo moi khoi co mot lop; schema van ho tro nhieu lop.
 - Khong tu y tao database truoc khi schema duoc nhom thong nhat.
-
-
 
 ### 3.4. Student - Hoc sinh
 
@@ -124,11 +130,15 @@ Muc dich: Luu thong tin ho so hoc sinh trong truong THPT.
 | created_at | TIMESTAMPTZ | NOT NULL, DEFAULT CURRENT_TIMESTAMP | Thoi diem tao ho so |
 
 Rang buoc du lieu du kien:
+
 - Moi hoc sinh co mot student_id duy nhat.
 - student_code la duy nhat trong toan he thong, khong trung giua cac nien khoa.
 - student_code khong duoc rong va phai theo quy tac ma do nhom thong nhat.
 - full_name khong duoc rong hoac chi chua khoang trang.
 - date_of_birth phai la ngay hop le, khong nam trong tuong lai.
+- Kiem tra date_of_birth tai tang API/validation truoc khi luu du lieu.
+- Khong su dung CHECK phu thuoc CURRENT_DATE cho rang buoc nay, vi ngay hien tai thay doi theo thoi gian.
+- Khi date_of_birth khong hop le, API tra ve VALIDATION_ERROR (HTTP 400) theo quy chuan chung.
 - status chi nhan ACTIVE hoac INACTIVE trong ban de xuat.
 - Khong xoa cung hoc sinh da co lich su phan lop hoac ket qua hoc tap.
 - Khi hoc sinh ngung hoat dong, cap nhat status thay vi xoa ho so.
@@ -136,20 +146,20 @@ Rang buoc du lieu du kien:
 - Khong luu class_id va academic_year_id truc tiep trong bang Student.
 - Quan he hoc sinh, lop va nien khoa duoc quan ly qua Enrollment.
 - Khi chuyen lop, giu nguyen student_id va student_code.
-- Viec lien ket tai khoan dang nhap voi hoc sinh can thong nhat voi VT1.
+- Cach lien ket tai khoan dang nhap voi ho so hoc sinh can duoc thong nhat khi tich hop.
 
 Du lieu minh hoa:
+
 - HS0001 | Nguyen Minh An | 2010-07-15 | ACTIVE
 - HS0002 | Tran Gia Bao | 2010-03-20 | ACTIVE
 - HS0003 | Le Hoang Nam | 2009-11-10 | INACTIVE
 
 Luu y:
-- Day la schema de xuat cho VT3-01.
-- Quy tac ma hoc sinh, truong bat buoc va cac gia tri status can VT1 xac nhan.
+
+- Day la cau truc du lieu de xuat.
+- Quy tac ma hoc sinh, truong bat buoc va cac gia tri status can duoc thong nhat.
 - Khong tu y xoa hoc sinh hoac lich su hoc tap da ton tai.
 - Khong tu y tao database truoc khi schema duoc nhom thong nhat.
-
-
 
 ### 3.5. Enrollment - Lich su phan lop
 
@@ -167,6 +177,7 @@ Muc dich: Luu lich su hoc sinh duoc phan vao lop hoc theo tung nien khoa, bao to
 | created_at | TIMESTAMPTZ | NOT NULL, DEFAULT CURRENT_TIMESTAMP | Thoi diem tao ban ghi |
 
 Rang buoc du lieu du kien:
+
 - student_id tham chieu student(student_id).
 - class_id tham chieu class(class_id).
 - academic_year_id tham chieu academic_year(academic_year_id).
@@ -184,6 +195,7 @@ Rang buoc du lieu du kien:
 - Diem cua hoc sinh phai gan dung voi lan phan lop va nien khoa tuong ung.
 
 Quy tac khi chuyen lop:
+
 1. Tim ban ghi Enrollment dang hoat dong cua hoc sinh trong nien khoa.
 2. Ket thuc ban ghi cu bang cach cap nhat end_date va exit_reason = TRANSFER.
 3. Tao ban ghi Enrollment moi voi class_id cua lop moi.
@@ -192,27 +204,32 @@ Quy tac khi chuyen lop:
 6. Thuc hien cac thay doi trong mot transaction de tranh du lieu khong nhat quan.
 
 Quy tac khi len lop o nien khoa moi:
+
 - Giu nguyen ho so Student.
 - Tao Enrollment moi cho nien khoa moi.
 - Lien ket voi Class thuoc khoi lop moi.
 - Bao toan toan bo Enrollment va diem cua nien khoa truoc.
 
 Du lieu minh hoa:
+
 - HS0001 | 2025-2026 | 10A1 | 2025-09-05 | 2026-06-01 | COMPLETED
 - HS0001 | 2026-2027 | 11A1 | 2026-09-05 | NULL | NULL
 - HS0002 | 2026-2027 | 10A1 | 2026-09-05 | NULL | NULL
 
 Luu y:
+
 - Khong luu class_id truc tiep trong Student.
 - Enrollment la bang trung gian giua Student va Class.
-- Trang thai dang hoc tai lop duoc xac dinh qua end_date IS NULL.
-- Quy tac chuyen lop va pham vi bao toan diem can thong nhat voi VT1 va VT4.
-- Day la schema de xuat cho VT3-01, chua phai database chinh thuc.
+- end_date IS NULL chi co nghia la ban ghi chua co ngay ket thuc.
+- Tai ngay tra cuu D, Enrollment dang co hieu luc khi: start_date <= D AND (end_date IS NULL OR D < end_date).
+- Khong chi dua vao end_date IS NULL de ket luan hoc sinh dang hoc tai lop.
+- Can thong nhat cach chuyen lop va su dung diem lich su truoc khi trien khai.
+- Day la phuong an thiet ke, chua phai cau truc database chinh thuc.
 
-
-### 3.5.1. Rang buoc thoi gian Enrollment
+#### 3.5.1. Rang buoc thoi gian Enrollment
 
 Quy uoc khoang thoi gian:
+
 - Su dung khoang [start_date, end_date).
 - start_date la ngay bat dau, duoc bao gom.
 - end_date la ngay ket thuc, khong duoc bao gom.
@@ -222,25 +239,36 @@ Quy uoc khoang thoi gian:
 
 Rang buoc CHECK de xuat:
 
-    CHECK (end_date IS NULL OR end_date > start_date)
+```sql
+CHECK (end_date IS NULL OR end_date > start_date)
+```
 
 Rang buoc tinh nhat quan:
+
 - Neu end_date IS NULL thi exit_reason phai NULL.
 - Neu end_date IS NOT NULL thi exit_reason phai co gia tri hop le.
-- Khi chuyen lop, end_date cua Enrollment cu bang start_date cua Enrollment moi.
+- Khi chuyen lop hop le, end_date cua Enrollment cu bang start_date cua Enrollment moi.
+- Ngay chuyen lop (transferDate) phai lon hon start_date cua Enrollment cu.
+- Neu transferDate bang start_date cua Enrollment cu, khong thuc hien nghiep vu chuyen lop thong thuong vi se tao khoang thoi gian rong, vi pham rang buoc end_date > start_date.
+- Neu transferDate nho hon start_date cua Enrollment cu, phai tu choi vi ngay chuyen lop khong hop le.
+- Truong hop can sua phan lop ngay trong ngay bat dau duoc xem la nghiep vu dieu chinh du lieu va can co quy trinh xu ly rieng.
+- Neu Enrollment cu da co diem, khong tu y xoa, ghi de hoac chuyen lien ket diem khi dieu chinh.
+- Moi thao tac chuyen lop hoac dieu chinh phan lop phai bao dam tinh nhat quan du lieu va bao toan lich su.
 - Enrollment co start_date trong tuong lai chua duoc xem la dang hoc tai ngay hien tai.
 
 Vi du hop le:
+
 - Lop 10A1: 2026-09-05 den 2026-10-20.
 - Lop 10A2: 2026-10-20 den NULL.
 - Hai khoang thoi gian lien tiep, khong chong lan.
 
 Vi du khong hop le:
+
 - Lop 10A1: 2026-09-05 den 2026-10-25.
 - Lop 10A2: 2026-10-20 den NULL.
 - Hai khoang thoi gian chong lan tu 20/10 den truoc 25/10.
 
-### 3.5.2. Co che ngan chong lan thoi gian
+#### 3.5.2. Co che ngan chong lan thoi gian
 
 Phuong an PostgreSQL de xuat:
 
@@ -254,21 +282,35 @@ Phuong an PostgreSQL de xuat:
 
 SQL minh hoa, chua thuc thi:
 
-    CREATE EXTENSION IF NOT EXISTS btree_gist;
+```sql
+CREATE EXTENSION IF NOT EXISTS btree_gist;
 
-    ALTER TABLE enrollment
-    ADD CONSTRAINT enrollment_valid_dates
-    CHECK (end_date IS NULL OR end_date > start_date);
+ALTER TABLE enrollment
+ADD CONSTRAINT enrollment_valid_dates
+CHECK (end_date IS NULL OR end_date > start_date);
 
-    ALTER TABLE enrollment
-    ADD CONSTRAINT enrollment_no_overlap
-    EXCLUDE USING gist (
-        student_id WITH =,
-        academic_year_id WITH =,
-        daterange(start_date, end_date, '[)') WITH &&
-    );
+ALTER TABLE enrollment
+ADD CONSTRAINT enrollment_exit_consistency
+CHECK (
+    (end_date IS NULL AND exit_reason IS NULL)
+    OR (
+        end_date IS NOT NULL
+        AND exit_reason IS NOT NULL
+        AND exit_reason IN ('TRANSFER', 'COMPLETED', 'WITHDRAWN')
+    )
+);
+
+ALTER TABLE enrollment
+ADD CONSTRAINT enrollment_no_overlap
+EXCLUDE USING gist (
+    student_id WITH =,
+    academic_year_id WITH =,
+    daterange(start_date, end_date, '[)') WITH &&
+);
+```
 
 Giai thich:
+
 - btree_gist ho tro so sanh bang tren cac cot ID trong GiST.
 - daterange tao khoang thoi gian tu start_date den end_date.
 - [) la quy uoc bao gom ngay dau, khong bao gom ngay cuoi.
@@ -278,19 +320,22 @@ Giai thich:
 
 Co the duy tri them partial unique index:
 
-    CREATE UNIQUE INDEX enrollment_one_open_per_year
-    ON enrollment (student_id, academic_year_id)
-    WHERE end_date IS NULL;
+```sql
+CREATE UNIQUE INDEX enrollment_one_open_per_year
+ON enrollment (student_id, academic_year_id)
+WHERE end_date IS NULL;
+```
 
 Chi muc nay ngan hai Enrollment chua ket thuc trong cung nien khoa.
+
 EXCLUDE CONSTRAINT moi la co che ngan chong lan lich su day du.
 
 Luu y:
-- SQL tren la phuong an thiet ke de xuat.
-- Ten bang va ten cot phai thong nhat voi VT1.
-- VT1 phu trach review, dua rang buoc vao database migrations va kiem thu.
-- VT3 khong tu y chay ALTER TABLE tren database chung.
 
+- SQL tren la phuong an thiet ke de xuat.
+- Ten bang va ten cot phai thong nhat voi schema chung.
+- Cac rang buoc can duoc review, bo sung vao database migrations va kiem thu truoc khi ap dung.
+- Khong thuc thi ALTER TABLE tren database chung khi schema chua duoc phe duyet.
 
 ### 3.6. Subject - Mon hoc
 
@@ -305,6 +350,7 @@ Muc dich: Luu thong tin danh muc cac mon hoc trong truong THPT, phuc vu quan ly 
 | created_at | TIMESTAMPTZ | NOT NULL, DEFAULT CURRENT_TIMESTAMP | Thoi diem tao mon hoc |
 
 Rang buoc du lieu du kien:
+
 - Moi mon hoc co mot subject_id duy nhat.
 - code la duy nhat trong toan he thong.
 - code khong duoc rong hoac chi chua khoang trang.
@@ -316,18 +362,20 @@ Rang buoc du lieu du kien:
 - Moi mon hoc co the duoc su dung trong nhieu nien khoa.
 - Moi mon hoc co the duoc giang day o nhieu khoi lop.
 - Khong luu truc tiep academic_year_id hoac grade_id trong Subject.
-- Neu can quan ly mon hoc duoc mo cho tung khoi/nien khoa, phai thong nhat them bang lien ket voi VT1.
+- Neu can quan ly mon hoc theo khoi/nien khoa, can thong nhat phuong an bang lien ket.
 - Khong xoa cung mon hoc da co ket qua hoc tap lien quan.
 - Khi ngung su dung mon hoc, cap nhat status = INACTIVE.
 - Mon hoc INACTIVE khong duoc chon cho viec tao du lieu diem moi, nhung van phai hien thi duoc trong lich su.
-- Subject se duoc tham chieu boi phan quan ly diem cua VT4.
+- Subject se duoc tham chieu boi phan quan ly diem.
 
 Du lieu minh hoa:
+
 - TOAN | Toan | ACTIVE
 - NGUVAN | Ngu van | ACTIVE
 - TIENGANH | Tieng Anh | ACTIVE
 
 Quy tac nghiep vu de xuat:
+
 1. Phong Khao thi co quyen them, sua va tra cuu mon hoc.
 2. Khi them mon hoc, he thong kiem tra ma trung.
 3. Khi sua mon hoc, khong duoc lam sai lech du lieu diem da luu.
@@ -336,9 +384,10 @@ Quy tac nghiep vu de xuat:
 6. Hoc sinh chi duoc xem ket qua cac mon hoc cua chinh minh theo quyen truy cap.
 
 Luu y:
-- Day la schema de xuat cho VT3-01.
-- Quy tac ma mon hoc, trang thai va pham vi theo khoi can VT1 xac nhan.
-- Can thong nhat voi VT4 ve khoa ngoai subject_id trong bang diem.
+
+- Day la cau truc du lieu de xuat.
+- Quy tac ma mon hoc, trang thai va pham vi theo khoi can duoc thong nhat.
+- Can thong nhat khoa ngoai subject_id voi thiet ke bang diem.
 - Khong tu y tao database truoc khi schema duoc nhom thong nhat.
 
 ## 4. Quan he giua cac thuc the
@@ -354,13 +403,14 @@ Luu y:
 | Student | Enrollment | 1 - N | Enrollment.student_id |
 
 Giai thich:
+
 - Mot AcademicYear co the co nhieu Class.
 - Mot Grade co the duoc su dung boi nhieu Class.
 - Moi Class thuoc dung mot AcademicYear va mot Grade.
 - Mot Student co the co nhieu Enrollment.
 - Moi Enrollment lien ket voi dung mot Student va mot Class.
 - Mot AcademicYear co the co nhieu Enrollment.
-- Subject la danh muc mon hoc, se lien ket voi bang diem do VT4 thiet ke.
+- Subject la danh muc mon hoc dung chung, duoc lien ket voi bang diem.
 
 ### 4.2. Quan he AcademicYear - Class
 
@@ -372,11 +422,13 @@ Loai quan he: 1 - N.
 - Khoa ngoai cua Class: academic_year_id.
 
 Vi du:
+
 - Nien khoa 2025-2026 co lop 10A1, 11A1, 12A1.
 - Nien khoa 2026-2027 co lop 10A1, 11A1, 12A1.
 - Hai lop 10A1 thuoc hai nien khoa khac nhau la hai ban ghi Class khac nhau.
 
 Rang buoc:
+
 UNIQUE (academic_year_id, code).
 
 ### 4.3. Quan he Grade - Class
@@ -389,6 +441,7 @@ Loai quan he: 1 - N.
 - Khoa ngoai cua Class: grade_id.
 
 Vi du:
+
 - Grade 10 co the co lop 10A1, 10A2.
 - Grade 11 co the co lop 11A1, 11A2.
 - Grade 12 co the co lop 12A1, 12A2.
@@ -405,6 +458,7 @@ Loai quan he: 1 - N.
 - Khoa ngoai cua Enrollment: student_id.
 
 Vi du:
+
 - HS0001 hoc lop 10A1 trong nien khoa 2025-2026.
 - HS0001 hoc lop 11A1 trong nien khoa 2026-2027.
 
@@ -422,6 +476,7 @@ Loai quan he: 1 - N.
 - Khoa ngoai cua Enrollment: class_id.
 
 Vi du:
+
 - Lop 10A1 co HS0001, HS0002, HS0003.
 - Moi hoc sinh co mot ban ghi Enrollment rieng.
 
@@ -436,6 +491,7 @@ Loai quan he: 1 - N.
 - Khoa ngoai: Enrollment.academic_year_id.
 
 Rang buoc nhat quan:
+
 - Enrollment.academic_year_id phai trung voi Class.academic_year_id.
 - Can thiet ke rang buoc khoa ngoai kep de tranh phan lop sai nien khoa.
 - Class can co UNIQUE (class_id, academic_year_id) de ho tro khoa ngoai kep.
@@ -448,12 +504,13 @@ Subject luu danh muc mon hoc dung chung.
 - Mot mon hoc co the duoc su dung trong nhieu nien khoa.
 - Mot mon hoc co the co nhieu ban ghi ket qua hoc tap.
 - Khoa chinh cua Subject: subject_id.
-- Bang diem do VT4 thiet ke se tham chieu subject_id.
+- Bang diem se tham chieu subject_id.
 
 De xuat:
+
 - Khong xoa cung mon hoc da co diem.
 - Subject INACTIVE van phai tra cuu duoc diem lich su.
-- VT3 can thong nhat voi VT4 ve khoa ngoai subject_id.
+- Khoa ngoai subject_id can duoc thong nhat voi bang diem.
 
 ### 4.8. Quy tac bao toan lich su phan lop
 
@@ -463,7 +520,7 @@ BR-02: Moi lop thuoc mot nien khoa va mot khoi lop.
 
 BR-03: Khong trung ma lop trong cung nien khoa.
 
-BR-04: Mot hoc sinh chi co toi da mot Enrollment dang hoat dong trong moi nien khoa.
+BR-04: Tai mot ngay tra cuu D, mot hoc sinh chi co toi da mot Enrollment co hieu luc trong cung nien khoa.
 
 BR-05: Khong cho phep cac khoang thoi gian phan lop cua mot hoc sinh chong lan nhau trong cung nien khoa.
 
@@ -477,24 +534,26 @@ BR-09: Moi lan phan lop phai dung nien khoa cua Class.
 
 BR-10: Thay doi Enrollment phai duoc xu ly trong transaction.
 
-### 4.9. Cac diem can thong nhat voi VT1 va VT4
+### 4.9. Cac van de can thong nhat khi tich hop
 
 - Ten bang PostgreSQL chinh thuc va quy uoc dat ten khoa.
 - Quy tac chuyen lop khi hoc sinh da co diem.
 - Rang buoc ngan khoang thoi gian Enrollment chong lan.
 - Co can them bang lien ket Subject voi khoi/nien khoa hay khong.
-- Bang diem cua VT4 se lien ket voi enrollment_id hay cac khoa tuong ung.
+- Cach bang diem lien ket voi enrollment_id va cac khoa lien quan.
 - Quy tac trang thai ACTIVE/INACTIVE cua Student, Class va Subject.
 
 Ket luan:
-Day la thiet ke quan he de xuat cua VT3-01.
-Can VT1, VT4 va VT5 xem xet truoc khi chot schema database.
+
+Day la phuong an thiet ke quan he ban dau.
+
+Cac rang buoc lien quan den phan lop, diem va khoa diem can duoc thong nhat truoc khi chot schema database.
 
 ### 4.10. Phan hoi VT4 - Lien ket du lieu diem
 
 #### 4.10.1. Phuong an lien ket
 
-Theo phan hoi thiet ke VT4-01, de xuat cac quan he:
+Theo phan hoi cua VT4, de xuat cac quan he:
 
 | Thuc the cha | Thuc the con | Quan he | Khoa ngoai |
 |---|---|---|---|
@@ -503,6 +562,7 @@ Theo phan hoi thiet ke VT4-01, de xuat cac quan he:
 | ScoreRecord | ScoreComponent | 1 - N | ScoreComponent.score_record_id |
 
 Giai thich:
+
 - ScoreRecord tham chieu enrollment_id de xac dinh lan phan lop cua hoc sinh.
 - ScoreRecord tham chieu subject_id de xac dinh mon hoc.
 - ScoreComponent tham chieu score_record_id de luu diem thanh phan.
@@ -520,16 +580,18 @@ Giai thich:
 - Khong xoa ScoreRecord hoac ScoreComponent chi vi hoc sinh chuyen lop.
 - Can thong nhat quy tac UNIQUE cho ScoreRecord theo pham vi bang diem thuc te.
 - Neu quan ly diem theo hoc ky, can xac dinh them hoc ky trong khoa dinh danh phu hop.
-- Khong tu y chot cau truc bang diem thay VT4.
+- Cau truc bang diem can theo thiet ke da duoc thong nhat cua phan quan ly diem.
 
 #### 4.10.3. Bao toan diem khi chuyen lop
 
 Vi du:
+
 - HS0001 dang hoc lop 10A1 trong nien khoa 2025-2026.
 - Hoc sinh da co diem mon Toan tai lop 10A1.
 - Hoc sinh chuyen sang lop 10A2 trong cung nien khoa.
 
 Phuong an bao toan du lieu:
+
 1. Giu nguyen Student va student_id.
 2. Ket thuc Enrollment cua lop 10A1.
 3. Tao Enrollment moi cho lop 10A2.
@@ -549,27 +611,31 @@ Phuong an bao toan du lieu:
 - Hoc sinh van co the tra cuu ket qua hoc tap lich su theo quyen.
 - Cach tinh tong ket phai dua tren quy tac duoc nhom phe duyet.
 
-#### 4.10.5. Noi dung can VT1, VT4 va VT5 xac nhan
+#### 4.10.5. Noi dung can xac nhan khi tich hop
 
-VT1:
+**Co so du lieu va API:**
+
 - Xac nhan cac khoa ngoai va migration.
 - Xac nhan rang buoc UNIQUE cua ScoreRecord.
 - Xac nhan transaction khi chuyen lop.
 
-VT4:
+**Quan ly diem:**
+
 - Xac nhan cau truc ScoreRecord va ScoreComponent.
 - Xac nhan cach su dung diem lop cu tai lop moi.
 - Xac nhan cach tinh diem tong ket khi chuyen lop.
 
-VT5:
+**Khoa diem va lich su:**
+
 - Xac nhan trang thai khoa diem cua lop cu.
 - Xac nhan co che khoa diem tai lop moi.
 - Xac nhan viec chuyen lop khong vuot qua kiem tra khoa diem.
 
 Ket luan:
-VT3 ghi nhan va dong y ve mat dinh huong voi de xuat lien ket cua VT4.
-Cac quan he va quy tac chua duoc xem la schema chinh thuc cho den khi nhom phe duyet.
 
+Phuong an lien ket du lieu diem da duoc bo sung theo phan hoi VT4.
+
+Cac quan he va quy tac chua duoc xem la schema chinh thuc cho den khi nhom phe duyet.
 
 ## 5. Quy tac nghiep vu
 
@@ -631,7 +697,7 @@ BR-33: Enrollment phai tham chieu den Student va Class ton tai.
 
 BR-34: Nien khoa trong Enrollment phai trung voi nien khoa cua Class.
 
-BR-35: Moi hoc sinh chi co toi da mot Enrollment dang hoat dong trong mot nien khoa.
+BR-35: Enrollment co hieu luc tai ngay D khi start_date <= D AND (end_date IS NULL OR D < end_date). Quy tac khong chong lan thoi gian duoc quy dinh tai BR-36.
 
 BR-36: Khong cho phep cac khoang thoi gian phan lop cua cung mot hoc sinh trong cung nien khoa chong lan nhau. Su dung khoang [start_date, end_date) va EXCLUDE CONSTRAINT duoc de xuat tai muc 3.5.2.
 
@@ -677,13 +743,13 @@ BR-53: Backend phai kiem tra quyen truy cap, khong chi dua vao giao dien de an c
 
 BR-54: Du lieu dau vao phai duoc kiem tra truoc khi ghi vao database.
 
-BR-55: Khi trung ma dinh danh, API phai tra ve loi theo quy chuan chung cua VT1.
+BR-55: Khi trung ma dinh danh, API phai tra ve loi theo quy chuan chung.
 
-BR-56: Khi tham chieu niên khoa, lop hoac hoc sinh khong ton tai, API phai tra ve loi phu hop.
+BR-56: Khi tham chieu nien khoa, lop hoac hoc sinh khong ton tai, API phai tra ve loi phu hop.
 
 BR-57: Khi thao tac bi tu choi do vi pham quy tac nghiep vu, khong duoc ghi du lieu mot phan.
 
-BR-58: Response API phai su dung cau truc JSON va quy uoc ma loi do VT1 da thong nhat.
+BR-58: Response API phai tuan theo cau truc JSON va quy uoc ma loi chung.
 
 ### 5.9. Cac quy tac can nhom xac nhan
 
@@ -698,20 +764,15 @@ Cac noi dung sau chua duoc xem la quy tac chinh thuc neu nhom chua duyet:
 7. Pham vi chinh sua ho so hoc sinh da co ket qua hoc tap.
 8. Co cho phep khoi phuc ho so INACTIVE ve ACTIVE hay khong.
 
-Cac quy tac tren can duoc VT1, VT4 va VT5 thong nhat truoc khi trien khai.
+Cac quy tac tren can duoc nhom thong nhat truoc khi trien khai.
 
 ### 5.10. Ket luan
 
-Bo quy tac nghiep vu nay la co so de:
-- VT1 thiet ke database va middleware phan quyen.
-- VT3 lap trinh API danh muc, Student va Enrollment.
-- VT4 lien ket du lieu hoc sinh, lop va mon voi bang diem.
-- VT5 thiet ke rang buoc khoa diem va lich su thao tac.
-- VT2 thiet ke giao dien quan ly phu hop voi cac trang thai du lieu.
+Bo quy tac nghiep vu la co so de thiet ke database, xay dung API quan ly hoc sinh, lien ket voi bang diem, kiem soat khoa diem va doi chieu giao dien Figma.
 
-Day la ban de xuat VT3-01, can duoc nhom review truoc khi chot.
+Cac quy tac con mo can duoc nhom thong nhat truoc khi ap dung.
 
-### 5.11. Bo sung Business Rules theo phan hoi VT4
+### 5.11. Bo sung Business Rules lien quan den du lieu diem
 
 BR-59: ScoreRecord phai tham chieu den Enrollment hop le.
 
@@ -725,18 +786,19 @@ BR-63: Khi hoc sinh chuyen nien khoa, giu nguyen lich su phan lop va ket qua hoc
 
 BR-64: Khong tu dong sao chep diem sang Enrollment moi neu chua co quy tac duoc nhom phe duyet.
 
-BR-65: Viec su dung diem lop cu khi tinh tong ket tai lop moi phai theo quy tac do VT1 va VT4 thong nhat.
+BR-65: Viec su dung diem lop cu khi tinh tong ket tai lop moi phai theo quy tac da duoc nhom thong nhat.
 
 BR-66: Viec chuyen lop khong duoc tu dong mo khoa, xoa khoa hoac bo qua trang thai khoa diem.
 
 BR-67: Cac thao tac anh huong den Enrollment va du lieu diem phai dam bao tinh nhat quan va khong lam mat lich su.
 
 Ghi chu:
-- BR-59 den BR-67 la cac quy tac de xuat.
-- Cac quy tac lien quan den diem va khoa diem can VT1, VT4, VT5 xac nhan.
-- VT3 khong tu y trien khai thay phan nghiep vu cua VT4 hoac VT5.
 
-### 5.12. Lam ro quy tac trang thai theo phan hoi VT1
+- BR-59 den BR-67 la cac quy tac de xuat.
+- Cac quy tac lien quan den diem va khoa diem can duoc thong nhat voi cac phan lien quan.
+- Khong thay doi quy tac tinh diem hoac khoa diem khi chua duoc thong nhat.
+
+### 5.12. Lam ro quy tac trang thai
 
 #### 5.12.1. AcademicYear
 
@@ -747,6 +809,7 @@ Trang thai de xuat:
 - CLOSED: Nien khoa da ket thuc va duoc dong.
 
 Quy tac de xuat:
+
 - PLANNED: Cho phep cau hinh danh muc phuc vu chuan bi.
 - ACTIVE: Cho phep quan ly phan lop theo quyen.
 - CLOSED: Khong cho phep tao phan lop moi hoac thay doi du lieu lich su thong thuong.
@@ -763,6 +826,7 @@ Trang thai de xuat:
 - INACTIVE: Lop ngung nhan phan lop moi.
 
 Quy tac:
+
 - Lop INACTIVE van duoc tra cuu trong lich su.
 - Khong xoa Enrollment va diem cua lop INACTIVE.
 - Khong cho phep chuyen hoc sinh vao lop INACTIVE theo quy tac mac dinh de xuat.
@@ -776,6 +840,7 @@ Trang thai de xuat:
 - INACTIVE: Ho so hoc sinh ngung hoat dong.
 
 Quy tac:
+
 - Student INACTIVE van giu ma hoc sinh va lich su.
 - Khong xoa diem va Enrollment khi doi trang thai Student.
 - Viec phan lop moi cho Student INACTIVE can bi chan hoac duoc xu ly theo quy trinh duoc duyet.
@@ -790,15 +855,17 @@ Trang thai de xuat:
 - INACTIVE: Mon hoc ngung duoc su dung de tao du lieu diem moi.
 
 Quy tac:
+
 - Mon hoc INACTIVE van duoc tra cuu diem lich su.
 - Khong xoa ScoreRecord hoac ScoreComponent da co.
-- Viec sua diem cu phai theo quy tac khoa diem cua VT5.
+- Viec sua diem cu phai tuan theo quy tac khoa diem.
 
 #### 5.12.5. Enrollment
 
-Enrollment khong co cot status rieng trong schema VT3 hien tai.
+Enrollment khong co cot status rieng trong phuong an schema hien tai.
 
 Quy tac:
+
 - start_date xac dinh ngay bat dau phan lop.
 - end_date NULL nghia la chua ghi nhan ngay ket thuc.
 - end_date khac NULL nghia la lan phan lop da ket thuc vao moc end_date.
@@ -809,37 +876,39 @@ Quy tac:
 
 - ACTIVE/INACTIVE cua Student, Class va Subject khong phai trang thai khoa diem.
 - CLOSED la trang thai du kien cua AcademicYear.
-- Khoa diem theo tung cot QT1, QT2, QT3, GK, CK do VT5 phu trach.
+- Co che khoa diem theo tung cot QT1, QT2, QT3, GK, CK duoc xu ly tai phan quan ly khoa diem.
 - Khong xoa du lieu lich su khi thay doi trang thai.
-- Cac chuyen doi trang thai va phan quyen can VT1 phe duyet.
+- Cac chuyen doi trang thai va phan quyen can duoc thong nhat truoc khi trien khai.
 
 Trang thai: De xuat lam ro, cho nhom xac nhan.
-
 
 ## 6. Hop dong API
 
 ### 6.1. Quy uoc chung
 
 Base URL:
+
 http://localhost:3000/api/v1
 
 Phuong thuc HTTP:
+
 - GET: Lay danh sach hoac chi tiet.
 - POST: Tao du lieu hoac thuc hien nghiep vu.
 - PATCH: Cap nhat mot phan du lieu.
 - DELETE: Chi su dung khi du lieu duoc phep xoa.
 
 Quy tac:
+
 - Duong dan API dung chu thuong, kebab-case.
 - Ten tai nguyen dung danh tu so nhieu.
 - Thuoc tinh JSON su dung camelCase.
 - Ten bang va cot database su dung snake_case.
 - API quan tri yeu cau dang nhap va role KHAO_THI.
-- HOC_SINH khong duoc su dung API quan tri VT3.
+- HOC_SINH khong duoc su dung cac API quan tri.
 - Khong xoa cung du lieu da co lich su hoc tap.
-- API tra loi phai theo quy chuan cua VT1.
+- API tra loi phai theo quy chuan chung.
 
-Day la API contract de xuat, can VT1 va cac thanh vien lien quan xac nhan.
+Day la API Contract de xuat, can duoc thong nhat truoc khi trien khai.
 
 ### 6.2. API quan ly nien khoa (AcademicYear)
 
@@ -851,12 +920,14 @@ Day la API contract de xuat, can VT1 va cac thanh vien lien quan xac nhan.
 | PATCH | /academic-years/:id | Cap nhat nien khoa |
 
 Du lieu POST/PATCH de xuat:
+
 - code: Ma nien khoa, VD 2025-2026.
 - startYear: Nam bat dau.
 - endYear: Nam ket thuc.
 - status: PLANNED, ACTIVE hoac CLOSED.
 
 Validation:
+
 - Khong cho phep trung code.
 - endYear phai bang startYear + 1.
 - Code phai phu hop startYear va endYear.
@@ -873,17 +944,21 @@ Validation:
 | PATCH | /grades/:id | Cap nhat khoi lop |
 
 Du lieu de xuat:
+
 - gradeNumber: 10, 11 hoac 12.
 
 Validation:
+
 - Chi chap nhan khoi 10, 11, 12.
 - Khong trung gradeNumber.
 - Khong sua so khoi neu lam sai du lieu lop da tham chieu.
 - Khong xoa khoi da co lop hoc.
 
 Ghi chu:
+
 Du lieu demo chi can 3 khoi.
-VT1 can xac nhan co cho phep CRUD khoi hay chi quan ly danh muc co dinh.
+
+Can thong nhat viec quan ly khoi theo CRUD hay su dung danh muc co dinh.
 
 ### 6.4. API quan ly lop hoc (Class)
 
@@ -896,11 +971,13 @@ VT1 can xac nhan co cho phep CRUD khoi hay chi quan ly danh muc co dinh.
 | GET | /classes/:id/students | Lay danh sach hoc sinh trong lop |
 
 Query GET /classes:
+
 - academicYearId: Loc theo nien khoa.
 - gradeId: Loc theo khoi.
 - status: Loc theo trang thai.
 
 Du lieu POST/PATCH de xuat:
+
 - academicYearId
 - gradeId
 - code
@@ -908,6 +985,7 @@ Du lieu POST/PATCH de xuat:
 - status
 
 Validation:
+
 - AcademicYear va Grade phai ton tai.
 - Khong trung code trong cung academicYearId.
 - Ma lop phai phu hop gradeId.
@@ -915,6 +993,7 @@ Validation:
 - Khong thay doi nien khoa/khoi neu lam sai lich su.
 
 GET /classes/:id/students:
+
 - Chi lay hoc sinh thuoc pham vi lop duoc yeu cau.
 - Cho phep loc theo ngay hoac tinh trang phan lop.
 - Mac dinh lay hoc sinh dang duoc phan vao lop.
@@ -931,17 +1010,19 @@ GET /classes/:id/students:
 | PATCH | /subjects/:id | Cap nhat mon hoc |
 
 Du lieu de xuat:
+
 - code
 - name
 - status
 
 Validation:
+
 - Khong trung ma mon.
 - Ma va ten mon khong duoc rong.
 - status de xuat ACTIVE hoac INACTIVE.
 - Mon INACTIVE van hien thi trong lich su.
 - Khong xoa cung mon hoc da co ket qua hoc tap.
-- Subject ID phai thong nhat voi VT4.
+- Khoa subject_id phai phu hop voi thiet ke bang diem.
 
 ### 6.6. API quan ly hoc sinh (Student)
 
@@ -955,6 +1036,7 @@ Validation:
 | GET | /students/:id/enrollments | Lay lich su phan lop |
 
 Query GET /students de xuat:
+
 - studentCode
 - keyword
 - academicYearId
@@ -962,12 +1044,14 @@ Query GET /students de xuat:
 - status
 
 Du lieu POST de xuat:
+
 - studentCode
 - fullName
 - dateOfBirth
 - status
 
 Validation:
+
 - studentCode phai duy nhat.
 - fullName khong duoc rong.
 - dateOfBirth la ngay hop le, khong o tuong lai.
@@ -977,6 +1061,7 @@ Validation:
 - Khong lay hoc sinh cua lop khac khi da chi dinh classId.
 
 Cap nhat trang thai:
+
 - ACTIVE: Ho so dang hoat dong.
 - INACTIVE: Ho so ngung hoat dong.
 - Khong xoa Enrollment hoac diem khi doi trang thai.
@@ -991,25 +1076,54 @@ Cap nhat trang thai:
 | POST | /students/:id/transfers | Chuyen lop hoc sinh |
 
 POST /enrollments de xuat:
+
 - studentId
 - classId
 - academicYearId
 - startDate
 
 Validation:
+
 - Hoc sinh phai ton tai va du dieu kien phan lop.
 - Lop va nien khoa phai ton tai.
 - Nien khoa phai khop voi nien khoa cua lop.
-- Khong tao hai Enrollment dang hoat dong
-  trong cung nien khoa cho mot hoc sinh.
+- Khong tao hai Enrollment dang hoat dong trong cung nien khoa cho mot hoc sinh.
 - Khong cho phep cac khoang thoi gian chong lan.
+- Theo phuong an de xuat, Student phai co status = ACTIVE.
+- Class phai co status = ACTIVE.
+- Khong tao Enrollment moi trong AcademicYear co status = CLOSED.
+- Viec phan lop trong nien khoa PLANNED can duoc nhom xac nhan.
+- startDate phai la ngay hop le.
+- Khi tao Enrollment chua ket thuc, end_date = NULL va exit_reason = NULL.
 
 POST /students/:id/transfers de xuat:
+
 - fromEnrollmentId
 - toClassId
 - transferDate
 
+Validation ngay chuyen lop va lop dich:
+
+- Kiem tra fromEnrollmentId thuoc dung hoc sinh trong URL.
+- Enrollment cu phai ton tai va hop le tai ngay chuyen lop.
+- Theo phuong an de xuat, chuyen lop thong thuong chi ap dung cho Enrollment cu co end_date IS NULL.
+- Khong tu dong mo lai Enrollment da ket thuc.
+- Viec dieu chinh lich su phan lop can co quy trinh rieng duoc phe duyet.
+- transferDate phai la ngay hop le.
+- transferDate phai lon hon start_date cua Enrollment cu.
+- Neu transferDate bang start_date cua Enrollment cu, tu choi chuyen lop thong thuong; truong hop nay can duoc xu ly qua quy trinh dieu chinh rieng.
+- Neu transferDate nho hon start_date cua Enrollment cu, tra ve loi VALIDATION_ERROR (HTTP 400).
+- Lop dich phai ton tai va co status = ACTIVE.
+- toClassId phai khac class_id cua Enrollment cu.
+- Chuyen lop thong thuong chi thuc hien trong cung nien khoa; truong hop khac nien khoa can nghiep vu rieng duoc nhom phe duyet.
+- Khong cho phep tao Enrollment moi co khoang thoi gian chong lan.
+- Kiem tra cac rang buoc tai tang API va database.
+- Neu vi pham rang buoc chong lan, tra ve loi theo API conventions chung.
+- Khong xoa, ghi de hoac tu dong sao chep diem lich su.
+- Viec xu ly chuyen lop phai duoc thuc hien trong database transaction.
+
 Xu ly:
+
 1. Kiem tra quyen KHAO_THI.
 2. Kiem tra hoc sinh va Enrollment hien tai.
 3. Kiem tra lop dich hop le.
@@ -1021,17 +1135,19 @@ Xu ly:
 9. Neu co loi, rollback toan bo.
 
 Luu y:
-- API chuyen lop phai duoc VT1 va VT4 duyet.
+
+- API chuyen lop can duoc doi chieu voi quy tac phan lop va du lieu diem truoc khi trien khai.
 - Khong tu y thay doi lien ket diem lich su.
-- Quy tac chuyen khac khoi va chuyen giua nien khoa
-  can nhom xac nhan.
+- Quy tac chuyen khac khoi va chuyen giua nien khoa can nhom xac nhan.
 
 #### 6.7.1. Bo sung xu ly diem khi chuyen lop
 
 Endpoint:
+
 POST /students/:id/transfers
 
 Quy tac bo sung:
+
 - Kiem tra hoc sinh, Enrollment cu va lop dich.
 - Kiem tra rang buoc phan lop va nien khoa.
 - Kiem tra anh huong den diem va trang thai khoa diem.
@@ -1043,21 +1159,27 @@ Quy tac bo sung:
 - Neu co loi trong giao dich, phai rollback.
 
 Can xac nhan truoc khi trien khai:
+
 - Diem lop cu co duoc su dung de tinh tong ket tai lop moi khong?
 - Neu co, he thong se truy van va tong hop diem theo quy tac nao?
 - Truong hop diem da khoa thi xu ly ra sao?
 - Co can ghi AuditLog khi chuyen lop hay khong?
 
 Ghi chu:
-API nay van thuoc phan nghiep vu cua VT3.
-Xu ly diem do VT4 phu trach.
-Xu ly khoa diem va AuditLog do VT5 phu trach.
-Cac quy tac tren can VT1 phe duyet.
+
+API chuyen lop thuoc phan quan ly hoc sinh va phan lop.
+
+Xu ly diem duoc thuc hien theo thiet ke quan ly diem.
+
+Khoa diem va AuditLog duoc xu ly theo quy tac rieng.
+
+Cac quy tac tren can duoc thong nhat truoc khi trien khai.
 
 ### 6.8. Cau truc JSON thanh cong
 
-Theo quy chuan VT1:
+Theo quy chuan API chung:
 
+```json
 {
   "success": true,
   "data": {
@@ -1065,21 +1187,24 @@ Theo quy chuan VT1:
     "fullName": "Nguyen Van A"
   }
 }
+```
 
 Vi du tao hoc sinh thanh cong:
+
 - HTTP 201 Created.
 - data chua thong tin hoc sinh vua tao.
-- Khong tra ve mat khau hoac thong tin nhay cam
-  khong can thiet.
+- Khong tra ve mat khau hoac thong tin nhay cam khong can thiet.
 
 GET/PATCH thanh cong:
+
 - HTTP 200 OK.
 - data chua tai nguyen hoac danh sach tuong ung.
 
 ### 6.9. Cau truc JSON bao loi
 
-Theo quy chuan VT1:
+Theo quy chuan API chung:
 
+```json
 {
   "success": false,
   "error": {
@@ -1087,16 +1212,31 @@ Theo quy chuan VT1:
     "message": "Ma hoc sinh da ton tai"
   }
 }
+```
 
 Ma loi su dung:
+
 - 400 VALIDATION_ERROR: Du lieu dau vao sai.
 - 401 UNAUTHORIZED: Chua dang nhap.
 - 403 FORBIDDEN: Khong co quyen.
 - 404 NOT_FOUND: Khong tim thay du lieu.
 - 409 CONFLICT: Du lieu trung hoac xung dot.
+- 409 SCORE_LOCKED: Thanh phan diem da bi khoa.
+- 409 VERSION_CONFLICT: Du lieu da thay doi, phat sinh xung dot phien ban.
+- 422 INVALID_SCORE: Gia tri diem khong hop le.
 - 500 INTERNAL_ERROR: Loi may chu.
 
+Ghi chu:
+
+- Cac ma loi duoc tong hop tu quy chuan API chung.
+- SCORE_LOCKED va INVALID_SCORE chu yeu phuc vu nghiep vu quan ly diem.
+- VERSION_CONFLICT duoc su dung khi co co che kiem tra xung dot phien ban.
+- Khong phai API nao cung phat sinh tat ca cac ma loi tren.
+- Backend phai tra ve ma HTTP va error.code phu hop voi tung tinh huong.
+- Khong thay doi quy chuan ma loi chung khi chua duoc thong nhat.
+
 Vi du:
+
 - Tao hoc sinh trung ma: 409 CONFLICT.
 - Nhap ngay sinh sai: 400 VALIDATION_ERROR.
 - Student ID khong ton tai: 404 NOT_FOUND.
@@ -1104,11 +1244,10 @@ Vi du:
 
 ### 6.10. Phan quyen va bao mat
 
-- Cac API quan tri VT3 chi danh cho role KHAO_THI.
+- Cac API quan tri chi danh cho role KHAO_THI.
 - Backend phai kiem tra xac thuc va phan quyen.
 - Frontend an nut khong thay the kiem tra backend.
-- Hoc sinh chi duoc xem diem ca nhan thong qua
-  API do VT1 va VT2 phu trach.
+- Hoc sinh chi duoc xem diem ca nhan thong qua API do VT1 va VT2 phu trach.
 - Khong cho phep hoc sinh sua du lieu bang API.
 - Cac tham so ID phai duoc kiem tra hop le.
 - Khong tra ve thong tin nhay cam khong can thiet.
@@ -1116,26 +1255,18 @@ Vi du:
 
 ### 6.11. Noi dung can thong nhat truoc khi code
 
-1. VT1 xac nhan duong dan API va JSON fields.
-2. VT1 xac nhan middleware KHAO_THI.
-3. VT1 xac nhan database schema va migrations.
-4. VT4 xac nhan lien ket Enrollment voi diem.
-5. VT5 xac nhan anh huong khi chuyen lop da co diem khoa.
-6. VT2 xac nhan API phuc vu giao dien theo Figma.
-7. Nhom xac nhan quy tac status va soft delete.
-8. Nhom xac nhan quy tac chuyen lop va xu ly lich su.
+1. Duong dan API, JSON fields va middleware KHAO_THI.
+2. Database schema, migrations va cac rang buoc Enrollment.
+3. Lien ket Enrollment voi du lieu diem va quy tac khoa diem khi chuyen lop.
+4. Cac API can thiet de tich hop voi giao dien Figma.
+5. Quy tac status, bao toan lich su va pham vi chinh sua du lieu.
 
-Ket luan:
-Day la API Contract de xuat cho VT3-01.
-Chi tien hanh code sau khi cac phan phu thuoc
-da duoc nhom ban giao va thong nhat.
-
+Cac phan con phu thuoc chi duoc trien khai sau khi nhom thong nhat.
 
 ## 7. Noi dung ban giao
 
-### 7.1. Thong tin cong viec
+### 7.1. Thong tin tai lieu
 
-- Ma cong viec: VT3-01
 - Thanh vien thuc hien: VT3
 - Du an: He thong quan ly ket qua hoc tap hoc sinh THPT
 - Ten tai lieu: vt3-data-model.md
@@ -1151,6 +1282,7 @@ da duoc nhom ban giao va thong nhat.
 6. Subject - Quan ly danh muc mon hoc.
 
 Da mo ta:
+
 - Thuoc tinh va kieu du lieu PostgreSQL.
 - Khoa chinh, khoa ngoai va rang buoc.
 - Quan he giua cac thuc the.
@@ -1161,22 +1293,26 @@ Da mo ta:
 ### 7.3. Noi dung ban giao cho cac thanh vien
 
 VT1:
+
 - Su dung schema de tong hop ERD.
 - Xac nhan ten bang, khoa va rang buoc.
 - Tao database migrations.
 - Thong nhat middleware va API conventions.
 
 VT2:
+
 - Su dung API Contract de thiet ke giao dien.
 - Doi chieu danh sach, form va trang thai voi Figma.
 - Thong nhat cac truong du lieu can hien thi.
 
 VT4:
+
 - Lien ket Student, Enrollment, Class va Subject voi bang diem.
 - Xac nhan xu ly diem khi hoc sinh chuyen lop.
 - Bao toan ket qua hoc tap theo nien khoa.
 
 VT5:
+
 - Doi chieu Class, AcademicYear va Subject voi du lieu khoa diem.
 - Xac nhan anh huong khi chuyen lop da co diem khoa.
 
@@ -1186,41 +1322,45 @@ VT5:
 - Quy tac ma hoc sinh va ma mon hoc.
 - Cach xu ly diem khi chuyen lop.
 - Rang buoc thoi gian trong Enrollment.
-- Lien ket Enrollment voi ScoreRecord cua VT4.
+- Lien ket Enrollment voi ScoreRecord trong phan quan ly diem.
 - Co can bang Subject theo khoi va nien khoa hay khong.
 - Quy tac chuyen lop khac khoi.
 - Duong dan API va middleware chinh thuc.
 
-### 7.5. Tieu chi hoan thanh VT3-01
+### 7.5. Tieu chi hoan thanh ban thiet ke
 
 - Da thiet ke du 6 thuc the.
 - Da mo ta quan he va rang buoc du lieu.
 - Da xay dung Business Rules.
-- Da de xuat API Contract.
+- Da de xuat API Contract va phan quyen tuong ung.
 - Da ghi ro cac van de can nhom xac nhan.
 - Tai lieu duoc Commit va Push len branch rieng.
-- Tao Pull Request cho VT1 review.
-- Ban giao duong dan tai lieu cho VT1, VT4, VT5.
+- Tao Pull Request de nhom review.
+- Ban giao duong dan tai lieu cho cac thanh vien lien quan.
 
 Ket luan:
-VT3-01 da hoan thanh ban thiet ke de xuat.
-Schema va API can duoc nhom review, thong nhat
-truoc khi trien khai database va backend.
 
-### 7.6. Ghi nhan phan hoi thiet ke VT4-01
+Phan thiet ke du lieu da hoan thanh o muc de xuat.
+
+Schema va API can duoc nhom review, thong nhat truoc khi trien khai database va backend.
+
+### 7.6. Ghi nhan phan hoi thiet ke tu VT4
 
 Nguon phan hoi:
-VT4 - Lien ket du lieu diem voi thiet ke VT3-01.
+
+VT4 - Gop y ve cach lien ket du lieu diem voi Enrollment va Subject.
 
 Noi dung da tiep thu:
+
 1. De xuat ScoreRecord tham chieu enrollment_id.
 2. De xuat ScoreRecord tham chieu subject_id.
 3. ScoreComponent lien ket voi ScoreRecord.
 4. Bao toan diem khi hoc sinh chuyen lop va chuyen nien khoa.
 5. Khong xoa, ghi de hoac tu dong di chuyen diem lich su.
-6. Bo sung cac quy tac can VT1, VT4 va VT5 xac nhan.
+6. Bo sung nhung quy tac can thong nhat truoc khi tich hop.
 
 Noi dung cho thong nhat:
+
 - Quy tac su dung diem lop cu tai lop moi.
 - Cach tinh diem tong ket khi hoc sinh chuyen lop.
 - Rang buoc UNIQUE cua ScoreRecord.
@@ -1228,16 +1368,20 @@ Noi dung cho thong nhat:
 - Quy tac xu ly AuditLog va transaction.
 
 Ket luan:
-VT3 da tiep thu phan hoi so bo cua VT4.
+
+Phan hoi so bo tu VT4 da duoc tiep thu.
+
 Da bo sung phuong an lien ket du lieu diem vao tai lieu.
-Schema chinh thuc can duoc VT1, VT4 va VT5 xac nhan.
+
+Schema chinh thuc can duoc cac phan lien quan thong nhat.
 
 Trang thai: Da cap nhat theo phan hoi VT4 - Cho thong nhat schema.
 
 ### 7.7. Ghi nhan phan hoi review VT1
 
 Nguon:
-VT1 - Review thiet ke VT3-01.
+
+VT1 - Gop y ve rang buoc du lieu, trang thai va nghiep vu phan lop.
 
 #### 7.7.1. Noi dung da lam ro
 
@@ -1249,15 +1393,17 @@ VT1 - Review thiet ke VT3-01.
 
 #### 7.7.2. Quyet dinh de xuat va noi dung cho duyet
 
-A. Chuyen lop trong cung nien khoa
+**A. Chuyen lop trong cung nien khoa**
 
 De xuat:
+
 - Ket thuc Enrollment cu.
 - Tao Enrollment moi.
 - Giu nguyen diem va lien ket Enrollment cu.
 - Khong tu dong sao chep diem sang Enrollment moi.
 
 Can xac nhan:
+
 - Diem lop cu co duoc tinh vao tong ket tai lop moi khong?
 - Quy tac xu ly cac cot diem da khoa la gi?
 
@@ -1265,14 +1411,16 @@ Nguoi phoi hop: VT1, VT4, VT5.
 
 Trang thai: CHO XAC NHAN.
 
-B. Chuyen sang nien khoa moi
+**B. Chuyen sang nien khoa moi**
 
 De xuat:
+
 - Tao Enrollment moi.
 - Bao toan ket qua hoc tap nien khoa cu.
 - Khong sao chep diem tu nien khoa cu sang nien khoa moi.
 
 Can xac nhan:
+
 - Quy trinh dong Enrollment cu va nien khoa cu.
 - Quy tac tra cuu diem lich su.
 
@@ -1280,13 +1428,15 @@ Nguoi phoi hop: VT1, VT4.
 
 Trang thai: CHO XAC NHAN.
 
-C. Pham vi mon hoc
+**C. Pham vi mon hoc**
 
 De xuat:
+
 - Subject la danh muc mon hoc dung chung.
 - Subject khong chua truc tiep academic_year_id va grade_id.
 
 Can xac nhan:
+
 - Mon hoc co can cau hinh rieng theo khoi va nien khoa khong?
 - Neu can, co bo sung bang lien ket mon hoc voi khoi/nien khoa khong?
 
@@ -1294,13 +1444,15 @@ Nguoi phoi hop: VT1, VT4.
 
 Trang thai: CHO XAC NHAN.
 
-D. Rang buoc ScoreRecord
+**D. Rang buoc ScoreRecord**
 
 De xuat:
+
 - ScoreRecord tham chieu Enrollment va Subject.
 - ScoreComponent tham chieu ScoreRecord.
 
 Can xac nhan:
+
 - Khoa UNIQUE cua ScoreRecord.
 - Cach xac dinh hoc ky va pham vi diem.
 - Cach tinh tong ket sau khi chuyen lop.
@@ -1309,14 +1461,16 @@ Nguoi phoi hop: VT1, VT4.
 
 Trang thai: CHO XAC NHAN.
 
-E. Trang thai va khoa diem
+**E. Trang thai va khoa diem**
 
 De xuat:
+
 - Trang thai hoc sinh, lop va mon hoc doc lap voi trang thai khoa diem.
 - Chuyen lop khong duoc tu dong mo khoa diem.
 - Cac thay doi phai bao toan lich su.
 
 Can xac nhan:
+
 - Quy trinh mo khoa diem ngoai le.
 - AuditLog khi chuyen lop.
 - Quy tac xu ly Enrollment khi nien khoa CLOSED.
@@ -1327,10 +1481,70 @@ Trang thai: CHO XAC NHAN.
 
 #### 7.7.3. Ket luan
 
-VT3 da tiep thu cac nhan xet cua VT1 va bo sung phuong an xu ly.
+Cac nhan xet tu review VT1 da duoc tiep thu va bo sung phuong an xu ly.
 
-Cac noi dung lien quan den tinh diem, khoa diem va pham vi mon hoc can duoc VT1, VT4, VT5 thong nhat truoc khi chot schema.
+Cac noi dung lien quan den tinh diem, khoa diem va pham vi mon hoc can duoc nhom thong nhat truoc khi chot schema.
 
-VT3 khong tu y thay doi thiet ke ScoreRecord, ScoreComponent hoac co che khoa diem.
+Khong thay doi thiet ke ScoreRecord, ScoreComponent hoac co che khoa diem khi chua duoc thong nhat.
 
 Trang thai: Da bo sung theo review VT1 - Cho xac nhan schema chinh thuc.
+
+### 7.8. Danh sach quyet dinh can chot truoc khi trien khai
+
+Muc dich:
+
+Tong hop cac van de thiet ke con mo, xac dinh thanh vien phu trach xac nhan va tranh trien khai sai lech giua database, backend, du lieu diem va co che khoa diem.
+
+| Ma | Noi dung can xac nhan | Phuong an de xuat | Nguoi xac nhan | Trang thai |
+|---|---|---|---|---|
+| QD-01 | Rang buoc Enrollment | Su dung CHECK, EXCLUDE CONSTRAINT va transaction | VT1 | CHO XAC NHAN |
+| QD-02 | Chuyen lop ngay bat dau Enrollment | Khong xu ly bang API chuyen lop thong thuong; can quy trinh dieu chinh rieng | VT1, VT4 | CHO XAC NHAN |
+| QD-03 | Trang thai AcademicYear | PLANNED, ACTIVE, CLOSED; can chot quy tac chuyen trang thai | VT1 | CHO XAC NHAN |
+| QD-04 | Diem lich su khi chuyen lop | Giu nguyen ScoreRecord va ScoreComponent cua Enrollment cu | VT1, VT4 | CHO XAC NHAN |
+| QD-05 | Tinh diem tong ket sau chuyen lop | Chua tu y tinh hoac sao chep diem, cho quy tac nghiep vu | VT1, VT4 | CHO XAC NHAN |
+| QD-06 | Khoa diem va AuditLog | Chuyen lop khong tu dong mo khoa diem; can thong nhat co che ghi nhat ky | VT1, VT5 | CHO XAC NHAN |
+| QD-07 | Pham vi mon hoc | Subject la danh muc chung; can quyet dinh co bang lien ket theo khoi/nien khoa khong | VT1, VT4 | CHO XAC NHAN |
+| QD-08 | Rang buoc ScoreRecord | Can chot khoa ngoai, UNIQUE va pham vi hoc ky | VT1, VT4 | CHO XAC NHAN |
+| QD-09 | Database migrations | Thong nhat ten bang, khoa ngoai kep va cac CHECK/INDEX/EXCLUDE | VT1 | CHO XAC NHAN |
+| QD-10 | API Contract va phan quyen | Xac nhan endpoint, JSON fields, error codes va middleware KHAO_THI | VT1 | CHO XAC NHAN |
+| QD-11 | Moc ngay cua nien khoa | Can thong nhat ngay bat dau, ket thuc va cach kiem tra ngay phan lop | VT1 | CHO XAC NHAN |
+
+#### 7.8.1. Cac noi dung can phoi hop
+
+Truoc khi trien khai, can thong nhat cac noi dung sau:
+
+- Co so du lieu: kiem tra schema, khoa ngoai, rang buoc va migrations.
+- Quan ly diem: thong nhat lien ket giua Enrollment, ScoreRecord, ScoreComponent va cach xu ly diem khi chuyen lop.
+- Khoa diem: kiem tra trang thai khoa diem va lich su thao tac trong AuditLog.
+- Giao dien: doi chieu cac truong du lieu, API va trang thai voi thiet ke Figma.
+
+Nhung quy tac chua duoc thong nhat van duoc ghi nhan la phuong an de xuat.
+
+#### 7.8.2. Dieu kien trien khai cac chuc nang tiep theo
+
+Truoc khi trien khai cac chuc nang phu thuoc, can:
+
+1. Thong nhat schema va ten bang PostgreSQL.
+2. Xac nhan rang buoc Enrollment va database migrations.
+3. Thong nhat endpoint, JSON fields va middleware.
+4. Xac nhan lien ket voi du lieu diem va anh huong cua khoa diem khi chuyen lop.
+5. Chot cac quy tac nghiep vu bat buoc truoc khi code.
+
+Co the chuan bi cau truc code va test cases cho cac phan doc lap, nhung khong trien khai quy tac con cho xac nhan.
+
+#### 7.8.3. Ket luan ban giao
+
+Tai lieu da mo ta:
+
+- Sau thuc the quan ly du lieu hoc sinh THPT.
+- Thuoc tinh, khoa va rang buoc du lieu de xuat.
+- Quan he giua cac thuc the.
+- Quy tac bao toan lich su phan lop va diem.
+- Co che ngan chong lan thoi gian Enrollment.
+- Business Rules BR-01 den BR-67.
+- API Contract cho phan quan ly du lieu hoc sinh.
+- Danh sach quyet dinh can nhom xac nhan.
+
+Trang thai:
+
+CHO XAC NHAN TRUOC KHI CHOT SCHEMA.
