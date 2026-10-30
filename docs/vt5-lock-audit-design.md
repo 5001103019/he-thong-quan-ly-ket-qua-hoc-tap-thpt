@@ -26,8 +26,6 @@ Thiet ke co che khoa diem va nhat ky kiem toan (Audit Log) cho he thong quan ly 
 - Ten thuoc tinh JSON: camelCase.
 - Ten endpoint: chu thuong, kebab-case, danh tu so nhieu.
 
-Tai lieu tuan thu quy chuan chung tai docs/api-conventions.md.
-
 ### 1.3. Tai lieu tham chieu
 
 - Bao cao khao sat va dac ta Use Case cua Nhom 5.
@@ -37,9 +35,6 @@ Tai lieu tuan thu quy chuan chung tai docs/api-conventions.md.
 - docs/vt4-score-design.md (module quan ly diem).
 - docs/api-conventions.md (quy chuan API va kien truc).
 - docs/figma-handoff.md (quy chuan thiet ke giao dien).
-
-Trang thai: Ban thiet ke de xuat, cho Nhom truong review va xac nhan.
-
 
 ---
 
@@ -369,29 +364,3 @@ sequenceDiagram
         API-->>KT: 200 OK (Sua diem thanh cong)
     end
 ```
-
----
-
-## 7. Noi dung de nghi Nhom truong review
-
-Cac noi dung thiet ke cua phan Khoa diem va Audit Log de nghi Nhom truong review:
-
-1. Thiet ke co so du lieu:
-- Schema 2 bang `lock_status` va `audit_log`.
-- Rang buoc khoa doc lap theo bo 4: `(academic_year_id, class_id, subject_id, component)`.
-- Tinh bat bien cua `audit_log` (chi cho phep INSERT, chan lenh UPDATE va DELETE).
-- Rang buoc version kiem soat xung dot dong thoi (Optimistic Locking).
-
-2. Quy tac nghiep vu:
-- Khoa doc lap tung cot diem (QT1, QT2, QT3, GK, CK), khoa cot nay khong anh huong cot khac.
-- Backend chan tuyet doi thao tac sua diem khi cot dang LOCKED (tra ma loi `SCORE_LOCKED`).
-- Mo khoa bat buoc nhap nguoi yeu cau (`requestedBy`) va ly do (`reason`).
-- Hoan tat sua diem phai khoa lai (`RELOCK`).
-- Cap nhat diem va ghi `AuditLog` bat buoc trong cung mot transaction, loi thi rollback toan bo.
-- Bao toan diem cu va trang thai khoa cua lop cu khi hoc sinh chuyen lop.
-
-3. Hop dong API va Hook tich hop:
-- Danh sach 5 REST endpoint: `GET /locks`, `POST /locks/lock`, `POST /locks/unlock`, `POST /locks/relock`, `GET /audit-logs`.
-- Chu ky 2 ham hook noi bo: `assertComponentNotLocked` (kiem tra khoa) va `writeAuditLog` (ghi nhat ky).
-- Quy trinh kiem tra khoa theo tung dong khi import CSV, bo qua dong bi khoa va bao loi chi tiet.
-- Danh muc ma loi thong nhat.
