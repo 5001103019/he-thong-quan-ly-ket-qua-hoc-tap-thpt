@@ -1,4 +1,3 @@
-
 # THIET KE DU LIEU QUAN LY HOC SINH THPT
 
 ## 1. Muc tieu
@@ -549,11 +548,11 @@ Day la phuong an thiet ke quan he ban dau.
 
 Cac rang buoc lien quan den phan lop, diem va khoa diem can duoc thong nhat truoc khi chot schema database.
 
-### 4.10. Phan hoi VT4 - Lien ket du lieu diem
+### 4.10. Thiet ke lien ket du lieu diem
 
 #### 4.10.1. Phuong an lien ket
 
-Theo phan hoi cua VT4, de xuat cac quan he:
+Sau khi doi chieu voi thiet ke du lieu diem, de xuat cac quan he:
 
 | Thuc the cha | Thuc the con | Quan he | Khoa ngoai |
 |---|---|---|---|
@@ -633,7 +632,7 @@ Phuong an bao toan du lieu:
 
 Ket luan:
 
-Phuong an lien ket du lieu diem da duoc bo sung theo phan hoi VT4.
+Phuong an lien ket du lieu diem da duoc bo sung de phoi hop voi thiet ke du lieu diem.
 
 Cac quan he va quy tac chua duoc xem la schema chinh thuc cho den khi nhom phe duyet.
 
@@ -1247,7 +1246,7 @@ Vi du:
 - Cac API quan tri chi danh cho role KHAO_THI.
 - Backend phai kiem tra xac thuc va phan quyen.
 - Frontend an nut khong thay the kiem tra backend.
-- Hoc sinh chi duoc xem diem ca nhan thong qua API do VT1 va VT2 phu trach.
+- Hoc sinh chi duoc xem diem cua chinh minh qua API ket qua hoc tap; backend phai kiem tra phan quyen.
 - Khong cho phep hoc sinh sua du lieu bang API.
 - Cac tham so ID phai duoc kiem tra hop le.
 - Khong tra ve thong tin nhay cam khong can thiet.
@@ -1267,7 +1266,7 @@ Cac phan con phu thuoc chi duoc trien khai sau khi nhom thong nhat.
 
 ### 7.1. Thong tin tai lieu
 
-- Thanh vien thuc hien: VT3
+- Pham vi thiet ke: Quan ly nien khoa, khoi, lop, ho so hoc sinh, phan lop va mon hoc
 - Du an: He thong quan ly ket qua hoc tap hoc sinh THPT
 - Ten tai lieu: vt3-data-model.md
 - Trang thai: Hoan thanh ban thiet ke, cho nhom review
@@ -1290,28 +1289,28 @@ Da mo ta:
 - Nguyen tac bao toan lich su chuyen lop.
 - API Contract cho cac chuc nang quan ly.
 
-### 7.3. Noi dung ban giao cho cac thanh vien
+### 7.3. Noi dung ban giao va phoi hop
 
-VT1:
+**Co so du lieu va API:**
 
 - Su dung schema de tong hop ERD.
 - Xac nhan ten bang, khoa va rang buoc.
 - Tao database migrations.
 - Thong nhat middleware va API conventions.
 
-VT2:
+**Thiet ke giao dien Figma:**
 
 - Su dung API Contract de thiet ke giao dien.
 - Doi chieu danh sach, form va trang thai voi Figma.
 - Thong nhat cac truong du lieu can hien thi.
 
-VT4:
+**Thiet ke du lieu diem:**
 
 - Lien ket Student, Enrollment, Class va Subject voi bang diem.
 - Xac nhan xu ly diem khi hoc sinh chuyen lop.
 - Bao toan ket qua hoc tap theo nien khoa.
 
-VT5:
+**Khoa diem va AuditLog:**
 
 - Doi chieu Class, AcademicYear va Subject voi du lieu khoa diem.
 - Xac nhan anh huong khi chuyen lop da co diem khoa.
@@ -1344,11 +1343,11 @@ Phan thiet ke du lieu da hoan thanh o muc de xuat.
 
 Schema va API can duoc nhom review, thong nhat truoc khi trien khai database va backend.
 
-### 7.6. Ghi nhan phan hoi thiet ke tu VT4
+### 7.6. Cap nhat thiet ke lien ket du lieu diem
 
-Nguon phan hoi:
+Noi dung gop y:
 
-VT4 - Gop y ve cach lien ket du lieu diem voi Enrollment va Subject.
+Lien ket du lieu diem voi thiet ke quan ly hoc sinh va phan lop.
 
 Noi dung da tiep thu:
 
@@ -1369,19 +1368,17 @@ Noi dung cho thong nhat:
 
 Ket luan:
 
-Phan hoi so bo tu VT4 da duoc tiep thu.
+Cac gop y ve lien ket du lieu diem da duoc tiep thu va bo sung vao tai lieu.
 
 Da bo sung phuong an lien ket du lieu diem vao tai lieu.
 
 Schema chinh thuc can duoc cac phan lien quan thong nhat.
 
-Trang thai: Da cap nhat theo phan hoi VT4 - Cho thong nhat schema.
+Trang thai: Da cap nhat thiet ke lien ket du lieu diem - Cho nhom thong nhat schema.
 
-### 7.7. Ghi nhan phan hoi review VT1
+### 7.7. Dieu chinh thiet ke theo gop y ve rang buoc du lieu
 
-Nguon:
-
-VT1 - Gop y ve rang buoc du lieu, trang thai va nghiep vu phan lop.
+Noi dung ra soat: Rang buoc du lieu, trang thai va quy tac phan lop, chuyen lop.
 
 #### 7.7.1. Noi dung da lam ro
 
@@ -1407,8 +1404,6 @@ Can xac nhan:
 - Diem lop cu co duoc tinh vao tong ket tai lop moi khong?
 - Quy tac xu ly cac cot diem da khoa la gi?
 
-Nguoi phoi hop: VT1, VT4, VT5.
-
 Trang thai: CHO XAC NHAN.
 
 **B. Chuyen sang nien khoa moi**
@@ -1424,8 +1419,6 @@ Can xac nhan:
 - Quy trinh dong Enrollment cu va nien khoa cu.
 - Quy tac tra cuu diem lich su.
 
-Nguoi phoi hop: VT1, VT4.
-
 Trang thai: CHO XAC NHAN.
 
 **C. Pham vi mon hoc**
@@ -1439,8 +1432,6 @@ Can xac nhan:
 
 - Mon hoc co can cau hinh rieng theo khoi va nien khoa khong?
 - Neu can, co bo sung bang lien ket mon hoc voi khoi/nien khoa khong?
-
-Nguoi phoi hop: VT1, VT4.
 
 Trang thai: CHO XAC NHAN.
 
@@ -1456,8 +1447,6 @@ Can xac nhan:
 - Khoa UNIQUE cua ScoreRecord.
 - Cach xac dinh hoc ky va pham vi diem.
 - Cach tinh tong ket sau khi chuyen lop.
-
-Nguoi phoi hop: VT1, VT4.
 
 Trang thai: CHO XAC NHAN.
 
@@ -1475,39 +1464,37 @@ Can xac nhan:
 - AuditLog khi chuyen lop.
 - Quy tac xu ly Enrollment khi nien khoa CLOSED.
 
-Nguoi phoi hop: VT1, VT4, VT5.
-
 Trang thai: CHO XAC NHAN.
 
 #### 7.7.3. Ket luan
 
-Cac nhan xet tu review VT1 da duoc tiep thu va bo sung phuong an xu ly.
+Cac goi y ve rang buoc du lieu, trang thai va chuyen lop da duoc tiep thu va bo sung vao phuong an thiet ke.
 
 Cac noi dung lien quan den tinh diem, khoa diem va pham vi mon hoc can duoc nhom thong nhat truoc khi chot schema.
 
 Khong thay doi thiet ke ScoreRecord, ScoreComponent hoac co che khoa diem khi chua duoc thong nhat.
 
-Trang thai: Da bo sung theo review VT1 - Cho xac nhan schema chinh thuc.
+Trang thai: Da cap nhat phuong an thiet ke - Cho nhom thong nhat schema chinh thuc.
 
 ### 7.8. Danh sach quyet dinh can chot truoc khi trien khai
 
 Muc dich:
 
-Tong hop cac van de thiet ke con mo, xac dinh thanh vien phu trach xac nhan va tranh trien khai sai lech giua database, backend, du lieu diem va co che khoa diem.
+Tong hop cac van de thiet ke con mo, xac dinh phan viec can phoi hop xac nhan va tranh trien khai sai lech giua database, backend, du lieu diem va co che khoa diem.
 
-| Ma | Noi dung can xac nhan | Phuong an de xuat | Nguoi xac nhan | Trang thai |
+| Ma | Noi dung can xac nhan | Phuong an de xuat | Phan viec phoi hop xac nhan | Trang thai |
 |---|---|---|---|---|
-| QD-01 | Rang buoc Enrollment | Su dung CHECK, EXCLUDE CONSTRAINT va transaction | VT1 | CHO XAC NHAN |
-| QD-02 | Chuyen lop ngay bat dau Enrollment | Khong xu ly bang API chuyen lop thong thuong; can quy trinh dieu chinh rieng | VT1, VT4 | CHO XAC NHAN |
-| QD-03 | Trang thai AcademicYear | PLANNED, ACTIVE, CLOSED; can chot quy tac chuyen trang thai | VT1 | CHO XAC NHAN |
-| QD-04 | Diem lich su khi chuyen lop | Giu nguyen ScoreRecord va ScoreComponent cua Enrollment cu | VT1, VT4 | CHO XAC NHAN |
-| QD-05 | Tinh diem tong ket sau chuyen lop | Chua tu y tinh hoac sao chep diem, cho quy tac nghiep vu | VT1, VT4 | CHO XAC NHAN |
-| QD-06 | Khoa diem va AuditLog | Chuyen lop khong tu dong mo khoa diem; can thong nhat co che ghi nhat ky | VT1, VT5 | CHO XAC NHAN |
-| QD-07 | Pham vi mon hoc | Subject la danh muc chung; can quyet dinh co bang lien ket theo khoi/nien khoa khong | VT1, VT4 | CHO XAC NHAN |
-| QD-08 | Rang buoc ScoreRecord | Can chot khoa ngoai, UNIQUE va pham vi hoc ky | VT1, VT4 | CHO XAC NHAN |
-| QD-09 | Database migrations | Thong nhat ten bang, khoa ngoai kep va cac CHECK/INDEX/EXCLUDE | VT1 | CHO XAC NHAN |
-| QD-10 | API Contract va phan quyen | Xac nhan endpoint, JSON fields, error codes va middleware KHAO_THI | VT1 | CHO XAC NHAN |
-| QD-11 | Moc ngay cua nien khoa | Can thong nhat ngay bat dau, ket thuc va cach kiem tra ngay phan lop | VT1 | CHO XAC NHAN |
+| QD-01 | Rang buoc Enrollment | Su dung CHECK, EXCLUDE CONSTRAINT va transaction | Co so du lieu va API | CHO XAC NHAN |
+| QD-02 | Chuyen lop ngay bat dau Enrollment | Khong xu ly bang API chuyen lop thong thuong; can quy trinh dieu chinh rieng | Co so du lieu va API; Thiet ke du lieu diem | CHO XAC NHAN |
+| QD-03 | Trang thai AcademicYear | PLANNED, ACTIVE, CLOSED; can chot quy tac chuyen trang thai | Co so du lieu va API | CHO XAC NHAN |
+| QD-04 | Diem lich su khi chuyen lop | Giu nguyen ScoreRecord va ScoreComponent cua Enrollment cu | Co so du lieu va API; Thiet ke du lieu diem | CHO XAC NHAN |
+| QD-05 | Tinh diem tong ket sau chuyen lop | Chua tu y tinh hoac sao chep diem, cho quy tac nghiep vu | Co so du lieu va API; Thiet ke du lieu diem | CHO XAC NHAN |
+| QD-06 | Khoa diem va AuditLog | Chuyen lop khong tu dong mo khoa diem; can thong nhat co che ghi nhat ky | Co so du lieu va API; Khoa diem va AuditLog | CHO XAC NHAN |
+| QD-07 | Pham vi mon hoc | Subject la danh muc chung; can quyet dinh co bang lien ket theo khoi/nien khoa khong | Co so du lieu va API; Thiet ke du lieu diem | CHO XAC NHAN |
+| QD-08 | Rang buoc ScoreRecord | Can chot khoa ngoai, UNIQUE va pham vi hoc ky | Co so du lieu va API; Thiet ke du lieu diem | CHO XAC NHAN |
+| QD-09 | Database migrations | Thong nhat ten bang, khoa ngoai kep va cac CHECK/INDEX/EXCLUDE | Co so du lieu va API | CHO XAC NHAN |
+| QD-10 | API Contract va phan quyen | Xac nhan endpoint, JSON fields, error codes va middleware KHAO_THI | Co so du lieu va API | CHO XAC NHAN |
+| QD-11 | Moc ngay cua nien khoa | Can thong nhat ngay bat dau, ket thuc va cach kiem tra ngay phan lop | Co so du lieu va API | CHO XAC NHAN |
 
 #### 7.8.1. Cac noi dung can phoi hop
 
