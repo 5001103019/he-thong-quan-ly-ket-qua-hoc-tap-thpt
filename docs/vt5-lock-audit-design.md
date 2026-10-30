@@ -10,14 +10,15 @@ Thiet ke co che khoa diem va nhat ky kiem toan (Audit Log) cho he thong quan ly 
 - Khoa theo tung nien khoa, lop va mon hoc.
 - Cho phep khoa khi con hoc sinh thieu diem nhung bat buoc phai hien thi canh bao so luong hoc sinh chua co diem.
 - Chan backend tuyet doi khong cho them, sua, xoa diem khi cot diem dang o trang thai khoa (LOCKED).
-- Mo khoa bat buoc nhap nguoi yeu cau (requestedBy) va ly do giai trinh (unlockReason).
-- Sau khi sua diem xong thi khao thi phai thuc hien khoa lai (RELOCK) cot diem.
-- Ghi nhat ky kiem toan bat bien (Audit Log) cho moi thao tac khoa, mo khoa, khoa lai va sua diem.
-- Xac dinh va tham chieu chinh xac tai khoan thuc hien thao tac tu bang User/AppUser thong qua middleware xac thuc (JWT/Session).
-- Luu day du gia tri diem cu, diem moi, nguoi sua, ly do sua, thoi diem thuc hien va lien ket voi phien mo khoa tuong ung.
+- Mo khoa bat buoc nhap nguoi yeu cau (requested_by) va ly do giai trinh (unlock_reason).
+- Sau khi sua diem xong thi can bo khao thi phai thuc hien khoa lai (RELOCK) cot diem.
+- Ghi nhat ky kiem toan bat bien (Audit Log) cho moi thao tac khoa, mo khoa, sua diem va khoa lai.
+- Hoan thien bang AuditLog: truong `performed_by` va `requested_by` tham chieu chinh xac den bang `User` (`user_id`) thong qua middleware xac thuc (JWT/Session).
+- Bao dam truy vet day du: nguoi khoa, nguoi mo khoa, nguoi sua diem cung thoi diem thuc hien chinh xac (TIMESTAMPTZ).
 - Tich hop ham kiem tra khoa va ghi log trong cung mot database transaction voi thao tac sua diem de bao dam toan ven du lieu.
-- Tach biet ro rang giua trang thai Khoa diem va Cong bo diem; ghi ro quy tac tu dong khoa chua duoc chot.
-- Cung cap day du dac ta thuc the, rang buoc, API Contract va so do hoat dong (Activity Diagram) de VT1 tong hop ERD va Data Dictionary.
+- Tach biet ro rang giua trang thai Khoa diem va Cong bo diem: hai trang thai doc lap hoan toan, khong tu dong cong bo khi khoa diem; ghi ro quy tac tu dong khoa chua duoc chot trong pham vi hien tai va khong tu y bo sung co che xu ly khac.
+- Bổ sung so do Activity Diagram the hien day du luong nghiep vu va cac truong hop tu choi thao tac (403, 400, 409).
+- Cung cap day du dac ta thuc the, rang buoc va API Contract de VT1 tong hop ERD va Data Dictionary.
 
 ### 1.2. Cong nghe va quy uoc
 
@@ -51,8 +52,8 @@ Thiet ke co che khoa diem va nhat ky kiem toan (Audit Log) cho he thong quan ly 
 
 ### 2.2. Cac thuc the lien quan trong he thong
 
-Su dung thuc the quan ly tai khoan va phan quyen (do VT1 / Auth quan ly):
-- **User** (bang `app_user` hoac `users`): Luu thong tin tai khoan nguoi dung (`user_id`, `username`, `role`, `full_name`, `email`, ...). Day la can cu de xac dinh danh tinh nguoi thuc hien moi thao tac khoa, mo khoa, sua diem va ghi nhan nhat ky kiem toan.
+Su dung thuc the quan ly tai khoan va nguoi dung (do VT1 / Auth quan ly):
+- **User** (bang `app_user` hoac `users`): Luu thong tin tai khoan nguoi dung (`user_id`, `username`, `role`, `full_name`, `email`, ...). Day la bang nguon de tham chieu khoa ngoai cho `performed_by`, `requested_by`, `locked_by`, `unlocked_by`.
 
 Su dung cac thuc the do VT3-01 thiet ke (module quan ly hoc sinh va lop hoc):
 - **AcademicYear**: Nien khoa.
@@ -67,13 +68,15 @@ Su dung cac thuc the do VT4-01 thiet ke (module quan ly diem):
 
 ### 2.3. Quan he du lieu de xuat
 
-- `AcademicYear`, `Class`, `Subject` lien ket voi `LockStatus` de xac dinh pham vi khoa.
-- Moi `LockStatus` dai dien cho 1 thanh phan diem cua 1 mon hoc tai 1 lop trong 1 nien khoa cu the.
-- `User` tham chieu den `LockStatus`:
-  + `locked_by_user_id` tham chieu `app_user(user_id)`: Nguoi thuc hien khoa / khoa lai.
-  + `unlocked_by_user_id` tham chieu `app_user(user_id)`: Nguoi thuc hien mo khoa.
-- `User` tham chieu den `AuditLog`:
-  + `user_id` tham chieu `app_user(user_id)`: Tai khoan he thong thuc hien thao tac (bat buoc NOT NULL).
+- `AcademicYear`, `Class`, `Subject` lien ket voi `LockStatus` de xac dinh pham vi khoa theo bo 4 thanh phan.
+- Moi `LockStatus` dai dien cho 1 thanh phan diem cua 1 mon hoc tai 1 lop trong 1 nien khoa.
+- `User` lien ket voi `LockStatus`:
+  + `locked_by` tham chieu `app_user(user_id)`: Nguoi thuc hien khoa / khoa lai.
+  + `unlocked_by` tham chieu `app_user(user_id)`: Nguoi thuc hien mo khoa.
+  + `requested_by` tham chieu `app_user(user_id)`: Nguoi yeu cau mo khoa de giai trinh.
+- `User` lien ket voi `AuditLog`:
+  + `performed_by` tham chieu `app_user(user_id)`: Tai khoan thuc hien thao tac (bat buoc NOT NULL).
+  + `requested_by` tham chieu `app_user(user_id)`: Tai khoan nguoi yeu cau thao tac (cho phep NULL).
 - `LockStatus` lien ket voi `AuditLog` de theo doi toan bo lich su thay doi trang thai khoa cua cot diem.
 - `ScoreRecord` va `ScoreComponent` lien ket voi `AuditLog` de luu chi tiet diem truoc va sau khi sua.
 - `Student` lien ket voi `AuditLog` de biet hoc sinh nao duoc sua diem.
@@ -95,13 +98,12 @@ Muc dich: Luu trang thai khoa hien tai cua tung thanh phan diem theo nien khoa, 
 | subject_id | BIGINT | NOT NULL, FOREIGN KEY | Tham chieu subject(subject_id) |
 | component | VARCHAR(10) | NOT NULL | QT1, QT2, QT3, GK, CK |
 | status | VARCHAR(20) | NOT NULL, DEFAULT 'UNLOCKED' | UNLOCKED hoac LOCKED |
-| locked_by_user_id | BIGINT | Cho phep NULL, FOREIGN KEY | Tham chieu app_user(user_id) - Nguoi khoa |
-| locked_by | VARCHAR(100) | Cho phep NULL | Snapshot username/ho ten nguoi khoa |
+| locked_by | BIGINT | Cho phep NULL, FOREIGN KEY | Tham chieu app_user(user_id) - Nguoi khoa |
 | locked_at | TIMESTAMPTZ | Cho phep NULL | Thoi diem thuc hien khoa |
-| unlocked_by_user_id | BIGINT | Cho phep NULL, FOREIGN KEY | Tham chieu app_user(user_id) - Nguoi mo khoa |
-| unlocked_by | VARCHAR(100) | Cho phep NULL | Snapshot username/ho ten nguoi mo khoa |
+| unlocked_by | BIGINT | Cho phep NULL, FOREIGN KEY | Tham chieu app_user(user_id) - Nguoi mo khoa |
 | unlocked_at | TIMESTAMPTZ | Cho phep NULL | Thoi diem thuc hien mo khoa |
-| requested_by | VARCHAR(150) | Cho phep NULL | Nguoi yeu cau mo khoa de giai trinh |
+| requested_by | BIGINT | Cho phep NULL, FOREIGN KEY | Tham chieu app_user(user_id) - Nguoi yeu cau mo khoa |
+| requested_by_name | VARCHAR(150) | Cho phep NULL | Ho ten/chuc vu nguoi yeu cau de giai trinh |
 | unlock_reason | TEXT | Cho phep NULL | Ly do mo khoa bat buoc de giai trinh |
 | version | INTEGER | NOT NULL, DEFAULT 1 | Optimistic Locking tranh xung dot dong thoi |
 | created_at | TIMESTAMPTZ | NOT NULL, DEFAULT CURRENT_TIMESTAMP | Thoi diem tao ban ghi |
@@ -116,13 +118,14 @@ Rang buoc de xuat cho LockStatus:
 - `academic_year_id` tham chieu `academic_year(academic_year_id)`.
 - `class_id` tham chieu `class(class_id)`.
 - `subject_id` tham chieu `subject(subject_id)`.
-- `locked_by_user_id` tham chieu `app_user(user_id)`.
-- `unlocked_by_user_id` tham chieu `app_user(user_id)`.
+- `locked_by` tham chieu `app_user(user_id)`.
+- `unlocked_by` tham chieu `app_user(user_id)`.
+- `requested_by` tham chieu `app_user(user_id)`.
 
 Luu y ky thuat:
 - Mac dinh khi bat dau nhap diem, trang thai cot diem la `UNLOCKED`.
 - Truong `version` dung de phat hien xung dot dong thoi (Optimistic Concurrency Control) khi co 2 khao thi cung thao tac khoa/mo khoa cung luc.
-- Khi mo khoa (UNLOCK), he thong bat buoc phai co `requested_by` va `unlock_reason`. Khi khoa lai (RELOCK), he thong cap nhat lai `status = 'LOCKED'`, `locked_by_user_id`, `locked_at` va tang `version`.
+- Khi mo khoa (UNLOCK), he thong bat buoc phai co `requested_by` va `unlock_reason`. Khi khoa lai (RELOCK), he thong cap nhat lai `status = 'LOCKED'`, `locked_by`, `locked_at` va tang `version`.
 
 ### 3.2. AuditLog
 
@@ -132,8 +135,9 @@ Muc dich: Luu nhat ky kiem toan bat bien (Append-Only) cho moi thao tac khoa, mo
 |---|---|---|---|
 | audit_log_id | BIGSERIAL | PRIMARY KEY | Ma ban ghi nhat ky |
 | action_type | VARCHAR(50) | NOT NULL | LOCK, UNLOCK, RELOCK, SCORE_EDIT, SCORE_IMPORT |
-| user_id | BIGINT | NOT NULL, FOREIGN KEY | Tham chieu app_user(user_id) - Tai khoan thuc hien |
-| performed_by | VARCHAR(100) | NOT NULL | Snapshot username/ho ten nguoi thuc hien |
+| performed_by | BIGINT | NOT NULL, FOREIGN KEY | Tham chieu app_user(user_id) - Nguoi thuc hien (xac dinh qua JWT/Session middleware) |
+| requested_by | BIGINT | Cho phep NULL, FOREIGN KEY | Tham chieu app_user(user_id) - Nguoi yeu cau thao tac |
+| requested_by_name | VARCHAR(150) | Cho phep NULL | Ho ten/ghi chu ve nguoi yeu cau |
 | lock_status_id | BIGINT | Cho phep NULL, FOREIGN KEY | Tham chieu lock_status(lock_status_id) |
 | academic_year_id | BIGINT | NOT NULL, FOREIGN KEY | Tham chieu academic_year(academic_year_id) |
 | class_id | BIGINT | NOT NULL, FOREIGN KEY | Tham chieu class(class_id) |
@@ -142,37 +146,36 @@ Muc dich: Luu nhat ky kiem toan bat bien (Append-Only) cho moi thao tac khoa, mo
 | student_id | BIGINT | Cho phep NULL, FOREIGN KEY | Tham chieu student(student_id) |
 | score_record_id | BIGINT | Cho phep NULL, FOREIGN KEY | Tham chieu score_record(score_record_id) |
 | score_component_id | BIGINT | Cho phep NULL, FOREIGN KEY | Tham chieu score_component(score_component_id) |
-| old_value | NUMERIC | Cho phep NULL | Gia tri diem truoc khi sua |
-| new_value | NUMERIC | Cho phep NULL | Gia tri diem sau khi sua |
-| requested_by | VARCHAR(150) | Cho phep NULL | Nguoi yeu cau thao tac |
-| reason | TEXT | Cho phep NULL | Ly do mo khoa hoac ly do sua diem |
+| old_value | NUMERIC | Cho phep NULL | Gia tri diem truoc khi sua (phan biet 0 va NULL) |
+| new_value | NUMERIC | Cho phep NULL | Gia tri diem sau khi sua (phan biet 0 va NULL) |
+| reason | TEXT | Cho phep NULL | Ly do mo khoa hoac ly do sua diem de giai trinh |
 | related_log_id | BIGINT | Cho phep NULL, FOREIGN KEY | Tham chieu audit_log(audit_log_id) |
 | result | VARCHAR(20) | NOT NULL, DEFAULT 'SUCCESS' | Ket qua: SUCCESS, REJECTED, FAILED |
-| created_at | TIMESTAMPTZ | NOT NULL, DEFAULT CURRENT_TIMESTAMP | Thoi diem ghi nhat ky |
+| created_at | TIMESTAMPTZ | NOT NULL, DEFAULT CURRENT_TIMESTAMP | Thoi diem ghi nhat ky bat bien |
 
 Rang buoc de xuat cho AuditLog:
 - `audit_log_id` la khoa chinh.
 - `action_type IN ('LOCK', 'UNLOCK', 'RELOCK', 'SCORE_EDIT', 'SCORE_IMPORT')`.
 - `result IN ('SUCCESS', 'REJECTED', 'FAILED')`.
-- `user_id` tham chieu `app_user(user_id)`: Bat buoc phai co tai khoan thuc hien hop le duoc xac thuc boi he thong.
+- `performed_by` tham chieu `app_user(user_id)`: Bat buoc phai co tai khoan thuc hien hop le duoc he thong xac thuc qua middleware (NOT NULL).
+- `requested_by` tham chieu `app_user(user_id)`: Nguoi yeu cau mo khoa hoac de nghi sua diem.
 - `related_log_id` tham chieu `audit_log(audit_log_id)`: Dung de lien ket chat che cac thao tac sua diem (`SCORE_EDIT`) voi ban ghi mo khoa (`UNLOCK`) tuong ung.
 - Diem 0 la mot gia tri hop le trong co so du lieu, hoan toan khac voi `NULL` (chua nhap diem). Khi luu vao `old_value` va `new_value`, he thong bao toan gia tri goc 0 va khong thay the bang NULL.
-- Bang nay la bat bien (Append-Only): Chi cho phep thao tac `INSERT`. Nghieng cam tuyet doi moi thao tac `UPDATE` hoac `DELETE` duoi moi hinh thuc de bao dam tinh toan ven va gia tri phap ly khi thanh tra.
+- Bang nay la bat bien (Append-Only): Chi cho phep thao tac `INSERT`. Nghiem cam tuyet doi moi thao tac `UPDATE` hoac `DELETE` duoi moi hinh thuc de bao dam tinh toan ven va gia tri phap ly khi thanh tra.
 
-### 3.3. Co che xac dinh va truy vet tai khoan nguoi thuc hien
+### 3.3. Co che xac dinh va truy vet tai khoan qua Middleware (JWT/Session)
 
-De bao dam tinh xac thuc va chong gia mao nguoi thao tac:
+De bao dam truy vet day du, chinh xac nguoi thuc hien va thoi diem thao tac:
 1. **Xac dinh tai khoan tu Middleware xac thuc**:
-   - Backend khong bao gio tin tuong `user_id` hoac `performed_by` do client truyen qua Request Body hoac Query.
-   - Khi request di qua Auth Middleware, he thong kiem tra JWT token / Session, giai ma va gan thong tin user vao context: `req.user.id`, `req.user.username`, `req.user.role`.
-   - Ham xu ly nghiep vu lay truc tiep `req.user.id` de ghi vao cot `user_id` (khoa ngoai den bang `app_user`) va ghi snapshot username/ho ten vao `performed_by`.
-2. **Truy vet day du 4 nhom thao tac cot loi**:
-   - **Thao tac Khoa diem (LOCK)**: Luu `locked_by_user_id = req.user.id`, `locked_at = NOW()`, ghi AuditLog voi `action_type = 'LOCK'`, `user_id = req.user.id`, `created_at = NOW()`.
-   - **Thao tac Mo khoa (UNLOCK)**: Luu `unlocked_by_user_id = req.user.id`, `unlocked_at = NOW()`, `requested_by` (nguoi de nghi) va `unlock_reason` (ly do giai trinh); ghi AuditLog voi `action_type = 'UNLOCK'`, `user_id = req.user.id`, `requested_by`, `reason`, `created_at = NOW()`.
-   - **Thao tac Sua diem (SCORE_EDIT)**: Ghi AuditLog voi `action_type = 'SCORE_EDIT'`, `user_id = req.user.id`, `old_value`, `new_value`, `reason`, `related_log_id` tro ve ban ghi UNLOCK truoc do, `created_at = NOW()`.
-   - **Thao tac Khoa lai (RELOCK)**: Luu `locked_by_user_id = req.user.id`, `locked_at = NOW()`, ghi AuditLog voi `action_type = 'RELOCK'`, `user_id = req.user.id`, `created_at = NOW()`.
-3. **Snapshot nguoi dung bat bien**:
-   - Luu ca `user_id` (khoa ngoai quan he) va snapshot chuoi `performed_by` de dam bao neu tai khoan trong tuong lai co thay doi username, doi ho ten hoac bi khoa thi ban ghi lich su kiem toan van hien thi chinh xac nguoi da thuc hien tai thoi diem do.
+   - Backend khong tin tuong bat ky tham so danh tinh nao do client truyen qua Request Body hoac Query.
+   - Khi request di qua Auth Middleware, he thong kiem tra JWT token / Session hop le, lay thong tin xac thuc: `req.user.id`, `req.user.username`, `req.user.role`.
+   - Backend tu dong gan `performed_by = req.user.id` (khoa ngoai tham chieu `app_user(user_id)`).
+   - Doi voi `requested_by`, backend kiem tra ID nguoi yeu cau ton tai hop le trong bang `app_user` (neu co tai khoan) hoac ghi nhan kem `requested_by_name`.
+2. **Dam bao truy vet day du 4 nhom thao tac va thoi diem (TIMESTAMPTZ)**:
+   - **Nguoi khoa diem**: Ghi nhan `locked_by` (User ID) va `locked_at` (TIMESTAMPTZ) trong `LockStatus`; dong thoi tao 1 ban ghi AuditLog voi `action_type = 'LOCK'`, `performed_by = req.user.id`, `created_at = CURRENT_TIMESTAMP`.
+   - **Nguoi mo khoa diem**: Ghi nhan `unlocked_by` (User ID), `unlocked_at` (TIMESTAMPTZ), `requested_by` (User ID nguoi yeu cau) va `unlock_reason` trong `LockStatus`; dong thoi tao 1 ban ghi AuditLog voi `action_type = 'UNLOCK'`, `performed_by = req.user.id`, `requested_by`, `reason`, `created_at = CURRENT_TIMESTAMP`.
+   - **Nguoi sua diem**: Ghi nhan trong AuditLog voi `action_type = 'SCORE_EDIT'`, `performed_by = req.user.id`, `old_value`, `new_value`, `reason`, `related_log_id` tro ve ban ghi mo khoa, `created_at = CURRENT_TIMESTAMP`. Thao tac nam trong cung database transaction voi cap nhat diem.
+   - **Nguoi khoa lai**: Ghi nhan `locked_by` (User ID) va `locked_at` (TIMESTAMPTZ) trong `LockStatus`; dong thoi tao 1 ban ghi AuditLog voi `action_type = 'RELOCK'`, `performed_by = req.user.id`, `created_at = CURRENT_TIMESTAMP`.
 
 ### 3.4. Quy tac toan ven giao dich (Transaction Integrity)
 
@@ -194,10 +197,10 @@ De bao dam tinh xac thuc va chong gia mao nguoi thao tac:
 
 ### 4.2. Quy tac mo khoa va sua diem
 
-- **BR-L06**: Khi mo khoa (UNLOCK), bat buoc phai cung cap nguoi yeu cau (`requestedBy`) va ly do giai trinh mo khoa (`reason`).
+- **BR-L06**: Khi mo khoa (UNLOCK), bat buoc phai cung cap nguoi yeu cau (`requested_by`) va ly do giai trinh mo khoa (`reason`).
 - **BR-L07**: Ly do mo khoa khong duoc de trong, phai ghi ro rang noi dung de phuc vu giai trinh voi ban giam hieu va doan thanh tra.
 - **BR-L08**: Sau khi sua diem hoan tat trong phien mo khoa, can bo khao thi phai chu dong thuc hien thao tac khoa lai (`RELOCK`) de dong bang cot diem tro lai.
-- **BR-L09**: Moi lan sua diem trong thoi gian cot diem duoc mo khoa bat buoc phai ghi ro gia tri diem cu (`old_value`), gia tri diem moi (`new_value`), nguoi sua (`user_id`, `performed_by`), ly do sua va lien ket dung voi ma nhat ky cua lan mo khoa truoc do (`related_log_id`).
+- **BR-L09**: Moi lan sua diem trong thoi gian cot diem duoc mo khoa bat buoc phai ghi ro gia tri diem cu (`old_value`), gia tri diem moi (`new_value`), nguoi sua (`performed_by`), ly do sua va lien ket dung voi ma nhat ky cua lan mo khoa truoc do (`related_log_id`).
 
 ### 4.3. Quy tac chan sua khi cot da khoa
 
@@ -211,24 +214,27 @@ De bao dam tinh xac thuc va chong gia mao nguoi thao tac:
 - **BR-A02**: Moi thao tac LOCK, UNLOCK, RELOCK, SCORE_EDIT va SCORE_IMPORT deu phai tao dung 1 ban ghi tuong ung vao AuditLog.
 - **BR-A03**: Diem 0 va NULL phai duoc luu chinh xac trong log; tuyet doi khong tu dong quy doi NULL thanh 0 hoac nguoc lai.
 - **BR-A04**: Chi tai khoan co vai tro `KHAO_THI` moi co quyen xem danh sach, tra cuu va loc du lieu AuditLog.
-- **BR-A05**: Nhat ky kiem toan bat buoc phai luu tham chieu den tai khoan thuc hien tu bang User (`user_id`), ten nguoi thuc hien tai thoi diem do (`performed_by`), va thoi diem chinh xac xay ra thao tac (`created_at`).
+- **BR-A05**: Nhat ky kiem toan bat buoc phai luu tham chieu den tai khoan thuc hien tu bang User (`performed_by`), nguoi yeu cau (`requested_by`), va thoi diem chinh xac xay ra thao tac (`created_at` TIMESTAMPTZ).
 
 ### 4.5. Quy tac phan quyen
 
 - **BR-P01**: He thong thong nhat 2 vai tro co ban: `KHAO_THI` va `HOC_SINH`.
 - **BR-P02**: `HOC_SINH` khong duoc phep goi cac API quan ly khoa diem va khong duoc phep xem AuditLog.
-- **BR-P03**: **Hoc sinh chi duoc xem ket qua hoc tap cua chinh minh khi diem da duoc cong bo theo thoi gian quy dinh cua nha truong. Khoa diem khong dong nghia voi cong bo diem.** Cot diem bi khoa (LOCKED) chi mang y nghia dong bang thao tac nhap/sua diem noi bo cua phong Khao thi, khong phai la hanh dong cong bo diem cho hoc sinh xem.
+- **BR-P03**: **Hoc sinh chi duoc xem ket qua hoc tap cua chinh minh khi diem da duoc cong bo theo thoi gian quy dinh. Khoa diem khong dong nghia voi cong bo diem.**
 
 ### 4.6. Quy tac giua khoa diem va cong bo diem (Lock vs Publish)
 
-- **BR-LP01**: **Doc lap trang thai**: Trang thai Khoa diem (`LockStatus`: UNLOCKED / LOCKED) va trang thai Cong bo diem (Publish / Public Scores) la hai trang thai hoan toan doc lap ve ca mat nghiep vu va du lieu:
-  + *Khoa diem*: Nham kiem soat toan ven du lieu noi bo cua phong Khao thi, ngan chan giao vien hoac can bo tuy y sua doi diem sau han chot nhap diem.
-  + *Cong bo diem*: Nham phuc vu hoc sinh va phu huynh xem ket qua hoc tap cua chinh minh theo lich trinh quy dinh cua nha truong.
-- **BR-LP02**: **Khong tu dong cong bo khi khoa diem**: He thong TUYET DOI KHONG tu dong cong bo diem khi cot diem duoc khao thi bam khoa (`Lock != Publish`). Diem sau khi khoa van chi nam trong pham vi quan tri noi bo cua phong Khao thi cho den khi den moc thoi gian hoac duoc kich hoat cong bo chinh thuc.
+- **BR-LP01**: **Doc lap hoan toan giua Khoa diem va Cong bo diem**:
+  + Trang thai Khoa diem (`LockStatus`: UNLOCKED / LOCKED) va trang thai Cong bo diem la **hai trang thai doc lap hoan toan**.
+  + *Khoa diem*: Nham kiem soat toan ven du lieu noi bo cua phong Khao thi, ngan chan sua doi diem sau han chot nhap diem.
+  + *Cong bo diem*: Nham phuc vu hoc sinh va phu huynh xem ket qua hoc tap cua chinh minh theo moc thoi gian quy dinh cua nha truong.
+- **BR-LP02**: **Khong tu dong cong bo khi khoa diem**:
+  + He thong **khong tu dong cong bo khi khoa diem** (`Lock != Publish`).
+  + Khi can bo khao thi thuc hien khoa cot diem, cot diem do chi bi dong bang thao tac nhap/sua noi bo, hoc sinh van chua the xem duoc diem neu chua den thoi diem cong bo chinh thuc.
 - **BR-LP03**: **Quy tac tu dong khoa (Auto-lock)**:
-  + Hien tai quy tac tu dong khoa diem (nhu khoa tu dong theo han chot thoi gian, khoa qua cron job dinh ky) **CHUA DUOC CHOT** trong dac ta nghiep vu cua nhom va can GVHD/Nha truong phe duyet neu muon ap dung.
-  + Trong pham vi thiet ke hien tai, he thong **chi ho tro co che khoa chu dong (Manual Lock)** boi can bo co role `KHAO_THI` thong qua API va giao dien.
-  + He thong **KHONG tu y bo sung bat ky co che xu ly tu dong khoa ngoai pham vi da thong nhat**.
+  + Ghi ro: **Quy tac tu dong khoa (Auto-lock) nay chua duoc chot trong pham vi hien tai**.
+  + He thong **khong tu y bo sung co che xu ly nao khac** ngoai pham vi da thong nhat.
+  + Trong pham vi thiet ke hien tai, chi ho tro co che khoa chu dong (Manual Lock) boi can bo co role `KHAO_THI` qua API va giao dien.
 
 ### 4.7. Xu ly khi hoc sinh chuyen lop
 
@@ -284,7 +290,7 @@ Phan hoi thanh cong (HTTP 200 OK):
       {
         "component": "QT1",
         "status": "LOCKED",
-        "lockedBy": "nguyen_van_a",
+        "lockedBy": 1,
         "lockedAt": "2026-10-25T08:30:00.000Z",
         "version": 2
       },
@@ -335,21 +341,19 @@ Body gui len:
 ```
 
 Xu ly nghiep vu tai Backend:
-1. Xac thuc `req.user` phai co role `KHAO_THI` (neu sai: tra ve 403 FORBIDDEN).
+1. Xac thuc `req.user` phai co role `KHAO_THI` (neu khong co quyen: tra ve `403 FORBIDDEN`).
 2. Kiem tra ban ghi `LockStatus` hien tai. Neu `version != expectedVersion` thi tra ve `409 VERSION_CONFLICT`.
 3. Neu `status` da la `LOCKED` thi tra ve `409 CONFLICT`.
 4. Dem so luong hoc sinh trong lop chua co diem tai cot `component` nay:
-   - Neu co hoc sinh chua co diem: van cho phep khoa, dong thoi kem thong tin `warning` trong ket qua phan hoi.
+   - Neu con hoc sinh chua co diem: van cho phep khoa, dong thoi kem thong tin `warning` trong ket qua phan hoi.
 5. Cap nhat `LockStatus`:
    - `status = 'LOCKED'`
-   - `locked_by_user_id = req.user.id`
-   - `locked_by = req.user.username`
+   - `locked_by = req.user.id` (User ID tu JWT middleware)
    - `locked_at = CURRENT_TIMESTAMP`
    - `version = version + 1`
 6. Ghi 1 ban ghi vao `AuditLog`:
    - `action_type = 'LOCK'`
-   - `user_id = req.user.id`
-   - `performed_by = req.user.username`
+   - `performed_by = req.user.id`
    - `result = 'SUCCESS'`
    - `created_at = CURRENT_TIMESTAMP`
 
@@ -362,7 +366,7 @@ Phan hoi thanh cong (HTTP 200 OK):
     "status": "LOCKED",
     "component": "QT1",
     "version": 2,
-    "lockedBy": "nguyen_van_a",
+    "lockedBy": 1,
     "lockedAt": "2026-10-30T10:00:00.000Z",
     "warning": {
       "hasMissingScores": true,
@@ -383,31 +387,33 @@ Body gui len:
   "subjectId": 2,
   "component": "QT1",
   "expectedVersion": 2,
-  "requestedBy": "Tran Thi B (Giao vien Toan)",
+  "requestedBy": 5,
+  "requestedByName": "Tran Thi B (Giao vien Toan)",
   "reason": "Sua diem bai kiem tra so 1 cua hoc sinh Nguyen Van C do cham sot cau hoi so 4"
 }
 ```
 
 Xu ly nghiep vu tai Backend:
-1. Xac thuc `req.user.role == 'KHAO_THI'`.
+1. Xac thuc `req.user.role == 'KHAO_THI'` (neu khong co quyen: tra ve `403 FORBIDDEN`).
 2. Kiem tra tinh hop le cua `requestedBy` va `reason`: khong duoc de trong hoac chi chua khoang trang (neu thieu: tra ve `400 VALIDATION_ERROR`).
-3. Kiem tra `expectedVersion`.
+3. Kiem tra `expectedVersion` (neu xung dot: tra ve `409 VERSION_CONFLICT`).
 4. Kiem tra trang thai hien tai: bat buoc phai la `LOCKED` moi duoc mo khoa (neu dang `UNLOCKED`: tra ve `409 CONFLICT`).
 5. Cap nhat `LockStatus`:
    - `status = 'UNLOCKED'`
-   - `unlocked_by_user_id = req.user.id`
-   - `unlocked_by = req.user.username`
+   - `unlocked_by = req.user.id`
    - `unlocked_at = CURRENT_TIMESTAMP`
    - `requested_by = body.requestedBy`
+   - `requested_by_name = body.requestedByName`
    - `unlock_reason = body.reason`
    - `version = version + 1`
 6. Ghi ban ghi mo khoa vao `AuditLog`:
    - `action_type = 'UNLOCK'`
-   - `user_id = req.user.id`
-   - `performed_by = req.user.username`
+   - `performed_by = req.user.id`
    - `requested_by = body.requestedBy`
+   - `requested_by_name = body.requestedByName`
    - `reason = body.reason`
    - `result = 'SUCCESS'`
+   - `created_at = CURRENT_TIMESTAMP`
 
 Phan hoi thanh cong (HTTP 200 OK):
 ```json
@@ -418,9 +424,9 @@ Phan hoi thanh cong (HTTP 200 OK):
     "status": "UNLOCKED",
     "component": "QT1",
     "version": 3,
-    "unlockedBy": "nguyen_van_a",
+    "unlockedBy": 1,
     "unlockedAt": "2026-10-30T10:15:00.000Z",
-    "requestedBy": "Tran Thi B (Giao vien Toan)",
+    "requestedBy": 5,
     "reason": "Sua diem bai kiem tra so 1 cua hoc sinh Nguyen Van C do cham sot cau hoi so 4",
     "auditLogId": 501
   }
@@ -441,20 +447,19 @@ Body gui len:
 ```
 
 Xu ly nghiep vu tai Backend:
-1. Xac thuc `req.user.role == 'KHAO_THI'`.
-2. Kiem tra `expectedVersion`.
+1. Xac thuc `req.user.role == 'KHAO_THI'` (neu sai: tra ve `403 FORBIDDEN`).
+2. Kiem tra `expectedVersion` (neu sai: tra ve `409 VERSION_CONFLICT`).
 3. Kiem tra trang thai hien tai phai la `UNLOCKED` (neu da `LOCKED`: tra ve `409 CONFLICT`).
 4. Cap nhat `LockStatus`:
    - `status = 'LOCKED'`
-   - `locked_by_user_id = req.user.id`
-   - `locked_by = req.user.username`
+   - `locked_by = req.user.id`
    - `locked_at = CURRENT_TIMESTAMP`
    - `version = version + 1`
 5. Ghi 1 ban ghi `RELOCK` vao `AuditLog`:
    - `action_type = 'RELOCK'`
-   - `user_id = req.user.id`
-   - `performed_by = req.user.username`
+   - `performed_by = req.user.id`
    - `result = 'SUCCESS'`
+   - `created_at = CURRENT_TIMESTAMP`
 
 Phan hoi thanh cong (HTTP 200 OK):
 ```json
@@ -465,7 +470,7 @@ Phan hoi thanh cong (HTTP 200 OK):
     "status": "LOCKED",
     "component": "QT1",
     "version": 4,
-    "lockedBy": "nguyen_van_a",
+    "lockedBy": 1,
     "lockedAt": "2026-10-30T10:30:00.000Z"
   }
 }
@@ -481,7 +486,7 @@ Query parameters:
 - `subjectId` (BIGINT, tuy chon): Loc theo mon hoc.
 - `component` (VARCHAR, tuy chon): QT1, QT2, QT3, GK, CK.
 - `studentId` (BIGINT, tuy chon): Loc theo hoc sinh.
-- `userId` (BIGINT, tuy chon): Loc theo ID tai khoan thuc hien.
+- `performedBy` (BIGINT, tuy chon): Loc theo ID nguoi thuc hien tu bang User.
 - `actionType` (VARCHAR, tuy chon): LOCK, UNLOCK, RELOCK, SCORE_EDIT, SCORE_IMPORT.
 - `from`, `to` (ISO8601 TIMESTAMPTZ, tuy chon): Khoang thoi gian thuc hien.
 
@@ -494,8 +499,7 @@ Phan hoi thanh cong (HTTP 200 OK):
       {
         "auditLogId": 502,
         "actionType": "SCORE_EDIT",
-        "userId": 1,
-        "performedBy": "nguyen_van_a",
+        "performedBy": 1,
         "academicYearId": 1,
         "classId": 10,
         "subjectId": 2,
@@ -513,13 +517,13 @@ Phan hoi thanh cong (HTTP 200 OK):
       {
         "auditLogId": 501,
         "actionType": "UNLOCK",
-        "userId": 1,
-        "performedBy": "nguyen_van_a",
+        "performedBy": 1,
+        "requestedBy": 5,
+        "requestedByName": "Tran Thi B (Giao vien Toan)",
         "academicYearId": 1,
         "classId": 10,
         "subjectId": 2,
         "component": "QT1",
-        "requestedBy": "Tran Thi B (Giao vien Toan)",
         "reason": "Sua diem bai kiem tra so 1 cua hoc sinh Nguyen Van C do cham sot cau hoi so 4",
         "relatedLogId": null,
         "result": "SUCCESS",
@@ -558,8 +562,8 @@ await assertComponentNotLocked({
  */
 await writeAuditLog({
   actionType: 'SCORE_EDIT',
-  userId: req.user.id,
-  performedBy: req.user.username,
+  performedBy: req.user.id, // User ID xac thuc tu JWT Middleware
+  requestedBy: null,
   academicYearId,
   classId,
   subjectId,
@@ -583,7 +587,7 @@ await writeAuditLog({
 | 401 | UNAUTHORIZED | Chua dang nhap hoac token xac thuc khong hop le / het han |
 | 403 | FORBIDDEN | Khong co quyen truy cap (khong phai vai tro KHAO_THI) |
 | 404 | NOT_FOUND | Khong tim thay thong tin nien khoa, lop, mon hoc hoac cot diem |
-| 409 | CONFLICT | Trang thai cot diem khong phu hop voi thao tac (VD: mo khoa cot dang UNLOCKED) |
+| 409 | CONFLICT | Trang thai cot diem khong phu hop voi thao tac (VD: mo khoa cot dang UNLOCKED hoac khoa lai cot da LOCKED) |
 | 409 | SCORE_LOCKED | Cot diem dang bi khoa (LOCKED), backend chan tuyet doi thao tac sua diem |
 | 409 | VERSION_CONFLICT | Xung dot phien ban du lieu do co nguoi khac da thao tac dong thoi |
 | 422 | INVALID_SCORE | Gia tri diem khong hop le (ngoai mien 0-10 hoac cot QT co so thap phan) |
@@ -639,7 +643,7 @@ sequenceDiagram
         Hook-->>API: Hop le, cho phep tiep tuc
         API->>DB: UPDATE score_component (oldValue -> newValue)
         API->>Hook: Goi writeAuditLog(entry, { tx })
-        Hook->>DB: INSERT INTO audit_log (action_type='SCORE_EDIT', user_id, oldValue, newValue, related_log_id, ...)
+        Hook->>DB: INSERT INTO audit_log (action_type='SCORE_EDIT', performed_by=user_id, oldValue, newValue, related_log_id, ...)
         alt Ghi log thanh cong
             API->>DB: COMMIT TRANSACTION
             API-->>KT: 200 OK (Sua diem va ghi audit log thanh cong)
@@ -653,14 +657,14 @@ sequenceDiagram
 
 ### 6.3. So do hoat dong tong the (Activity Diagram)
 
-So do hoat dong the hien day du quy trinh khoa cot diem, thu sua khi dang khoa bi chan, mo khoa co ly do giai trinh, sua diem va ghi log bat bien trong transaction, khoa lai va tat ca cac truong hop tu choi thao tac:
+So do hoat dong the hien day du quy trinh: Khoa diem, Mo khoa co ly do, Sua diem (kiem tra khoa, transaction), Ghi AuditLog, Khoa lai va cac truong hop tu choi thao tac (`403 FORBIDDEN`, `400 VALIDATION_ERROR`, `409 SCORE_LOCKED`, `409 CONFLICT`, `409 VERSION_CONFLICT`):
 
 ```mermaid
 flowchart TD
-    Start([Bat dau quy trinh quan ly cot diem]) --> Choose["Can bo Khao thi chon Nien khoa, Lop, Mon va Thanh phan diem"]
+    Start([Bat dau quy trinh quan ly cot diem]) --> Choose["Can bo Khao thi chon Nien khoa, Lop, Mon va Cot diem"]
     Choose --> ChooseAction{"Chon thao tac nghiep vu"}
 
-    %% --- LUONG KHOA DIEM ---
+    %% --- LUONG 1: KHOA DIEM ---
     ChooseAction -- "1. Khoa cot diem" --> ReqLock["Gui yeu cau khoa cot diem: POST /locks/lock"]
     ReqLock --> CheckAuthLock{"Kiem tra quyen:\nRole KHAO_THI?"}
     CheckAuthLock -- "Khong phai Khao thi" --> RejectLock403["TU CHOI: 403 FORBIDDEN\nNguoi dung khong co quyen"]
@@ -670,30 +674,30 @@ flowchart TD
     CheckStatusLock -- "Da la LOCKED" --> RejectLockStatus409["TU CHOI: 409 CONFLICT\nCot diem da o trang thai khoa"]
     CheckStatusLock -- "Dang la UNLOCKED" --> CheckMissing{"Kiem tra hoc sinh trong lop\ncon thieu diem khong?"}
     CheckMissing -- "Con hoc sinh thieu diem" --> ShowWarn["Canh bao so luong hoc sinh thieu diem\n(He thong van cho phep khoa tiep tuc)"]
-    CheckMissing -- "Day du diem" --> DoLock["Cap nhat LockStatus sang LOCKED\nLuu locked_by_user_id va locked_at"]
+    CheckMissing -- "Day du diem" --> DoLock["Cap nhat LockStatus sang LOCKED\nLuu locked_by=user_id va locked_at=NOW"]
     ShowWarn --> DoLock
-    DoLock --> WriteLogLock["Ghi 1 ban ghi vao AuditLog\n(action_type='LOCK', user_id, result='SUCCESS')"]
+    DoLock --> WriteLogLock["Ghi 1 ban ghi vao AuditLog\n(action_type='LOCK', performed_by=user_id, result='SUCCESS', created_at=NOW)"]
     WriteLogLock --> LockDone([Hoan tat khoa cot diem: 200 OK])
 
-    %% --- LUONG THU SUA DIEM KHI DANG KHOA (BI CHAN) ---
+    %% --- LUONG 2: THU SUA DIEM KHI DANG KHOA (BI CHAN) ---
     ChooseAction -- "2. Thu sua diem khi cot dang khoa" --> TryEdit["Nguoi dung thu gui request sua diem\nhoac import CSV cot dang khoa"]
     TryEdit --> HookCheck{"assertComponentNotLocked:\nKiem tra trang thai cot?"}
     HookCheck -- "Cot dang LOCKED" --> BlockEdit409["TU CHOI: 409 SCORE_LOCKED\nRollback transaction, chan tuyet doi sua diem"]
     BlockEdit409 --> BlockEditEnd([Thao tac sua diem bi tu choi hoan toan])
 
-    %% --- LUONG MO KHOA CO LY DO ---
-    ChooseAction -- "3. Mo khoa diem de sua" --> ReqUnlock["Gui yeu cau mo khoa: POST /locks/unlock\n(kem requestedBy va unlockReason)"]
+    %% --- LUONG 3: MO KHOA CO LY DO ---
+    ChooseAction -- "3. Mo khoa diem de sua" --> ReqUnlock["Gui yeu cau mo khoa: POST /locks/unlock\n(kem requestedBy va reason)"]
     ReqUnlock --> CheckAuthUnlock{"Kiem tra quyen:\nRole KHAO_THI?"}
     CheckAuthUnlock -- "Khong phai Khao thi" --> RejectUnlock403["TU CHOI: 403 FORBIDDEN"]
     CheckAuthUnlock -- "Hop le" --> CheckReasonValid{"Kiem tra du lieu:\nCo requestedBy va reason khong?"}
     CheckReasonValid -- "Thieu hoac rong" --> RejectUnlock400["TU CHOI: 400 VALIDATION_ERROR\nBat buoc phai nhap nguoi yeu cau va ly do giai trinh"]
     CheckReasonValid -- "Hop le va day du" --> CheckStatusUnlock{"Trang thai hien tai?"}
     CheckStatusUnlock -- "Dang la UNLOCKED" --> RejectUnlock409["TU CHOI: 409 CONFLICT\nCot diem dang mo, khong can mo khoa"]
-    CheckStatusUnlock -- "Dang la LOCKED" --> DoUnlock["Cap nhat LockStatus sang UNLOCKED\nLuu unlocked_by_user_id, unlocked_at,\nrequested_by va unlock_reason"]
-    DoUnlock --> WriteLogUnlock["Ghi 1 ban ghi vao AuditLog\n(action_type='UNLOCK', user_id, requested_by, reason)"]
+    CheckStatusUnlock -- "Dang la LOCKED" --> DoUnlock["Cap nhat LockStatus sang UNLOCKED\nLuu unlocked_by=user_id, unlocked_at=NOW,\nrequested_by va unlock_reason"]
+    DoUnlock --> WriteLogUnlock["Ghi 1 ban ghi vao AuditLog\n(action_type='UNLOCK', performed_by=user_id, requested_by, reason, created_at=NOW)"]
     WriteLogUnlock --> UnlockDone["Mo khoa thanh cong: 200 OK\n(Tra ve auditLogId cua phien mo khoa)"]
 
-    %% --- LUONG SUA DIEM VA GHI LOG TRONG TRANSACTION ---
+    %% --- LUONG 4: SUA DIEM VA GHI LOG TRONG TRANSACTION ---
     UnlockDone --> ReqEditScore["Khao thi tien hanh sua diem cho hoc sinh\n(PATCH /score-records/... hoac CSV)"]
     ReqEditScore --> BeginTx["Backend bat dau Database Transaction"]
     BeginTx --> CheckHookTx{"assertComponentNotLocked"}
@@ -701,20 +705,20 @@ flowchart TD
     CheckHookTx -- "UNLOCKED" --> ValidateScoreVal{"Kiem tra hop le diem so:\n0 <= score <= 10\nQT la so nguyen?"}
     ValidateScoreVal -- "Diem khong hop le" --> RbScore["ROLLBACK Transaction\nTra ve 422 INVALID_SCORE"]
     ValidateScoreVal -- "Diem hop le" --> UpdateScoreDB["Cap nhat gia tri diem moi vao DB\n(score_component)"]
-    UpdateScoreDB --> WriteAuditScore["Ghi AuditLog: action_type='SCORE_EDIT'\nuser_id, oldValue, newValue, reason,\nrelated_log_id lien ket voi ban ghi UNLOCK"]
+    UpdateScoreDB --> WriteAuditScore["Ghi AuditLog trong cung transaction:\naction_type='SCORE_EDIT', performed_by=user_id,\nold_value, new_value, reason, related_log_id, created_at=NOW"]
     WriteAuditScore --> CheckAuditOk{"Ghi AuditLog\nthanh cong khong?"}
-    CheckAuditOk -- "Gap loi DB" --> RbAudit["ROLLBACK Transaction toan bo\nTra ve 500 INTERNAL_ERROR\n(Bao dam tinh toan ven)"]
+    CheckAuditOk -- "Gap loi DB/Log" --> RbAudit["ROLLBACK Transaction toan bo\nTra ve 500 INTERNAL_ERROR\n(Bao dam tinh toan ven du lieu)"]
     CheckAuditOk -- "Thanh cong" --> CommitTx["COMMIT Database Transaction"]
     CommitTx --> EditScoreDone([Sua diem va ghi nhat ky thanh cong: 200 OK])
 
-    %% --- LUONG KHOA LAI (RELOCK) ---
+    %% --- LUONG 5: KHOA LAI (RELOCK) ---
     EditScoreDone --> ReqRelock["Khao thi gui yeu cau khoa lai cot diem:\nPOST /locks/relock"]
     ReqRelock --> CheckAuthRelock{"Kiem tra quyen:\nRole KHAO_THI?"}
     CheckAuthRelock -- "Khong phai Khao thi" --> RejectRelock403["TU CHOI: 403 FORBIDDEN"]
     CheckAuthRelock -- "Hop le" --> CheckStatusRelock{"Trang thai hien tai?"}
     CheckStatusRelock -- "Da la LOCKED" --> RejectRelock409["TU CHOI: 409 CONFLICT\nCot diem da duoc khoa lai truoc do"]
-    CheckStatusRelock -- "Dang la UNLOCKED" --> DoRelock["Cap nhat LockStatus sang LOCKED\nLuu locked_by_user_id va locked_at moi\ntang version"]
-    DoRelock --> WriteLogRelock["Ghi 1 ban ghi vao AuditLog\n(action_type='RELOCK', user_id, result='SUCCESS')"]
+    CheckStatusRelock -- "Dang la UNLOCKED" --> DoRelock["Cap nhat LockStatus sang LOCKED\nLuu locked_by=user_id va locked_at=NOW moi\ntang version"]
+    DoRelock --> WriteLogRelock["Ghi 1 ban ghi vao AuditLog\n(action_type='RELOCK', performed_by=user_id, result='SUCCESS', created_at=NOW)"]
     WriteLogRelock --> RelockDone([Cot diem duoc khoa lai an toan: 200 OK])
 ```
 
@@ -734,13 +738,12 @@ Bang duoi day tong hop toan bo cac thuc the, truong du lieu, khoa ngoai va rang 
 | `subject_id` | BIGINT | NOT NULL | `subject(subject_id)` | Mon hoc |
 | `component` | VARCHAR(10) | NOT NULL | CHECK (component IN ('QT1','QT2','QT3','GK','CK')) | Thanh phan diem |
 | `status` | VARCHAR(20) | NOT NULL, DEFAULT 'UNLOCKED' | CHECK (status IN ('UNLOCKED','LOCKED')) | Trang thai khoa |
-| `locked_by_user_id`| BIGINT | NULL | `app_user(user_id)` | Nguoi khoa |
-| `locked_by` | VARCHAR(100) | NULL | - | Snapshot username nguoi khoa |
+| `locked_by` | BIGINT | NULL | `app_user(user_id)` | Nguoi khoa (User ID) |
 | `locked_at` | TIMESTAMPTZ | NULL | - | Thoi diem khoa |
-| `unlocked_by_user_id` | BIGINT | NULL | `app_user(user_id)` | Nguoi mo khoa |
-| `unlocked_by` | VARCHAR(100) | NULL | - | Snapshot username nguoi mo khoa |
+| `unlocked_by` | BIGINT | NULL | `app_user(user_id)` | Nguoi mo khoa (User ID) |
 | `unlocked_at` | TIMESTAMPTZ | NULL | - | Thoi diem mo khoa |
-| `requested_by` | VARCHAR(150) | NULL | - | Nguoi yeu cau mo khoa |
+| `requested_by` | BIGINT | NULL | `app_user(user_id)` | Nguoi yeu cau mo khoa (User ID) |
+| `requested_by_name`| VARCHAR(150) | NULL | - | Ho ten nguoi yeu cau de giai trinh |
 | `unlock_reason` | TEXT | NULL | - | Ly do giai trinh |
 | `version` | INTEGER | NOT NULL, DEFAULT 1 | CHECK (version >= 1) | Optimistic lock |
 | `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT CURRENT_TIMESTAMP | - | Thoi diem tao |
@@ -754,8 +757,9 @@ Bang duoi day tong hop toan bo cac thuc the, truong du lieu, khoa ngoai va rang 
 |---|---|---|---|---|
 | `audit_log_id` | BIGSERIAL | PRIMARY KEY | - | Dinh danh duy nhat ban ghi |
 | `action_type` | VARCHAR(50) | NOT NULL | CHECK (action_type IN ('LOCK','UNLOCK','RELOCK','SCORE_EDIT','SCORE_IMPORT')) | Loai thao tac |
-| `user_id` | BIGINT | NOT NULL | `app_user(user_id)` | Tai khoan he thong thuc hien |
-| `performed_by` | VARCHAR(100) | NOT NULL | - | Snapshot username tai thoi diem do |
+| `performed_by` | BIGINT | NOT NULL | `app_user(user_id)` | Tai khoan thuc hien (xac dinh tu JWT Middleware) |
+| `requested_by` | BIGINT | NULL | `app_user(user_id)` | Tai khoan nguoi yeu cau thao tac |
+| `requested_by_name`| VARCHAR(150) | NULL | - | Ho ten nguoi yeu cau de giai trinh |
 | `lock_status_id` | BIGINT | NULL | `lock_status(lock_status_id)` | Cot diem lien quan |
 | `academic_year_id` | BIGINT | NOT NULL | `academic_year(academic_year_id)` | Nien khoa |
 | `class_id` | BIGINT | NOT NULL | `class(class_id)` | Lop hoc |
@@ -766,7 +770,6 @@ Bang duoi day tong hop toan bo cac thuc the, truong du lieu, khoa ngoai va rang 
 | `score_component_id`| BIGINT | NULL | `score_component(score_component_id)`| Thanh phan diem sua |
 | `old_value` | NUMERIC | NULL | - | Diem cu (phan biet 0 va NULL) |
 | `new_value` | NUMERIC | NULL | - | Diem moi (phan biet 0 va NULL) |
-| `requested_by` | VARCHAR(150) | NULL | - | Nguoi yeu cau |
 | `reason` | TEXT | NULL | - | Ly do giai trinh |
 | `related_log_id` | BIGINT | NULL | `audit_log(audit_log_id)` | Lien ket ban ghi UNLOCK |
 | `result` | VARCHAR(20) | NOT NULL, DEFAULT 'SUCCESS' | CHECK (result IN ('SUCCESS','REJECTED','FAILED')) | Ket qua thao tac |
@@ -781,10 +784,11 @@ Bang duoi day tong hop toan bo cac thuc the, truong du lieu, khoa ngoai va rang 
 |---|---|---|
 | Khoa doc lap theo nien khoa, lop, mon, thanh phan | DA THONG NHAT | VT5, VT4, VT1 |
 | Canh bao khi thieu diem nhung van cho phep khoa | DA THONG NHAT | VT5, VT2, VT1 |
-| Mo khoa bat buoc co requestedBy va reason | DA THONG NHAT | VT5, VT2, VT1 |
+| Mo khoa bat buoc co requested_by va reason | DA THONG NHAT | VT5, VT2, VT1 |
 | Ghi AuditLog bat bien va rollback neu ghi log loi | DA THONG NHAT | VT5, VT4, VT1 |
 | Khoa diem doc lap voi Cong bo diem (Lock != Publish) | DA THONG NHAT | VT5, VT1, Nhom |
 | Hoc sinh chi xem diem khi da den gio/lich cong bo | DA THONG NHAT | VT5, VT1, Nhom |
-| Tham chieu tai khoan nguoi thuc hien qua User ID | DA THONG NHAT | VT5, VT1 |
+| Tham chieu performed_by, requested_by qua User ID | DA THONG NHAT | VT5, VT1 |
+| Truy vet nguoi khoa, nguoi mo khoa, nguoi sua diem cung TIMESTAMPTZ | DA THONG NHAT | VT5, VT1 |
 | Quy tac tu dong khoa diem (Auto-lock / Cronjob) | CHUA CHOT (Khong tu y bo sung) | Can xac nhan GV/Nhom |
 | Quy tac cong bo diem chi tiet (Lich / Co che Publish) | CHO VT1 XAC NHAN | VT1 phu trach |
