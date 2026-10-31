@@ -83,5 +83,5 @@ Backend phai kiem tra quyen truy cap.
 - Moi thanh vien lam tren branch rieng.
 - Khong commit truc tiep len main.
 - Commit, Push va tao Pull Request.
-- VT1 review truoc khi merge.
+- Giang review truoc khi merge.
 - API thay doi phai cap nhat tai lieu.

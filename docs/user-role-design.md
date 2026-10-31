@@ -69,7 +69,7 @@ Rang buoc du lieu:
 - password_hash khong duoc NULL.
 - Khong luu mat khau dang van ban thuan.
 - role_id tham chieu Role(role_id).
-- student_id tham chieu Student(student_id) cua VT3.
+- student_id tham chieu Student(student_id) cua Ngoc.
 - student_id co the NULL doi voi tai khoan KHAO_THI.
 - Tai khoan HOC_SINH bat buoc lien ket voi mot Student.
 - Tai khoan KHAO_THI khong lien ket voi Student.
@@ -90,7 +90,7 @@ Quy tac bao mat:
 Luu y:
 - UNIQUE tren username can thuc thi ca quy tac khong phan biet chu hoa, chu thuong.
 - Quy tac role HOC_SINH phai co student_id can duoc kiem tra tai backend hoac bang rang buoc lien bang phu hop.
-- Schema User se duoc doi chieu voi AuditLog cua VT5 truoc khi tao migration chinh thuc.
+- Schema User se duoc doi chieu voi AuditLog cua Uyen truoc khi tao migration chinh thuc.
 
 
 ## 4. Quan he giua cac thuc the
