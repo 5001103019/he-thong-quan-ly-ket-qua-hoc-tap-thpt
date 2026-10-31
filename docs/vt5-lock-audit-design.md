@@ -53,7 +53,7 @@ Thiet ke co che khoa diem va Audit Log cho he thong quan ly ket qua hoc tap THPT
 ### 2.2. Cac thuc the lien quan trong he thong
 
 Su dung thuc the quan ly tai khoan va nguoi dung (Module Xac thuc va phan quyen):
-- **User** (bang `app_user` hoac `users`): Luu thong tin tai khoan nguoi dung (`user_id`, `username`, `role`, `full_name`, `email`, ...). Day la bang nguon de tham chieu khoa ngoai cho `performed_by`, `requested_by`, `locked_by`, `unlocked_by`.
+- **User** (bang `app_user`): Luu thong tin tai khoan nguoi dung (`user_id`, `username`, `role`, `full_name`, `email`, ...). Day la bang nguon de tham chieu khoa ngoai cho `performed_by`, `requested_by`, `locked_by`, `unlocked_by`.
 
 Su dung cac thuc the cua module quan ly hoc sinh va lop hoc:
 - **AcademicYear**: Nien khoa.
@@ -121,7 +121,6 @@ Rang buoc de xuat cho LockStatus:
 - `locked_by` tham chieu `app_user(user_id)`.
 - `unlocked_by` tham chieu `app_user(user_id)`.
 - `requested_by` tham chieu `app_user(user_id)` (cho phep NULL).
-- `CHECK (status != 'UNLOCKED' OR (unlock_reason IS NOT NULL AND (requested_by IS NOT NULL OR (requested_by_name IS NOT NULL AND length(trim(requested_by_name)) > 0))))`.
 
 Luu y ky thuat:
 - Mac dinh khi bat dau nhap diem, trang thai cot diem la `UNLOCKED`.
@@ -275,17 +274,18 @@ He thong ap dung quy tac Database Transaction nguyen tu (ACID) bat buoc cho tat 
 
 - **BR-P01**: He thong thong nhat 2 vai tro co ban: `KHAO_THI` va `HOC_SINH`.
 - **BR-P02**: `HOC_SINH` khong duoc phep goi cac API quan ly khoa diem va khong duoc phep xem AuditLog.
-- **BR-P03**: **Hoc sinh chi duoc xem ket qua hoc tap cua chinh minh khi diem da duoc cong bo theo thoi gian quy dinh. Khoa diem khong dong nghia voi cong bo diem.**
+- **BR-P03**: Hoc sinh dang nhap va chi duoc xem ket qua hoc tap cua chinh minh theo nien khoa va mon hoc. He thong khong bat buoc trien khai co che cong bo diem theo lich trong pham vi hien tai.
+
 
 ### 4.6. Quy tac giua khoa diem va cong bo diem (Lock vs Publish)
 
 - **BR-LP01**: **Doc lap hoan toan giua Khoa diem va Cong bo diem**:
   + Trang thai Khoa diem (`LockStatus`: UNLOCKED / LOCKED) va trang thai Cong bo diem la **hai trang thai doc lap hoan toan**.
   + *Khoa diem*: Nham kiem soat toan ven du lieu noi bo cua phong Khao thi, ngan chan sua doi diem sau han chot nhap diem.
-  + *Cong bo diem*: Nham phuc vu hoc sinh va phu huynh xem ket qua hoc tap cua chinh minh theo moc thoi gian quy dinh cua nha truong.
+  + *Cong bo diem*: Nham phuc vu hoc sinh va phu huynh xem ket qua hoc tap cua chinh minh.
 - **BR-LP02**: **Khong tu dong cong bo khi khoa diem**:
   + He thong **khong tu dong cong bo khi khoa diem** (`Lock != Publish`).
-  + Khi can bo khao thi thuc hien khoa cot diem, cot diem do chi bi dong bang thao tac nhap/sua noi bo, hoc sinh van chua the xem duoc diem neu chua den thoi diem cong bo chinh thuc.
+  + Khi can bo khao thi thuc hien khoa cot diem, cot diem do chi bi dong bang thao tac nhap/sua noi bo.
 - **BR-LP03**: **Quy tac tu dong khoa (Auto-lock)**:
   + Ghi ro: **Quy tac tu dong khoa (Auto-lock) nay chua duoc chot trong pham vi hien tai**.
   + He thong **khong tu y bo sung co che xu ly nao khac** ngoai pham vi da thong nhat.
@@ -890,7 +890,7 @@ Bang duoi day tong hop toan bo cac thuc the, truong du lieu, khoa ngoai va rang 
 | Transaction nguyen tu cho ca LOCK, UNLOCK, RELOCK va SCORE_EDIT (loi thi rollback) | DA THONG NHAT | Khoa diem, Quan ly diem, Database |
 | Ghi AuditLog bat bien va rollback neu ghi log loi | DA THONG NHAT | Khoa diem, Quan ly diem, Database |
 | Khoa diem doc lap voi Cong bo diem (Lock != Publish) | DA THONG NHAT | Khoa diem, Kien truc he thong |
-| Hoc sinh chi xem diem khi da den gio/lich cong bo | DA THONG NHAT | Khoa diem, Kien truc he thong |
+| Hoc sinh chi xem ket qua hoc tap cua chinh minh theo nien khoa va mon hoc | DA THONG NHAT | Xac thuc, Phan quyen, Quan ly diem |
 | Tham chieu performed_by, requested_by qua User ID va requested_by_name | DA THONG NHAT | Khoa diem, Kien truc Database |
 | Truy vet nguoi khoa, nguoi mo khoa, nguoi sua diem cung TIMESTAMPTZ | DA THONG NHAT | Khoa diem, Database |
 | Quy tac tu dong khoa diem (Auto-lock / Cronjob) | CHUA CHOT (Khong tu y bo sung) | Cho nha truong / GVHD xac nhan |
