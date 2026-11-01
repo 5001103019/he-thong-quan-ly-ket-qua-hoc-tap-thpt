@@ -26,7 +26,7 @@ Thiet ke phai bao dam:
 ### 1.2. Cong nghe va quy uoc
 
 - Backend: Node.js, Express.
-- Database: PostgreSQL.
+- Database: Microsoft SQL Server.
 - API: REST.
 - Dinh dang du lieu: JSON.
 - Base URL: http://localhost:3000/api/v1
@@ -100,12 +100,12 @@ Viec lien ket khoa diem va AuditLog tuan theo thiet ke cua cac module lien quan.
 
 Muc dich: Luu ban ghi ket qua hoc tap cua mot hoc sinh theo lan phan lop va mon hoc.
 
-| Thuoc tinh | Kieu PostgreSQL | Rang buoc de xuat | Mo ta |
+| Thuoc tinh | Kieu SQL Server | Rang buoc de xuat | Mo ta |
 |---|---|---|---|
-| score_record_id | BIGSERIAL | PRIMARY KEY | Ma ban ghi diem |
+| score_record_id | BIGINT IDENTITY(1,1) | PRIMARY KEY | Ma ban ghi diem |
 | enrollment_id | BIGINT | NOT NULL, FOREIGN KEY | Tham chieu Enrollment |
 | subject_id | BIGINT | NOT NULL, FOREIGN KEY | Tham chieu Subject |
-| version | INTEGER | NOT NULL, DEFAULT 1 | Phien ban kiem tra xung dot |
+| version | INT | NOT NULL, DEFAULT 1, CHECK (version >= 1) | Phien ban kiem tra xung dot |
 
 Rang buoc de xuat:
 
@@ -128,12 +128,12 @@ Luu y:
 
 Muc dich: Luu gia tri tung thanh phan diem cua ScoreRecord.
 
-| Thuoc tinh | Kieu PostgreSQL | Rang buoc de xuat | Mo ta |
+| Thuoc tinh | Kieu SQL Server | Rang buoc de xuat | Mo ta |
 |---|---|---|---|
-| score_component_id | BIGSERIAL | PRIMARY KEY | Ma thanh phan diem |
+| score_component_id | BIGINT IDENTITY(1,1) | PRIMARY KEY | Ma thanh phan diem |
 | score_record_id | BIGINT | NOT NULL, FOREIGN KEY | Tham chieu ScoreRecord |
 | component_type | VARCHAR(10) | NOT NULL | QT1, QT2, QT3, GK, CK |
-| score_value | NUMERIC | Cho phep NULL | Gia tri diem |
+| score_value | DECIMAL(4,2) | Cho phep NULL | Gia tri diem |
 | score_status | VARCHAR(15) | NOT NULL, DEFAULT 'NOT_ENTERED' | Trang thai diem: NOT_ENTERED, SCORED, ABSENT, EXEMPT |
 Rang buoc de xuat:
 
@@ -145,13 +145,19 @@ Rang buoc de xuat:
 - Diem 0 la gia tri hop le va khac NULL.
 - Mien diem hop le tu 0 den 10, bao gom ca 0 va 10.
 - QT1, QT2, QT3 chi chap nhan diem nguyen; neu nhap so co phan thap phan thi bao loi, khong tu dong lam tron.
-- Rang buoc de xuat cho cot QT: `CHECK (component_type NOT IN ('QT1', 'QT2', 'QT3') OR score_value IS NULL OR score_value = TRUNC(score_value))`.
+- Rang buoc de xuat cho cot QT:
+    CHECK (component_type NOT IN ('QT1', 'QT2', 'QT3')
+    OR score_value IS NULL
+    OR score_value = FLOOR(score_value)).
 - GK va CK chi chap nhan diem tu 0 den 10 theo buoc 0.25. Du lieu khong hop le phai bi tu choi, khong tu dong lam tron.
 - Khong duoc tu dong chuyen NULL thanh 0.
 - Rang buoc trang thai: `CHECK (score_status IN ('NOT_ENTERED', 'SCORED', 'ABSENT', 'EXEMPT'))`.
 - Rang buoc gia tri va trang thai: `CHECK ((score_status = 'SCORED' AND score_value IS NOT NULL) OR (score_status IN ('NOT_ENTERED', 'ABSENT', 'EXEMPT') AND score_value IS NULL))`.
 - Rang buoc mien diem: `CHECK (score_value IS NULL OR score_value BETWEEN 0 AND 10)`.
-- Rang buoc GK/CK: `CHECK (component_type NOT IN ('GK', 'CK') OR score_value IS NULL OR MOD(score_value * 4, 1) = 0)`.
+- Rang buoc GK/CK:
+    CHECK (component_type NOT IN ('GK', 'CK')
+    OR score_value IS NULL
+    OR (score_value * 4) % 1 = 0).
 Vi du:
 
 | Thanh phan | Gia tri | Y nghia |
@@ -168,7 +174,7 @@ Luu y:
 - Quy tac DTK lam tron 2 chu so sau dau phay da duoc nhom thong nhat; khong tu dong lam tron diem QT khi nhap.
 - NOT_ENTERED, ABSENT va EXEMPT co score_value = NULL; SCORED co score_value hop le tu 0 den 10.
 - Khong quy doi ABSENT hoac EXEMPT thanh diem 0. Khong tinh DTK khi co thanh phan ABSENT hoac EXEMPT.
-
+- Backend phai kiem tra gia tri diem goc truoc khi chuyen sang DECIMAL(4,2), khong cho phep tu dong lam tron du lieu nhap khong hop le.
 ### 3.3. Quy tac toan ven du lieu
 
 - ScoreRecord khong duoc tham chieu Enrollment khong ton tai.
@@ -326,10 +332,10 @@ Neu mot hoac nhieu thanh phan diem bat buoc chua co du lieu:
 
 Thong tin cong thuc va phe duyet duoc luu tap trung trong bang cau hinh `ScoreFormulaPolicy`, khong luu lap lai trong `ScoreComponent`.
 
-| Thuoc tinh | Kieu PostgreSQL | Rang buoc | Mo ta |
+| Thuoc tinh | Kieu SQL Server | Rang buoc | Mo ta |
 |---|---|---|---|
-| formula_policy_id | BIGSERIAL | PRIMARY KEY | Ma chinh sach tinh diem |
-| formula_expression | TEXT | NOT NULL | Cong thuc tinh DTK |
+| formula_policy_id | BIGINT IDENTITY(1,1) | PRIMARY KEY | Ma chinh sach tinh diem |
+| formula_expression | NVARCHAR(500) | NOT NULL | Cong thuc tinh DTK |
 | weight_qt1 | SMALLINT | NOT NULL, DEFAULT 1 | He so QT1 |
 | weight_qt2 | SMALLINT | NOT NULL, DEFAULT 1 | He so QT2 |
 | weight_qt3 | SMALLINT | NOT NULL, DEFAULT 1 | He so QT3 |
@@ -338,8 +344,8 @@ Thong tin cong thuc va phe duyet duoc luu tap trung trong bang cau hinh `ScoreFo
 | rounding_digits | SMALLINT | NOT NULL, DEFAULT 2 | So chu so lam tron |
 | version | INTEGER | NOT NULL, UNIQUE, CHECK (version >= 1) | Phien ban cong thuc |
 | approval_status | VARCHAR(10) | NOT NULL, DEFAULT 'PENDING' | Trang thai phe duyet |
-| approved_by | VARCHAR(150) | Cho phep NULL | Thong tin nguoi phe duyet |
-| approved_at | TIMESTAMPTZ | Cho phep NULL | Thoi diem phe duyet |
+| approved_by | NVARCHAR(150) | Cho phep NULL | Thong tin giang vien phe duyet |
+| approved_at | DATETIMEOFFSET(7) | Cho phep NULL | Thoi diem phe duyet |
 
 Rang buoc bo sung:
 
@@ -613,7 +619,7 @@ Noi dung da thiet ke:
 
 - Da thiet ke ScoreRecord va ScoreComponent.
 - Da mo ta quan he voi mo hinh du lieu hoc sinh.
-- Da de xuat cac rang buoc PostgreSQL.
+- Da de xuat cac rang buoc SQL Server.
 - Da xay dung Business Rules.
 - Da mo ta quy tac tinh diem tong ket.
 - Da thiet ke API Contract de xuat.
