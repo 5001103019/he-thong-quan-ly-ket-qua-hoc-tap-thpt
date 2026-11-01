@@ -106,4 +106,25 @@ runTest("Phat hien diem sai", () => {
     assert.deepEqual(result.invalid, ["QT2"]);
 });
 
-console.log("\nTong ket: " + passed + "/10 PASS");
+
+    // TC11: QT1 nhan diem nguyen
+    runTest("QT1 nhan diem nguyen", () => {
+        assert.equal(validateScoreValue(7, "QT1").valid, true);
+    });
+
+    // TC12: QT1 khong nhan diem le
+    runTest("QT1 tu choi diem le", () => {
+        assert.equal(validateScoreValue(7.5, "QT1").valid, false);
+    });
+
+    // TC13: GK nhan diem theo buoc 0.25
+    runTest("GK nhan diem 7.25", () => {
+        assert.equal(validateScoreValue(7.25, "GK").valid, true);
+    });
+
+    // TC14: CK tu choi diem khong dung buoc
+    runTest("CK tu choi diem 7.3", () => {
+        assert.equal(validateScoreValue(7.3, "CK").valid, false);
+    });
+
+    console.log("\nTong ket: " + passed + "/14 PASS");
