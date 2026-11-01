@@ -19,13 +19,13 @@ Thiet ke du lieu quan ly nien khoa, khoi, lop, hoc sinh, phan lop va mon hoc.
 
 Muc dich: Luu thong tin cac nien khoa trong he thong.
 
-| Thuoc tinh | Kieu du lieu PostgreSQL | Rang buoc | Mo ta |
+| Thuoc tinh | Kieu du lieu Microsoft SQL Server | Rang buoc | Mo ta |
 |---|---|---|---|
-| academic_year_id | BIGSERIAL | PRIMARY KEY | Ma dinh danh nien khoa |
+| academic_year_id | BIGINT IDENTITY(1,1) | PRIMARY KEY | Ma dinh danh nien khoa |
 | code | VARCHAR(9) | NOT NULL, UNIQUE | Ma nien khoa, VD: 2025-2026 |
 | start_year | SMALLINT | NOT NULL | Nam bat dau |
 | end_year | SMALLINT | NOT NULL | Nam ket thuc |
-| status | VARCHAR(20) | NOT NULL | PLANNED, ACTIVE hoac CLOSED |
+| status | VARCHAR(20) | NOT NULL, CHECK (status IN ('PLANNED', 'ACTIVE', 'CLOSED')) | Trang thai nien khoa |
 
 Quy tac du lieu du kien:
 
@@ -47,9 +47,9 @@ Luu y: Trang thai minh hoa can duoc nhom xac nhan.
 
 Muc dich: Luu thong tin cac khoi lop 10, 11, 12 trong truong THPT.
 
-| Thuoc tinh | Kieu du lieu PostgreSQL | Rang buoc | Mo ta |
+| Thuoc tinh | Kieu du lieu Microsoft SQL Server | Rang buoc | Mo ta |
 |---|---|---|---|
-| grade_id | SMALLSERIAL | PRIMARY KEY | Ma dinh danh khoi lop |
+| grade_id | SMALLINT IDENTITY(1,1) | PRIMARY KEY | Ma dinh danh khoi lop |
 | grade_number | SMALLINT | NOT NULL, UNIQUE, CHECK (grade_number IN (10, 11, 12)) | So khoi: 10, 11 hoac 12 |
 
 Quy tac du lieu du kien:
@@ -74,14 +74,14 @@ Luu y: Cau truc bang va cac rang buoc can duoc thong nhat truoc khi tao database
 
 Muc dich: Luu thong tin cac lop hoc theo tung nien khoa va khoi lop.
 
-| Thuoc tinh | Kieu du lieu PostgreSQL | Rang buoc | Mo ta |
+| Thuoc tinh | Kieu du lieu Microsoft SQL Server | Rang buoc | Mo ta |
 |---|---|---|---|
-| class_id | BIGSERIAL | PRIMARY KEY | Ma dinh danh lop hoc |
+| class_id | BIGINT IDENTITY(1,1) | PRIMARY KEY | Ma dinh danh lop hoc |
 | academic_year_id | BIGINT | NOT NULL, FOREIGN KEY | Tham chieu AcademicYear |
 | grade_id | SMALLINT | NOT NULL, FOREIGN KEY | Tham chieu Grade |
 | code | VARCHAR(20) | NOT NULL | Ma lop, VD: 10A1 |
-| name | VARCHAR(100) | NOT NULL | Ten lop, VD: Lop 10A1 |
-| status | VARCHAR(20) | NOT NULL, DEFAULT 'ACTIVE' | Trang thai lop |
+| name | NVARCHAR(100) | NOT NULL | Ten lop, VD: Lop 10A1 |
+| status | VARCHAR(20) | NOT NULL, DEFAULT 'ACTIVE', CHECK (status IN ('ACTIVE', 'INACTIVE')) | Trang thai lop |
 
 Rang buoc du lieu du kien:
 
@@ -119,14 +119,14 @@ Luu y:
 
 Muc dich: Luu thong tin ho so hoc sinh trong truong THPT.
 
-| Thuoc tinh | Kieu du lieu PostgreSQL | Rang buoc | Mo ta |
+| Thuoc tinh | Kieu du lieu Microsoft SQL Server | Rang buoc | Mo ta |
 |---|---|---|---|
-| student_id | BIGSERIAL | PRIMARY KEY | Ma dinh danh noi bo cua hoc sinh |
-| student_code | VARCHAR(30) | NOT NULL, UNIQUE | Ma hoc sinh, VD: HS0001 |
-| full_name | VARCHAR(150) | NOT NULL | Ho va ten hoc sinh |
+| student_id | BIGINT IDENTITY(1,1) | PRIMARY KEY | Ma dinh danh noi bo cua hoc sinh |
+| student_code | VARCHAR(30) | NOT NULL, UNIQUE, CHECK khong rong | Ma hoc sinh, VD: HS0001 |
+| full_name | NVARCHAR(150) | NOT NULL, CHECK khong rong | Ho va ten hoc sinh |
 | date_of_birth | DATE | NOT NULL | Ngay sinh hoc sinh |
-| status | VARCHAR(20) | NOT NULL, DEFAULT 'ACTIVE' | Trang thai ho so hoc sinh |
-| created_at | TIMESTAMPTZ | NOT NULL, DEFAULT CURRENT_TIMESTAMP | Thoi diem tao ho so |
+| status | VARCHAR(20) | NOT NULL, DEFAULT 'ACTIVE', CHECK (status IN ('ACTIVE', 'INACTIVE')) | Trang thai ho so hoc sinh |
+| created_at | DATETIMEOFFSET(7) | NOT NULL, DEFAULT SYSDATETIMEOFFSET() | Thoi diem tao ho so |
 
 Rang buoc du lieu du kien:
 
@@ -164,16 +164,16 @@ Luu y:
 
 Muc dich: Luu lich su hoc sinh duoc phan vao lop hoc theo tung nien khoa, bao toan du lieu khi chuyen lop hoac len lop.
 
-| Thuoc tinh | Kieu du lieu PostgreSQL | Rang buoc | Mo ta |
+| Thuoc tinh | Kieu du lieu Microsoft SQL Server | Rang buoc | Mo ta |
 |---|---|---|---|
-| enrollment_id | BIGSERIAL | PRIMARY KEY | Ma dinh danh lan phan lop |
+| enrollment_id | BIGINT IDENTITY(1,1) | PRIMARY KEY | Ma dinh danh lan phan lop |
 | student_id | BIGINT | NOT NULL, FOREIGN KEY | Tham chieu Student |
-| class_id | BIGINT | NOT NULL, FOREIGN KEY | Tham chieu Class |
+| class_id | BIGINT | NOT NULL, FOREIGN KEY kep voi academic_year_id | Tham chieu Class |
 | academic_year_id | BIGINT | NOT NULL, FOREIGN KEY | Tham chieu AcademicYear |
 | start_date | DATE | NOT NULL | Ngay bat dau hoc tai lop |
-| end_date | DATE | NULL | Ngay ket thuc hoc tai lop, moc ket thuc khong bao gom ngay nay |
-| exit_reason | VARCHAR(20) | NULL | Ly do ket thuc: TRANSFER, COMPLETED, WITHDRAWN |
-| created_at | TIMESTAMPTZ | NOT NULL, DEFAULT CURRENT_TIMESTAMP | Thoi diem tao ban ghi |
+| end_date | DATE | NULL, CHECK (end_date IS NULL OR end_date > start_date) | Ngay ket thuc hoc tai lop, moc ket thuc khong bao gom ngay nay |
+| exit_reason | VARCHAR(20) | NULL, CHECK rang buoc voi end_date va gia tri hop le | Ly do ket thuc: TRANSFER, COMPLETED, WITHDRAWN |
+| created_at | DATETIMEOFFSET(7) | NOT NULL, DEFAULT SYSDATETIMEOFFSET() | Thoi diem tao ban ghi |
 
 Rang buoc du lieu du kien:
 
@@ -269,84 +269,77 @@ Vi du khong hop le:
 
 #### 3.5.2. Co che ngan chong lan thoi gian
 
-Phuong an PostgreSQL de xuat:
+Phuong an Microsoft SQL Server da duoc trien khai:
 
-1. Su dung CHECK de dam bao end_date > start_date khi co ngay ket thuc.
-2. Su dung EXCLUDE CONSTRAINT voi GiST va daterange de ngan cac khoang thoi gian chong lan.
-3. So sanh theo student_id va academic_year_id.
-4. Su dung khoang thoi gian [start_date, end_date).
-5. end_date NULL duoc hieu la khoang chua co gioi han ket thuc.
-6. Thao tac chuyen lop phai duoc thuc hien trong transaction.
-7. Khong chi dua vao validation cua API vi hai request dong thoi co the gay xung dot.
+1. Su dung CHECK CONSTRAINT de kiem tra tinh hop le cua ngay bat dau va ngay ket thuc Enrollment.
+2. Su dung CHECK CONSTRAINT de dam bao tinh nhat quan giua end_date va exit_reason.
+3. Su dung filtered UNIQUE INDEX de ngan mot hoc sinh co nhieu Enrollment chua ket thuc trong cung nien khoa.
+4. Su dung index IX_enrollment_overlap_lookup de ho tro truy van kiem tra khoang thoi gian.
+5. Su dung trigger trg_enrollment_no_overlap de phat hien cac khoang thoi gian Enrollment chong lan khi INSERT hoac UPDATE.
+6. Su dung UPDLOCK va HOLDLOCK trong truy van kiem tra cua trigger de ho tro kiem soat truy cap dong thoi.
+7. Thuc hien nghiep vu chuyen lop trong database transaction.
+8. Neu thao tac vi pham rang buoc, phai tu choi va rollback giao dich.
+9. Khong chi dua vao validation tai tang API de ngan du lieu chong lan.
 
-SQL minh hoa, chua thuc thi:
+Cac rang buoc da trien khai trong migration 001:
 
-```sql
-CREATE EXTENSION IF NOT EXISTS btree_gist;
+- CK_enrollment_dates: end_date phai lon hon start_date neu end_date khac NULL.
+- CK_enrollment_exit: end_date va exit_reason phai nhat quan.
+- UX_enrollment_open_student_year: Dam bao moi hoc sinh chi co toi da mot Enrollment chua ket thuc trong cung nien khoa.
 
-ALTER TABLE enrollment
-ADD CONSTRAINT enrollment_valid_dates
-CHECK (end_date IS NULL OR end_date > start_date);
+Co che kiem tra chong lan trong migration 002:
 
-ALTER TABLE enrollment
-ADD CONSTRAINT enrollment_exit_consistency
-CHECK (
-    (end_date IS NULL AND exit_reason IS NULL)
-    OR (
-        end_date IS NOT NULL
-        AND exit_reason IS NOT NULL
-        AND exit_reason IN ('TRANSFER', 'COMPLETED', 'WITHDRAWN')
-    )
-);
+- IX_enrollment_overlap_lookup la index tren student_id, academic_year_id va start_date, co INCLUDE end_date.
+- Trigger dbo.trg_enrollment_no_overlap duoc kich hoat AFTER INSERT, UPDATE tren bang dbo.enrollment.
+- Trigger so sanh Enrollment moi hoac vua cap nhat voi cac Enrollment khac cua cung hoc sinh trong cung nien khoa.
+- Khong so sanh mot Enrollment voi chinh no.
+- Hai khoang thoi gian duoc xem la chong lan khi ngay bat dau cua moi khoang nho hon moc ket thuc cua khoang con lai.
+- Khi end_date NULL, phep so sanh trong trigger su dung moc '99991231' de bieu dien khoang chua co ngay ket thuc.
+- Khi phat hien chong lan, trigger phat sinh loi THROW voi ma 51060.
 
-ALTER TABLE enrollment
-ADD CONSTRAINT enrollment_no_overlap
-EXCLUDE USING gist (
-    student_id WITH =,
-    academic_year_id WITH =,
-    daterange(start_date, end_date, '[)') WITH &&
-);
-```
+Quy uoc thoi gian:
 
-Giai thich:
+- Su dung khoang [start_date, end_date).
+- Bao gom ngay bat dau, khong bao gom ngay ket thuc.
+- Hai Enrollment lien tiep co the co end_date cua ban ghi cu bang start_date cua ban ghi moi.
+- Hai khoang lien tiep nhu tren khong duoc xem la chong lan.
+- Khong cho phep hai khoang thoi gian co phan giao nhau trong cung hoc sinh va nien khoa.
 
-- btree_gist ho tro so sanh bang tren cac cot ID trong GiST.
-- daterange tao khoang thoi gian tu start_date den end_date.
-- [) la quy uoc bao gom ngay dau, khong bao gom ngay cuoi.
-- Toan tu && kiem tra hai khoang thoi gian co giao nhau hay khong.
-- Khi end_date NULL, daterange co can tren mo rong.
-- EXCLUDE ngan hai ban ghi cung hoc sinh va nien khoa co khoang thoi gian giao nhau.
+Vai tro cua cac co che:
 
-Co the duy tri them partial unique index:
-
-```sql
-CREATE UNIQUE INDEX enrollment_one_open_per_year
-ON enrollment (student_id, academic_year_id)
-WHERE end_date IS NULL;
-```
-
-Chi muc nay ngan hai Enrollment chua ket thuc trong cung nien khoa.
-
-EXCLUDE CONSTRAINT moi la co che ngan chong lan lich su day du.
+- CHECK CONSTRAINT kiem tra tinh hop le cua tung ban ghi.
+- Filtered UNIQUE INDEX ngan nhieu Enrollment chua ket thuc trong cung nien khoa.
+- Trigger kiem tra chong lan giua cac khoang thoi gian, bao gom ca lich su da ket thuc.
+- Index IX_enrollment_overlap_lookup ho tro hieu nang truy van cua co che kiem tra.
+- Transaction dam bao viec ket thuc Enrollment cu va tao Enrollment moi duoc xu ly nhat quan.
 
 Luu y:
 
-- SQL tren la phuong an thiet ke de xuat.
-- Ten bang va ten cot phai thong nhat voi schema chung.
-- Cac rang buoc can duoc review, bo sung vao database migrations va kiem thu truoc khi ap dung.
-- Khong thuc thi ALTER TABLE tren database chung khi schema chua duoc phe duyet.
+- Filtered UNIQUE INDEX khong thay the duoc trigger kiem tra chong lan lich su.
+- Cac thao tac chuyen lop phai bao toan Enrollment va ket qua hoc tap da phat sinh.
+- Khong tu dong xoa, ghi de hoac thay doi lien ket diem khi chuyen lop.
+- Backend phai xu ly loi rang buoc va rollback giao dich khi can thiet.
+- Can kiem thu truong hop chuyen lop lien tiep, khoang thoi gian chong lan, du lieu trung va cac request dong thoi.
+- Co che khoa trong trigger can duoc kiem thu thuc te voi cac giao dich dong thoi de danh gia kha nang ngan xung dot.
+
+Nguon doi chieu:
+
+- database/migrations/001_create_tables.sql
+- database/migrations/002_prevent_enrollment_overlap.sql
+
+Trang thai: Da cap nhat mo ta thiet ke theo migration Microsoft SQL Server.
 
 ### 3.6. Subject - Mon hoc
 
 Muc dich: Luu thong tin danh muc cac mon hoc trong truong THPT, phuc vu quan ly va nhap ket qua hoc tap.
 
-| Thuoc tinh | Kieu du lieu PostgreSQL | Rang buoc | Mo ta |
+| Thuoc tinh | Kieu du lieu Microsoft SQL Server | Rang buoc | Mo ta |
 |---|---|---|---|
-| subject_id | BIGSERIAL | PRIMARY KEY | Ma dinh danh noi bo cua mon hoc |
-| code | VARCHAR(20) | NOT NULL, UNIQUE | Ma mon hoc, VD: TOAN |
-| name | VARCHAR(100) | NOT NULL | Ten mon hoc |
-| status | VARCHAR(20) | NOT NULL, DEFAULT 'ACTIVE' | Trang thai mon hoc |
-| created_at | TIMESTAMPTZ | NOT NULL, DEFAULT CURRENT_TIMESTAMP | Thoi diem tao mon hoc |
+| subject_id | BIGINT IDENTITY(1,1) | PRIMARY KEY | Ma dinh danh noi bo cua mon hoc |
+| code | VARCHAR(20) COLLATE Latin1_General_100_CI_AS | NOT NULL, UNIQUE, CHECK khong rong | Ma mon hoc, VD: TOAN |
+| name | NVARCHAR(100) | NOT NULL, CHECK khong rong | Ten mon hoc |
+| status | VARCHAR(20) | NOT NULL, DEFAULT 'ACTIVE', CHECK (status IN ('ACTIVE', 'INACTIVE')) | Trang thai mon hoc |
+| created_at | DATETIMEOFFSET(7) | NOT NULL, DEFAULT SYSDATETIMEOFFSET() | Thoi diem tao mon hoc |
 
 Rang buoc du lieu du kien:
 
@@ -535,7 +528,7 @@ BR-10: Thay doi Enrollment phai duoc xu ly trong transaction.
 
 ### 4.9. Cac van de can thong nhat khi tich hop
 
-- Ten bang PostgreSQL chinh thuc va quy uoc dat ten khoa.
+- Ten bang, schema va quy uoc dat ten khoa trong Microsoft SQL Server phai thong nhat voi database migrations da trien khai.
 - Quy tac chuyen lop khi hoc sinh da co diem.
 - Rang buoc ngan khoang thoi gian Enrollment chong lan.
 - Co can them bang lien ket Subject voi khoi/nien khoa hay khong.
@@ -698,7 +691,7 @@ BR-34: Nien khoa trong Enrollment phai trung voi nien khoa cua Class.
 
 BR-35: Enrollment co hieu luc tai ngay D khi start_date <= D AND (end_date IS NULL OR D < end_date). Quy tac khong chong lan thoi gian duoc quy dinh tai BR-36.
 
-BR-36: Khong cho phep cac khoang thoi gian phan lop cua cung mot hoc sinh trong cung nien khoa chong lan nhau. Su dung khoang [start_date, end_date) va EXCLUDE CONSTRAINT duoc de xuat tai muc 3.5.2.
+BR-36: Khong cho phep cac khoang thoi gian phan lop cua cung mot hoc sinh trong cung nien khoa chong lan nhau. Su dung khoang [start_date, end_date). Trong Microsoft SQL Server, co che ngan chong lan duoc trien khai bang trigger trg_enrollment_no_overlap va duoc ho tro boi index IX_enrollment_overlap_lookup theo muc 3.5.2.
 
 BR-37: Khi chuyen lop, ket thuc Enrollment cu va tao Enrollment moi.
 
@@ -1282,7 +1275,7 @@ Cac phan con phu thuoc chi duoc trien khai sau khi nhom thong nhat.
 
 Da mo ta:
 
-- Thuoc tinh va kieu du lieu PostgreSQL.
+- Thuoc tinh va kieu du lieu Microsoft SQL Server, duoc doi chieu voi cau truc bang trong database/migrations/001_create_tables.sql.
 - Khoa chinh, khoa ngoai va rang buoc.
 - Quan he giua cac thuc the.
 - Quy tac nghiep vu va kiem tra du lieu.
@@ -1384,7 +1377,7 @@ Noi dung ra soat: Rang buoc du lieu, trang thai va quy tac phan lop, chuyen lop.
 
 1. Dieu chinh rang buoc end_date > start_date.
 2. Thong nhat cach bieu dien khoang thoi gian [start_date, end_date).
-3. De xuat EXCLUDE CONSTRAINT de ngan chong lan Enrollment.
+3. Lam ro co che ngan chong lan Enrollment tren Microsoft SQL Server bang CHECK, filtered UNIQUE INDEX, trigger trg_enrollment_no_overlap va index IX_enrollment_overlap_lookup.
 4. Lam ro trang thai cua AcademicYear, Class, Student, Subject va Enrollment.
 5. Bao toan du lieu diem va lich su phan lop.
 
@@ -1484,7 +1477,7 @@ Tong hop cac van de thiet ke con mo, xac dinh phan viec can phoi hop xac nhan va
 
 | Ma | Noi dung can xac nhan | Phuong an de xuat | Phan viec phoi hop xac nhan | Trang thai |
 |---|---|---|---|---|
-| QD-01 | Rang buoc Enrollment | Su dung CHECK, EXCLUDE CONSTRAINT va transaction | Co so du lieu va API | CHO XAC NHAN |
+| QD-01 | Rang buoc Enrollment | Su dung CHECK, filtered UNIQUE INDEX, trigger trg_enrollment_no_overlap va transaction | Co so du lieu va API | CHO XAC NHAN |
 | QD-02 | Chuyen lop ngay bat dau Enrollment | Khong xu ly bang API chuyen lop thong thuong; can quy trinh dieu chinh rieng | Co so du lieu va API; Thiet ke du lieu diem | CHO XAC NHAN |
 | QD-03 | Trang thai AcademicYear | PLANNED, ACTIVE, CLOSED; can chot quy tac chuyen trang thai | Co so du lieu va API | CHO XAC NHAN |
 | QD-04 | Diem lich su khi chuyen lop | Giu nguyen ScoreRecord va ScoreComponent cua Enrollment cu | Co so du lieu va API; Thiet ke du lieu diem | CHO XAC NHAN |
@@ -1492,7 +1485,7 @@ Tong hop cac van de thiet ke con mo, xac dinh phan viec can phoi hop xac nhan va
 | QD-06 | Khoa diem va AuditLog | Chuyen lop khong tu dong mo khoa diem; can thong nhat co che ghi nhat ky | Co so du lieu va API; Khoa diem va AuditLog | CHO XAC NHAN |
 | QD-07 | Pham vi mon hoc | Subject la danh muc chung; can quyet dinh co bang lien ket theo khoi/nien khoa khong | Co so du lieu va API; Thiet ke du lieu diem | CHO XAC NHAN |
 | QD-08 | Rang buoc ScoreRecord | Can chot khoa ngoai, UNIQUE va pham vi hoc ky | Co so du lieu va API; Thiet ke du lieu diem | CHO XAC NHAN |
-| QD-09 | Database migrations | Thong nhat ten bang, khoa ngoai kep va cac CHECK/INDEX/EXCLUDE | Co so du lieu va API | CHO XAC NHAN |
+| QD-09 | Database migrations | Doi chieu ten bang, khoa ngoai kep, CHECK, filtered UNIQUE INDEX, index IX_enrollment_overlap_lookup va trigger trg_enrollment_no_overlap voi cac migration da trien khai | Co so du lieu va API | CHO XAC NHAN |
 | QD-10 | API Contract va phan quyen | Xac nhan endpoint, JSON fields, error codes va middleware KHAO_THI | Co so du lieu va API | CHO XAC NHAN |
 | QD-11 | Moc ngay cua nien khoa | Can thong nhat ngay bat dau, ket thuc va cach kiem tra ngay phan lop | Co so du lieu va API | CHO XAC NHAN |
 
@@ -1511,7 +1504,7 @@ Nhung quy tac chua duoc thong nhat van duoc ghi nhan la phuong an de xuat.
 
 Truoc khi trien khai cac chuc nang phu thuoc, can:
 
-1. Thong nhat schema va ten bang PostgreSQL.
+1. Doi chieu schema dbo, ten bang, kieu du lieu va cac rang buoc voi database migrations Microsoft SQL Server da trien khai.
 2. Xac nhan rang buoc Enrollment va database migrations.
 3. Thong nhat endpoint, JSON fields va middleware.
 4. Xac nhan lien ket voi du lieu diem va anh huong cua khoa diem khi chuyen lop.
