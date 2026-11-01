@@ -1,4 +1,3 @@
-
 # SOFTWARE REQUIREMENTS SPECIFICATION (SRS)
 # HE THONG QUAN LY KET QUA HOC TAP HOC SINH THPT
 
@@ -6,13 +5,13 @@
 
 **Ma tai lieu:** G5-SRS
 
-**Phien ban tai lieu:** 1.0 - Draft
+**Phien ban tai lieu:** 1.1 - Draft (cap nhat cong nghe CSDL Microsoft SQL Server)
 
 **Trang thai:** Du thao dac ta yeu cau, chua phai bien ban nghiem thu
 
 **Cong nghe dang ky:** HTML, CSS, JavaScript
 
-**Cong nghe trien khai du kien:** HTML, CSS, JavaScript, Node.js, Express, PostgreSQL
+**Cong nghe trien khai du kien:** HTML, CSS, JavaScript, Node.js, Express, Microsoft SQL Server
 
 **Pham vi:** Do an mon Cong nghe phan mem
 
@@ -175,7 +174,9 @@ Cac gioi han tren la phuong an pham vi thiet ke. Neu phat sinh thay doi doi voi 
 
 - Frontend: HTML, CSS, JavaScript.
 - Backend: Node.js va Express.
-- Database: PostgreSQL.
+- Database: Microsoft SQL Server; migration su dung T-SQL.
+- Backend ket noi database bang thu vien Node.js `mssql` sau khi cai dat phu thuoc.
+- Cau hinh ket noi (`DB_SERVER`, `DB_NAME`, tai khoan va tuy chon bao mat) duoc cung cap qua `.env.example`; mat khau thuc te chi luu trong `.env` va khong dua len Git.
 - Giao tiep frontend-backend: REST API, JSON.
 - Giao dien demo: desktop, theo quy chuan trong docs/figma-handoff.md.
 - He thong duoc demo trong moi truong phat trien cua nhom.
@@ -250,10 +251,9 @@ Giang vien danh gia de tai la stakeholder, khong phai actor dang nhap cua he tho
 
 - Moi User duoc gan Role hop le.
 - USER la ten thuc the trong ERD.
-- Bang PostgreSQL tuong ung la app_user.
+- Bang Microsoft SQL Server tuong ung la app_user.
 - Tai khoan HOC_SINH phai lien ket voi Student.
-- Tai khoan KHAO_THI khong gan voi Student.
-
+- Tai khoan KHAO_THI khong bat buoc lien ket Student.
 - Backend lay danh tinh nguoi dung tu phien dang nhap hop le.
 - Khong tin student_id hoac performed_by do client tu khai bao.
 - Tai khoan INACTIVE khong duoc dang nhap.
@@ -1244,7 +1244,7 @@ Khong tu dong coi mot gia dinh la ket qua khao sat da duoc xac nhan.
 | AS-08 | Cong thuc DTK he so 1,1,1,2,3 va lam tron 2 chu so | Phuong an cua nhom; can bang chung phe duyet thuc te |
 | AS-09 | Khong can trang thai PUBLISHED rieng | Lua chon pham vi thiet ke |
 | AS-10 | Chi co 2 actor dang nhap | Theo de tai |
-| AS-11 | Su dung app_user lam ten bang User trong PostgreSQL | Quy uoc ky thuat |
+| AS-11 | Su dung app_user lam ten bang User trong Microsoft SQL Server | Quy uoc ky thuat |
 | AS-12 | Su dung mot cau hinh cong thuc thong nhat trong demo | Lua chon thiet ke |
 | AS-13 | Khong tu dong khoa diem theo thoi han | Gioi han trien khai hien tai |
 | AS-14 | Bao toan Enrollment va diem khi chuyen lop | Quy tac bao toan lich su |
@@ -1294,10 +1294,26 @@ Change Request duoc su dung khi de xuat thay doi pham vi hoac yeu cau da xac lap
 | DEC-03 | Khong tao trang thai PUBLISHED rieng | Lua chon thiet ke | Ghi nhan trong thiet ke |
 | DEC-04 | Cong thuc DTK 1,1,1,2,3 | Phuong an nghiep vu | Can doi chieu bang chung phe duyet |
 | DEC-05 | Import CSV co preview va bao loi tung dong | Chi tiet hoa FR10 | Ghi nhan trong thiet ke |
+| CR-DB-01 | Chuyen he quan tri CSDL tu PostgreSQL sang Microsoft SQL Server | Thay doi cong nghe trien khai | Nhom da thong nhat; dang dong bo tai lieu va code |
 
-Bang tren khong phai danh sach Change Request da duoc phe duyet.
+Cac dong DEC-01 den DEC-05 chu yeu la quyet dinh/phuong an thiet ke, khong tu dong duoc coi la CR da phe duyet. CR-DB-01 duoc nhom dong y ve mat cong nghe theo xac nhan noi bo; ket qua chuyen doi van can review va kiem thu.
 
 Neu ho so nhom co CR thuc te, can bo sung ma CR va bang chung tuong ung.
+
+### 8.6. CR-DB-01 - Thay doi he quan tri co so du lieu
+
+- **Ngay ghi nhan:** 01/11/2026.
+- **Noi dung cu:** PostgreSQL duoc chon lam he quan tri co so du lieu o ban thiet ke ban dau.
+- **Noi dung moi:** Microsoft SQL Server thay the PostgreSQL cho he thong.
+- **Ly do:** Ca nhom thong nhat thay doi cong nghe co so du lieu.
+- **Trang thai quyet dinh:** Nhom da dong y theo thong tin thong nhat noi bo; minh chung chap thuan/ghi nhan hop nhom can duoc luu trong ho so neu co.
+- **Pham vi anh huong:** VT1-01 (kien truc); VT1-02 (SRS, ERD, Data Dictionary); VT1-03 (schema, migrations, ket noi); tai lieu/API cua cac module lien quan.
+- **Thay doi ky thuat:** Driver Node.js chuyen sang `mssql`; migrations dung T-SQL; doi chieu cac kieu du lieu va rang buoc dac thu (IDENTITY, DATETIMEOFFSET, BIT, UNIQUE filtered index va kiem tra chong lan lich su Enrollment).
+- **Nghiep vu khong thay doi:** G5-FR01 den G5-FR12, 5 nhom NFR, quyen truy cap, bang diem QT1-QT3/GK/CK, cong thuc DTK, khoa/mo khoa va AuditLog; cac test case/RTM ve nghiep vu duoc giu nguyen.
+- **Toan ven giao dich:** Cap nhat diem hoac trang thai khoa va ghi AuditLog phai thanh cong cung nhau trong mot SQL Server transaction; loi thi rollback.
+- **Bao mat:** Khong commit thong tin dang nhap hay mat khau SQL Server vao repository.
+- **Trang thai trien khai:** Dang chuyen doi tai lieu/cau hinh; chua coi migrations, ket noi SQL Server hoac kiem thu database la da hoan thanh.
+- **Hanh dong doi chieu:** Sau khi cap nhat, kiem tra lai docs/erd.md, docs/data-dictionary.md, docs/api-conventions.md, README.md, `.env.example`, package.json, tai lieu VT3/VT4/VT5 va migrations.
 
 ---
 
@@ -1622,7 +1638,7 @@ Thuc the cau hinh bo sung:
 
 ### 12.2. Nguyen tac dong bo
 
-- USER trong ERD duoc anh xa thanh app_user trong PostgreSQL.
+- USER trong ERD duoc anh xa thanh app_user trong Microsoft SQL Server.
 - Student lien ket Class qua Enrollment.
 - ScoreRecord lien ket Enrollment va Subject.
 - ScoreComponent luu diem thanh phan.
@@ -1675,7 +1691,7 @@ Khong duoc tu y thay doi mot tai lieu lam mau thuan voi cac tai lieu con lai.
 | SRS-19 | Bang chung GV phe duyet cong thuc | CAN_KIEM_TRA |
 | SRS-20 | Ket qua nghiem thu Figma | CHUA_XAC_NHAN |
 | SRS-21 | Ket qua chay test PASS/FAIL | CHUA_CHAY |
-| SRS-22 | Review va ban giao GitHub | CHUA_XAC_NHAN |
+| SRS-22 | Review va ban giao GitHub | Ban 1.0 da Merge PR #7; ban 1.1 chua review/Merge |
 
 ---
 
@@ -1690,5 +1706,3 @@ Cac noi dung can bang chung khao sat, phe duyet giang vien, nghiem thu prototype
 Truoc khi trien khai UI, can doi chieu prototype Figma voi UC/FR va cac tieu chi chap nhan trong Muc 9.
 
 Truoc khi nghiem thu cuoi ky, can cap nhat ket qua kiem thu va minh chung hoan thanh yeu cau MUST trong RTM.
-
-**Trang thai tai lieu:** Draft - San sang cho buoc review va dong bo voi cac tai lieu thiet ke lien quan.

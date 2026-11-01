@@ -1,4 +1,3 @@
-
 # DATA DICTIONARY - HE THONG QUAN LY KET QUA HOC TAP THPT
 
 ## 1. Muc tieu
@@ -34,6 +33,7 @@ ScoreFormulaPolicy duoc bo sung tu thiet ke quan ly diem de luu cong thuc, he so
 
 Day la thuc the cau hinh bo sung, khong phai bang diem moi.
 
+
 ### 2.3. Quy uoc
 
 - PK: Primary Key - Khoa chinh.
@@ -43,17 +43,25 @@ Day la thuc the cau hinh bo sung, khong phai bang diem moi.
 - NULL: Cho phep chua co gia tri.
 - CHECK: Rang buoc kiem tra du lieu.
 - DEFAULT: Gia tri mac dinh.
-- TIMESTAMPTZ: Thoi diem co thong tin mui gio.
-- BIGSERIAL: Dinh danh so nguyen lon tu tang.
-- SMALLSERIAL: Dinh danh so nguyen nho tu tang.
-- NUMERIC: Kieu du lieu so chinh xac.
-- TRANSACTION: Nhom thao tac du lieu duoc thuc hien theo nguyen tac toan ven.
+- BIGINT IDENTITY(1,1): Dinh danh so nguyen lon tu tang.
+- SMALLINT IDENTITY(1,1): Dinh danh so nguyen nho tu tang.
+- NVARCHAR(n): Chuoi Unicode co do dai gioi han.
+- NVARCHAR(MAX): Chuoi Unicode co do dai lon.
+- BIT: Gia tri trang thai 0 hoac 1.
+- DECIMAL(p,s): So thap phan co do chinh xac co dinh.
+- DATETIMEOFFSET(7): Thoi diem co thong tin mui gio.
+- SYSDATETIMEOFFSET(): Thoi diem hien tai kem thong tin mui gio.
+- TRANSACTION: Nhom thao tac du lieu duoc thuc hien theo nguyen tac toan ven; neu co loi thi rollback.
 
-Ten thuc the duoc giu theo mo hinh thiet ke.
+He quan tri co so du lieu chinh thuc cua he thong la
+Microsoft SQL Server.
 
-Ten bang PostgreSQL chinh thuc su dung quy uoc snake_case va se duoc thong nhat khi tao migrations.
+Ten thuc the duoc giu theo mo hinh ERD.
+Ten bang va ten cot su dung quy uoc snake_case.
 
-Thuc the User duoc anh xa thanh bang app_user trong PostgreSQL, voi khoa chinh app_user(user_id).
+Doi voi ma dinh danh va trang thai dung VARCHAR; doi voi noi dung tieng Viet co dau dung NVARCHAR.
+Cac khoa ngoai su dung cung kieu du lieu voi khoa chinh duoc tham chieu.
+
 
 ## 3. Chi tiet cac thuc the
 
@@ -63,9 +71,9 @@ Thuc the User duoc anh xa thanh bang app_user trong PostgreSQL, voi khoa chinh a
 
 | Thuoc tinh | Kieu du lieu | Rang buoc | Mo ta |
 |---|---|---|---|
-| role_id | BIGSERIAL | PRIMARY KEY | Ma vai tro |
+| role_id | BIGINT IDENTITY(1,1) | PRIMARY KEY | Ma vai tro |
 | code | VARCHAR(30) | NOT NULL, UNIQUE | Ma vai tro |
-| name | VARCHAR(100) | NOT NULL | Ten vai tro |
+| name | NVARCHAR(100) | NOT NULL | Ten vai tro |
 
 **Quy tac du lieu:**
 
@@ -92,22 +100,23 @@ Thuc the User duoc anh xa thanh bang app_user trong PostgreSQL, voi khoa chinh a
 
 **Muc dich:** Luu tai khoan dang nhap va lien ket voi vai tro, ho so hoc sinh khi can thiet.
 
+
 | Thuoc tinh | Kieu du lieu | Rang buoc | Mo ta |
 |---|---|---|---|
-| user_id | BIGSERIAL | PRIMARY KEY | Ma tai khoan |
-| username | VARCHAR(50) | NOT NULL, UNIQUE | Ten dang nhap |
-| password_hash | TEXT | NOT NULL | Mat khau da bam |
+| user_id | BIGINT IDENTITY(1,1) | PRIMARY KEY | Ma tai khoan |
+| username | NVARCHAR(50) | NOT NULL, UNIQUE | Ten dang nhap |
+| password_hash | VARCHAR(255) | NOT NULL | Mat khau da bam |
 | role_id | BIGINT | NOT NULL, FOREIGN KEY | Tham chieu Role |
-| student_id | BIGINT | NULL, UNIQUE, FOREIGN KEY | Tham chieu Student |
-| is_active | BOOLEAN | NOT NULL, DEFAULT TRUE | Trang thai tai khoan |
-| created_at | TIMESTAMPTZ | NOT NULL, DEFAULT CURRENT_TIMESTAMP | Thoi diem tao |
+| student_id | BIGINT | NULL, FOREIGN KEY, UNIQUE FILTERED INDEX | Tham chieu Student |
+| is_active | BIT | NOT NULL, DEFAULT 1 | Trang thai tai khoan |
+| created_at | DATETIMEOFFSET(7) | NOT NULL, DEFAULT SYSDATETIMEOFFSET() | Thoi diem tao |
+
 
 **Quy tac du lieu:**
 
 - Moi User co mot user_id duy nhat.
 - username khong duoc NULL, rong hoac chi chua khoang trang.
-- username phai duy nhat khong phan biet chu hoa va chu thuong.
-- Can su dung unique index phu hop hoac citext khi tao migrations.
+- username phai duy nhat khong phan biet chu hoa va chu thuong. Khi tao migrations Microsoft SQL Server, su dung collation khong phan biet chu hoa/thuong (CI) ket hop UNIQUE constraint.
 - Mat khau phai duoc luu duoi dang password_hash.
 - Khong luu mat khau dang van ban thuan.
 - Khong tra ve password_hash trong API.
@@ -115,6 +124,7 @@ Thuc the User duoc anh xa thanh bang app_user trong PostgreSQL, voi khoa chinh a
 - Tai khoan HOC_SINH phai lien ket voi Student.
 - Tai khoan KHAO_THI khong gan voi Student.
 - Mot Student co toi da mot tai khoan User.
+- student_id cho phep NULL doi voi tai khoan KHAO_THI. Su dung UNIQUE FILTERED INDEX voi dieu kien student_id IS NOT NULL de dam bao moi hoc sinh co toi da mot tai khoan, dong thoi cho phep nhieu tai khoan KHAO_THI khong lien ket Student.
 - Quy tac HOC_SINH phai co student_id va KHAO_THI khong co student_id can duoc kiem tra tai backend hoac bang rang buoc lien bang phu hop.
 - Khoa ngoai role_id rieng le khong du de kiem tra quy tac lien ket Student theo vai tro.
 - Khi vo hieu hoa User, khong xoa du lieu Student, Enrollment hoac diem.
@@ -132,7 +142,7 @@ Thuc the User duoc anh xa thanh bang app_user trong PostgreSQL, voi khoa chinh a
 
 - Tai khoan thuc hien thao tac phai duoc xac dinh tu phien dang nhap hop le.
 - Khong tin ID nguoi thuc hien do client tu khai bao.
-- Ten bang PostgreSQL cua thuc the User duoc quy dinh la app_user.
+- Ten bang chinh thuc cua thuc the User la app_user.
 - Cac rang buoc se duoc trien khai trong database schema va backend theo thiet ke da thong nhat.
 
 ### 3.3. AcademicYear
@@ -141,7 +151,7 @@ Thuc the User duoc anh xa thanh bang app_user trong PostgreSQL, voi khoa chinh a
 
 | Thuoc tinh | Kieu du lieu | Rang buoc | Mo ta |
 |---|---|---|---|
-| academic_year_id | BIGSERIAL | PRIMARY KEY | Ma nien khoa |
+| academic_year_id | BIGINT IDENTITY(1,1) | PRIMARY KEY | Ma nien khoa |
 | code | VARCHAR(9) | NOT NULL, UNIQUE | Ma nien khoa, VD: 2025-2026 |
 | start_year | SMALLINT | NOT NULL | Nam bat dau |
 | end_year | SMALLINT | NOT NULL | Nam ket thuc |
@@ -175,10 +185,12 @@ Thuc the User duoc anh xa thanh bang app_user trong PostgreSQL, voi khoa chinh a
 
 **Muc dich:** Luu danh muc cac khoi lop trong truong THPT.
 
+
 | Thuoc tinh | Kieu du lieu | Rang buoc | Mo ta |
 |---|---|---|---|
-| grade_id | SMALLSERIAL | PRIMARY KEY | Ma khoi |
+| grade_id | SMALLINT IDENTITY(1,1) | PRIMARY KEY | Ma khoi |
 | grade_number | SMALLINT | NOT NULL, UNIQUE, CHECK | So khoi 10, 11 hoac 12 |
+
 
 **Quy tac du lieu:**
 
@@ -201,11 +213,11 @@ Thuc the User duoc anh xa thanh bang app_user trong PostgreSQL, voi khoa chinh a
 
 | Thuoc tinh | Kieu du lieu | Rang buoc | Mo ta |
 |---|---|---|---|
-| class_id | BIGSERIAL | PRIMARY KEY | Ma lop |
+| class_id | BIGINT IDENTITY(1,1) | PRIMARY KEY | Ma lop |
 | academic_year_id | BIGINT | NOT NULL, FOREIGN KEY | Tham chieu AcademicYear |
 | grade_id | SMALLINT | NOT NULL, FOREIGN KEY | Tham chieu Grade |
 | code | VARCHAR(20) | NOT NULL | Ma lop, VD: 10A1 |
-| name | VARCHAR(100) | NOT NULL | Ten lop |
+| name | NVARCHAR(100) | NOT NULL | Ten lop |
 | status | VARCHAR(20) | NOT NULL, DEFAULT 'ACTIVE' | Trang thai lop |
 
 **Quy tac du lieu:**
@@ -238,12 +250,12 @@ Thuc the User duoc anh xa thanh bang app_user trong PostgreSQL, voi khoa chinh a
 
 | Thuoc tinh | Kieu du lieu | Rang buoc | Mo ta |
 |---|---|---|---|
-| student_id | BIGSERIAL | PRIMARY KEY | Ma dinh danh hoc sinh |
+| student_id | BIGINT IDENTITY(1,1) | PRIMARY KEY | Ma dinh danh hoc sinh |
 | student_code | VARCHAR(30) | NOT NULL, UNIQUE | Ma hoc sinh |
-| full_name | VARCHAR(150) | NOT NULL | Ho va ten hoc sinh |
+| full_name | NVARCHAR(150) | NOT NULL | Ho va ten hoc sinh |
 | date_of_birth | DATE | NOT NULL | Ngay sinh |
 | status | VARCHAR(20) | NOT NULL, DEFAULT 'ACTIVE' | Trang thai ho so |
-| created_at | TIMESTAMPTZ | NOT NULL, DEFAULT CURRENT_TIMESTAMP | Thoi diem tao |
+| created_at | DATETIMEOFFSET(7) | NOT NULL, DEFAULT SYSDATETIMEOFFSET() | Thoi diem tao |
 
 **Quy tac du lieu:**
 
@@ -278,14 +290,14 @@ Thuc the User duoc anh xa thanh bang app_user trong PostgreSQL, voi khoa chinh a
 
 | Thuoc tinh | Kieu du lieu | Rang buoc | Mo ta |
 |---|---|---|---|
-| enrollment_id | BIGSERIAL | PRIMARY KEY | Ma dinh danh lan phan lop |
+| enrollment_id | BIGINT IDENTITY(1,1) | PRIMARY KEY | Ma dinh danh lan phan lop |
 | student_id | BIGINT | NOT NULL, FOREIGN KEY | Tham chieu Student |
 | class_id | BIGINT | NOT NULL, FOREIGN KEY | Tham chieu Class |
 | academic_year_id | BIGINT | NOT NULL, FOREIGN KEY | Tham chieu AcademicYear |
 | start_date | DATE | NOT NULL | Ngay bat dau hoc tai lop |
 | end_date | DATE | NULL | Ngay ket thuc, khong bao gom ngay nay |
 | exit_reason | VARCHAR(20) | NULL | Ly do ket thuc phan lop |
-| created_at | TIMESTAMPTZ | NOT NULL, DEFAULT CURRENT_TIMESTAMP | Thoi diem tao ban ghi |
+| created_at | DATETIMEOFFSET(7) | NOT NULL, DEFAULT SYSDATETIMEOFFSET() | Thoi diem tao ban ghi |
 
 **Quy tac du lieu:**
 
@@ -317,14 +329,16 @@ Thuc the User duoc anh xa thanh bang app_user trong PostgreSQL, voi khoa chinh a
 - Khong chi dua vao end_date IS NULL de xac dinh hoc sinh dang hoc.
 - Khong cho phep hai Enrollment cua cung mot hoc sinh va nien khoa co khoang thoi gian giao nhau.
 
-**Rang buoc PostgreSQL de xuat:**
+**Rang buoc Microsoft SQL Server de xuat:**
 
 - CHECK (end_date IS NULL OR end_date > start_date).
-- CHECK tinh nhat quan giua end_date va exit_reason.
-- UNIQUE INDEX tren (student_id, academic_year_id) voi dieu kien end_date IS NULL.
-- EXCLUDE CONSTRAINT su dung GiST va daterange de ngan cac khoang thoi gian chong lan.
-- Su dung btree_gist de ho tro so sanh student_id va academic_year_id.
-- Cac rang buoc SQL cu the se duoc trien khai trong VT1-03 sau khi schema duoc thong nhat.
+- CHECK ((end_date IS NULL AND exit_reason IS NULL) OR (end_date IS NOT NULL AND exit_reason IN ('TRANSFER', 'COMPLETED', 'WITHDRAWN'))).
+- FOREIGN KEY (class_id, academic_year_id) tham chieu Class (class_id, academic_year_id).
+- Bang Class can UNIQUE (class_id, academic_year_id) de ho tro khoa ngoai kep.
+- UNIQUE FILTERED INDEX tren (student_id, academic_year_id) voi dieu kien end_date IS NULL de ngan nhieu Enrollment chua ket thuc cua cung hoc sinh trong mot nien khoa.
+- SQL Server khong ho tro truc tiep EXCLUDE CONSTRAINT cho khoang thoi gian. De chan moi truong hop chong lan, backend can kiem tra khoang [start_date, end_date) trong transaction co co che khoa phu hop (vi du SERIALIZABLE hoac sp_getapplock theo hoc sinh va nien khoa).
+- Viec cap nhat Enrollment cu va tao Enrollment moi phai nam trong cung transaction.
+- Rang buoc va luong giao dich se duoc kiem thu khi trien khai migrations va backend VT1-03.
 
 **Quy tac khi hoc sinh chuyen lop:**
 
@@ -365,11 +379,11 @@ Thuc the User duoc anh xa thanh bang app_user trong PostgreSQL, voi khoa chinh a
 
 | Thuoc tinh | Kieu du lieu | Rang buoc | Mo ta |
 |---|---|---|---|
-| subject_id | BIGSERIAL | PRIMARY KEY | Ma dinh danh mon hoc |
+| subject_id | BIGINT IDENTITY(1,1) | PRIMARY KEY | Ma dinh danh mon hoc |
 | code | VARCHAR(20) | NOT NULL, UNIQUE | Ma mon hoc, VD: TOAN |
-| name | VARCHAR(100) | NOT NULL | Ten mon hoc |
+| name | NVARCHAR(100) | NOT NULL | Ten mon hoc |
 | status | VARCHAR(20) | NOT NULL, DEFAULT 'ACTIVE' | Trang thai mon hoc |
-| created_at | TIMESTAMPTZ | NOT NULL, DEFAULT CURRENT_TIMESTAMP | Thoi diem tao mon hoc |
+| created_at | DATETIMEOFFSET(7) | NOT NULL, DEFAULT SYSDATETIMEOFFSET() | Thoi diem tao mon hoc |
 
 **Quy tac du lieu:**
 
@@ -428,7 +442,7 @@ Thuc the User duoc anh xa thanh bang app_user trong PostgreSQL, voi khoa chinh a
 
 | Thuoc tinh | Kieu du lieu | Rang buoc | Mo ta |
 |---|---|---|---|
-| score_record_id | BIGSERIAL | PRIMARY KEY | Ma ban ghi diem |
+| score_record_id | BIGINT IDENTITY(1,1) | PRIMARY KEY | Ma ban ghi diem |
 | enrollment_id | BIGINT | NOT NULL, FOREIGN KEY | Tham chieu Enrollment |
 | subject_id | BIGINT | NOT NULL, FOREIGN KEY | Tham chieu Subject |
 | version | INTEGER | NOT NULL, DEFAULT 1, CHECK | Phien ban ban ghi de phat hien xung dot |
@@ -487,10 +501,10 @@ Thuc the User duoc anh xa thanh bang app_user trong PostgreSQL, voi khoa chinh a
 
 | Thuoc tinh | Kieu du lieu | Rang buoc | Mo ta |
 |---|---|---|---|
-| score_component_id | BIGSERIAL | PRIMARY KEY | Ma thanh phan diem |
+| score_component_id | BIGINT IDENTITY(1,1) | PRIMARY KEY | Ma thanh phan diem |
 | score_record_id | BIGINT | NOT NULL, FOREIGN KEY | Tham chieu ScoreRecord |
 | component_type | VARCHAR(10) | NOT NULL, CHECK | Loai thanh phan diem |
-| score_value | NUMERIC | NULL, CHECK | Gia tri diem tu 0 den 10 |
+| score_value | DECIMAL(4,2) | NULL, CHECK | Gia tri diem tu 0 den 10 |
 | score_status | VARCHAR(15) | NOT NULL, DEFAULT 'NOT_ENTERED', CHECK | Trang thai diem |
 
 **Quy tac du lieu:**
@@ -521,15 +535,17 @@ Thuc the User duoc anh xa thanh bang app_user trong PostgreSQL, voi khoa chinh a
 - Neu score_status = NOT_ENTERED, ABSENT hoac EXEMPT thi score_value phai la NULL.
 - ABSENT va EXEMPT khong duoc tu dong quy doi thanh diem 0.
 
-**Rang buoc PostgreSQL de xuat:**
+**Rang buoc Microsoft SQL Server de xuat:**
 
 - UNIQUE (score_record_id, component_type).
 - CHECK (component_type IN ('QT1', 'QT2', 'QT3', 'GK', 'CK')).
 - CHECK (score_status IN ('NOT_ENTERED', 'SCORED', 'ABSENT', 'EXEMPT')).
 - CHECK (score_value IS NULL OR score_value BETWEEN 0 AND 10).
-- CHECK (component_type NOT IN ('QT1', 'QT2', 'QT3') OR score_value IS NULL OR score_value = TRUNC(score_value)).
-- CHECK (component_type NOT IN ('GK', 'CK') OR score_value IS NULL OR MOD(score_value * 4, 1) = 0).
+- CHECK (component_type NOT IN ('QT1', 'QT2', 'QT3') OR score_value IS NULL OR score_value = FLOOR(score_value)).
+- CHECK (component_type NOT IN ('GK', 'CK') OR score_value IS NULL OR score_value * 4 = FLOOR(score_value * 4)).
 - CHECK ((score_status = 'SCORED' AND score_value IS NOT NULL) OR (score_status IN ('NOT_ENTERED', 'ABSENT', 'EXEMPT') AND score_value IS NULL)).
+- score_value su dung DECIMAL(4,2), gia tri NULL duoc phan biet voi diem 0.
+- Backend phai kiem tra do chinh xac cua diem truoc khi ep kieu va ghi DB; khong tu dong lam tron diem khong hop le.
 
 **Quy tac tinh diem tong ket:**
 
@@ -570,22 +586,22 @@ Thuc the User duoc anh xa thanh bang app_user trong PostgreSQL, voi khoa chinh a
 
 | Thuoc tinh | Kieu du lieu | Rang buoc | Mo ta |
 |---|---|---|---|
-| lock_status_id | BIGSERIAL | PRIMARY KEY | Ma trang thai khoa |
+| lock_status_id | BIGINT IDENTITY(1,1) | PRIMARY KEY | Ma trang thai khoa |
 | academic_year_id | BIGINT | NOT NULL, FOREIGN KEY | Tham chieu AcademicYear |
 | class_id | BIGINT | NOT NULL, FOREIGN KEY | Tham chieu Class |
 | subject_id | BIGINT | NOT NULL, FOREIGN KEY | Tham chieu Subject |
 | component | VARCHAR(10) | NOT NULL, CHECK | Thanh phan diem |
 | status | VARCHAR(20) | NOT NULL, DEFAULT 'UNLOCKED', CHECK | Trang thai khoa |
 | locked_by | BIGINT | NULL, FOREIGN KEY | Tai khoan thuc hien khoa |
-| locked_at | TIMESTAMPTZ | NULL | Thoi diem khoa |
+| locked_at | DATETIMEOFFSET(7) | NULL | Thoi diem khoa |
 | unlocked_by | BIGINT | NULL, FOREIGN KEY | Tai khoan thuc hien mo khoa |
-| unlocked_at | TIMESTAMPTZ | NULL | Thoi diem mo khoa |
+| unlocked_at | DATETIMEOFFSET(7) | NULL | Thoi diem mo khoa |
 | requested_by | BIGINT | NULL, FOREIGN KEY | Tai khoan nguoi yeu cau |
-| requested_by_name | VARCHAR(150) | NULL | Ten nguoi yeu cau de giai trinh |
-| unlock_reason | TEXT | NULL | Ly do mo khoa |
+| requested_by_name | NVARCHAR(150) | NULL | Ten nguoi yeu cau de giai trinh |
+| unlock_reason | NVARCHAR(MAX) | NULL | Ly do mo khoa |
 | version | INTEGER | NOT NULL, DEFAULT 1, CHECK | Phien ban kiem tra xung dot |
-| created_at | TIMESTAMPTZ | NOT NULL, DEFAULT CURRENT_TIMESTAMP | Thoi diem tao |
-| updated_at | TIMESTAMPTZ | NOT NULL, DEFAULT CURRENT_TIMESTAMP | Thoi diem cap nhat |
+| created_at | DATETIMEOFFSET(7) | NOT NULL, DEFAULT SYSDATETIMEOFFSET() | Thoi diem tao |
+| updated_at | DATETIMEOFFSET(7) | NOT NULL, DEFAULT SYSDATETIMEOFFSET() | Thoi diem cap nhat |
 
 **Quy tac du lieu:**
 
@@ -617,7 +633,7 @@ Thuc the User duoc anh xa thanh bang app_user trong PostgreSQL, voi khoa chinh a
 
 - Chi tai khoan KHAO_THI duoc mo khoa va khoa lai.
 - Khi mo khoa, phai ghi nhan nguoi yeu cau va ly do.
-- requested_by tham chieu User(user_id) neu nguoi yeu cau co tai khoan.
+- requested_by tham chieu app_user(user_id) neu nguoi yeu cau co tai khoan.
 - Neu nguoi yeu cau khong co tai khoan, requested_by co the NULL nhung requested_by_name phai duoc nhap de ghi nhan danh tinh.
 - unlock_reason bat buoc co noi dung khi thuc hien mo khoa.
 - unlocked_by va unlocked_at ghi nhan nguoi va thoi diem mo khoa.
@@ -625,7 +641,8 @@ Thuc the User duoc anh xa thanh bang app_user trong PostgreSQL, voi khoa chinh a
 - Khi khoa lai, cap nhat locked_by, locked_at va version.
 - Moi lan LOCK, UNLOCK hoac RELOCK phai duoc ghi vao AuditLog.
 
-**Rang buoc PostgreSQL de xuat:**
+
+**Rang buoc Microsoft SQL Server de xuat:**
 
 - UNIQUE (academic_year_id, class_id, subject_id, component).
 - CHECK (component IN ('QT1', 'QT2', 'QT3', 'GK', 'CK')).
@@ -634,11 +651,19 @@ Thuc the User duoc anh xa thanh bang app_user trong PostgreSQL, voi khoa chinh a
 - FOREIGN KEY (academic_year_id) tham chieu AcademicYear.
 - FOREIGN KEY (class_id) tham chieu Class.
 - FOREIGN KEY (subject_id) tham chieu Subject.
-- FOREIGN KEY (locked_by) tham chieu User.
-- FOREIGN KEY (unlocked_by) tham chieu User.
-- FOREIGN KEY (requested_by) tham chieu User.
-- Can kiem tra rang buoc nien khoa cua Class khi tao LockStatus.
-- De xuat FOREIGN KEY (class_id, academic_year_id) tham chieu Class (class_id, academic_year_id), su dung UNIQUE (class_id, academic_year_id) cua Class de bao dam nien khoa khop nhau.
+- FOREIGN KEY (locked_by) tham chieu app_user(user_id).
+- FOREIGN KEY (unlocked_by) tham chieu app_user(user_id).
+- FOREIGN KEY (requested_by) tham chieu app_user(user_id).
+- FOREIGN KEY (class_id, academic_year_id) tham chieu Class (class_id, academic_year_id); bang Class can UNIQUE (class_id, academic_year_id).
+
+**Luu y rang buoc mo khoa:**
+
+- Trang thai ban dau la UNLOCKED, khi chua tung mo khoa thi unlock_reason, requested_by va requested_by_name duoc phep NULL.
+- Khi thuc hien UNLOCK tu trang thai LOCKED, phai co ly do khong rong va nguoi yeu cau (requested_by hoac requested_by_name).
+- Khong tao CHECK bat buoc moi ban ghi status = 'UNLOCKED' phai co ly do, vi se chan ban ghi khoi tao hop le.
+- Backend phai xac thuc nghiep vu mo khoa va cap nhat status, version, AuditLog trong cung transaction.
+- updated_at duoc backend cap nhat moi lan thay doi; DEFAULT chi thiet lap gia tri khi INSERT.
+- Dong bo voi thiet ke VT5-01 da duoc review truoc khi chot migrations.
 
 **Quy tac transaction:**
 
@@ -658,7 +683,7 @@ Thuc the User duoc anh xa thanh bang app_user trong PostgreSQL, voi khoa chinh a
 **Luu y tich hop:**
 
 - Thiet ke duoc tong hop tu tai lieu LockStatus va AuditLog.
-- Ten bang PostgreSQL cua thuc the User la app_user.
+- Ten bang chinh thuc cua thuc the User la app_user.
 - Cac khoa ngoai locked_by, unlocked_by va requested_by tham chieu app_user(user_id).
 - Khong luu trang thai khoa truc tiep trong ScoreComponent.
 - Trang thai khoa diem va trang thai cong bo diem la hai nghiep vu doc lap.
@@ -672,11 +697,11 @@ Thuc the User duoc anh xa thanh bang app_user trong PostgreSQL, voi khoa chinh a
 
 | Thuoc tinh | Kieu du lieu | Rang buoc | Mo ta |
 |---|---|---|---|
-| audit_log_id | BIGSERIAL | PRIMARY KEY | Ma nhat ky |
+| audit_log_id | BIGINT IDENTITY(1,1) | PRIMARY KEY | Ma nhat ky |
 | action_type | VARCHAR(50) | NOT NULL, CHECK | Loai thao tac |
 | performed_by | BIGINT | NOT NULL, FOREIGN KEY | Tai khoan thuc hien thao tac |
 | requested_by | BIGINT | NULL, FOREIGN KEY | Tai khoan nguoi yeu cau neu co |
-| requested_by_name | VARCHAR(150) | NULL | Ten nguoi yeu cau neu khong co tai khoan |
+| requested_by_name | NVARCHAR(150) | NULL | Ten nguoi yeu cau neu khong co tai khoan |
 | lock_status_id | BIGINT | NULL, FOREIGN KEY | Tham chieu LockStatus |
 | academic_year_id | BIGINT | NOT NULL, FOREIGN KEY | Nien khoa lien quan |
 | class_id | BIGINT | NOT NULL, FOREIGN KEY | Lop hoc lien quan |
@@ -685,22 +710,22 @@ Thuc the User duoc anh xa thanh bang app_user trong PostgreSQL, voi khoa chinh a
 | student_id | BIGINT | NULL, FOREIGN KEY | Hoc sinh lien quan |
 | score_record_id | BIGINT | NULL, FOREIGN KEY | Ban ghi diem lien quan |
 | score_component_id | BIGINT | NULL, FOREIGN KEY | Thanh phan diem lien quan |
-| old_value | NUMERIC | NULL | Gia tri diem truoc khi sua |
-| new_value | NUMERIC | NULL | Gia tri diem sau khi sua |
-| reason | TEXT | NULL | Ly do mo khoa hoac sua diem |
+| old_value | DECIMAL(4,2) | NULL | Gia tri diem truoc khi sua |
+| new_value | DECIMAL(4,2) | NULL | Gia tri diem sau khi sua |
+| reason | NVARCHAR(MAX) | NULL | Ly do mo khoa hoac sua diem |
 | related_log_id | BIGINT | NULL, FOREIGN KEY | Tham chieu AuditLog cua lan UNLOCK lien quan |
 | result | VARCHAR(20) | NOT NULL, DEFAULT 'SUCCESS', CHECK | Ket qua thao tac |
-| created_at | TIMESTAMPTZ | NOT NULL, DEFAULT CURRENT_TIMESTAMP | Thoi diem ghi nhat ky |
+| created_at | DATETIMEOFFSET(7) | NOT NULL, DEFAULT SYSDATETIMEOFFSET() | Thoi diem ghi nhat ky |
 
 **Quy tac du lieu:**
 
 - Moi AuditLog co mot audit_log_id duy nhat.
 - action_type chi nhan LOCK, UNLOCK, RELOCK, SCORE_EDIT hoac SCORE_IMPORT.
 - result chi nhan SUCCESS, REJECTED hoac FAILED.
-- performed_by bat buoc tham chieu den User(user_id) da duoc xac thuc.
+- performed_by bat buoc tham chieu den app_user(user_id) da duoc xac thuc.
 - Backend lay performed_by tu phien dang nhap/JWT hop le.
 - Khong tin ID nguoi thuc hien do client tu khai bao.
-- requested_by tham chieu User(user_id) neu nguoi yeu cau co tai khoan.
+- requested_by tham chieu app_user(user_id) neu nguoi yeu cau co tai khoan.
 - Neu nguoi yeu cau khong co tai khoan thi requested_by co the NULL, nhung requested_by_name phai duoc ghi nhan theo quy tac mo khoa.
 - academic_year_id, class_id va subject_id la thong tin bat buoc theo pham vi thao tac trong thiet ke hien tai.
 - component chi nhan QT1, QT2, QT3, GK, CK hoac NULL khi thao tac khong gan rieng mot thanh phan diem.
@@ -719,23 +744,36 @@ Thuc the User duoc anh xa thanh bang app_user trong PostgreSQL, voi khoa chinh a
 - Moi ban ghi phai duoc bao toan de phuc vu truy vet va giai trinh.
 - Thong tin phe duyet cong thuc thuoc ScoreFormulaPolicy, khong luu lap lai trong AuditLog.
 
-**Rang buoc PostgreSQL de xuat:**
+**Luu y trien khai tren Microsoft SQL Server:**
+
+- AuditLog duoc ghi theo nguyen tac append-only.
+- Backend khong cung cap API UPDATE hoac DELETE AuditLog.
+- Quyen database cua tai khoan ung dung can duoc gioi han de ngan sua hoac xoa log.
+- Cac khoa ngoai luu lich su can tranh xoa day chuyen du lieu (ON DELETE CASCADE).
+- SCORE_EDIT va ghi AuditLog phai thanh cong trong cung transaction.
+- LOCK, UNLOCK, RELOCK va ghi AuditLog phai thanh cong trong cung transaction.
+- Khi transaction nghiep vu that bai thi phai rollback du lieu trong transaction do.
+- Neu can ghi log thao tac FAILED hoac REJECTED, can co co che ghi rieng sau rollback de tranh mat nhat ky.
+
+
+**Rang buoc Microsoft SQL Server de xuat:**
 
 - CHECK (action_type IN ('LOCK', 'UNLOCK', 'RELOCK', 'SCORE_EDIT', 'SCORE_IMPORT')).
 - CHECK (result IN ('SUCCESS', 'REJECTED', 'FAILED')).
 - CHECK (component IS NULL OR component IN ('QT1', 'QT2', 'QT3', 'GK', 'CK')).
-- FOREIGN KEY (performed_by) tham chieu User(user_id).
-- FOREIGN KEY (requested_by) tham chieu User(user_id).
+- FOREIGN KEY (performed_by) tham chieu app_user(user_id).
+- FOREIGN KEY (requested_by) tham chieu app_user(user_id).
 - FOREIGN KEY (lock_status_id) tham chieu LockStatus(lock_status_id).
 - FOREIGN KEY (academic_year_id) tham chieu AcademicYear(academic_year_id).
 - FOREIGN KEY (class_id) tham chieu Class(class_id).
 - FOREIGN KEY (subject_id) tham chieu Subject(subject_id).
+- FOREIGN KEY (class_id, academic_year_id) tham chieu Class (class_id, academic_year_id).
 - FOREIGN KEY (student_id) tham chieu Student(student_id).
 - FOREIGN KEY (score_record_id) tham chieu ScoreRecord(score_record_id).
 - FOREIGN KEY (score_component_id) tham chieu ScoreComponent(score_component_id).
 - FOREIGN KEY (related_log_id) tham chieu AuditLog(audit_log_id).
-- Bang tai khoan trong PostgreSQL la app_user; performed_by va requested_by tham chieu app_user(user_id).
-- Can bao dam tinh nhat quan giua class_id va academic_year_id cua ban ghi AuditLog.
+- Khi action_type = 'UNLOCK', phai ghi reason khong rong va requested_by hoac requested_by_name; backend kiem tra truoc khi ghi log.
+- Khong cau hinh ON DELETE CASCADE cho cac quan he luu lich su.
 
 **Quy tac transaction:**
 
@@ -769,8 +807,8 @@ Thuc the User duoc anh xa thanh bang app_user trong PostgreSQL, voi khoa chinh a
 
 | Thuoc tinh | Kieu du lieu | Rang buoc | Mo ta |
 |---|---|---|---|
-| formula_policy_id | BIGSERIAL | PRIMARY KEY | Ma chinh sach cong thuc |
-| formula_expression | TEXT | NOT NULL | Bieu thuc tinh diem tong ket |
+| formula_policy_id | BIGINT IDENTITY(1,1) | PRIMARY KEY | Ma chinh sach cong thuc |
+| formula_expression | NVARCHAR(MAX) | NOT NULL | Bieu thuc tinh diem tong ket |
 | weight_qt1 | SMALLINT | NOT NULL, CHECK = 1 | He so QT1 |
 | weight_qt2 | SMALLINT | NOT NULL, CHECK = 1 | He so QT2 |
 | weight_qt3 | SMALLINT | NOT NULL, CHECK = 1 | He so QT3 |
@@ -779,8 +817,8 @@ Thuc the User duoc anh xa thanh bang app_user trong PostgreSQL, voi khoa chinh a
 | rounding_digits | SMALLINT | NOT NULL, CHECK = 2 | So chu so thap phan khi lam tron |
 | version | INTEGER | NOT NULL, UNIQUE, CHECK | Phien ban cong thuc |
 | approval_status | VARCHAR(10) | NOT NULL, DEFAULT 'PENDING', CHECK | Trang thai phe duyet |
-| approved_by | VARCHAR(150) | NULL | Thong tin nguoi phe duyet |
-| approved_at | TIMESTAMPTZ | NULL | Thoi diem phe duyet |
+| approved_by | NVARCHAR(150) | NULL | Thong tin nguoi phe duyet |
+| approved_at | DATETIMEOFFSET(7) | NULL | Thoi diem phe duyet |
 
 **Quy tac du lieu:**
 
@@ -835,18 +873,18 @@ DTK = (QT1 + QT2 + QT3 + 2 * GK + 3 * CK) / 8
 - approved_by khong phai khoa ngoai den User.
 - Khong bo sung vai tro dang nhap GIANG_VIEN hay API phe duyet rieng trong pham vi hien tai.
 
-**Rang buoc PostgreSQL de xuat:**
 
-- CHECK (weight_qt1 = 1).
-- CHECK (weight_qt2 = 1).
-- CHECK (weight_qt3 = 1).
-- CHECK (weight_gk = 2).
-- CHECK (weight_ck = 3).
-- CHECK (rounding_digits = 2).
-- CHECK (version >= 1).
+**Rang buoc Microsoft SQL Server de xuat:**
+
 - UNIQUE (version).
+- CHECK (version >= 1).
+- CHECK (weight_qt1 = 1 AND weight_qt2 = 1 AND weight_qt3 = 1 AND weight_gk = 2 AND weight_ck = 3).
+- CHECK (rounding_digits = 2).
 - CHECK (approval_status IN ('PENDING', 'APPROVED', 'REJECTED')).
-- CHECK ((approval_status = 'APPROVED' AND approved_by IS NOT NULL AND BTRIM(approved_by) <> '' AND approved_at IS NOT NULL) OR (approval_status IN ('PENDING', 'REJECTED') AND approved_by IS NULL AND approved_at IS NULL)).
+- CHECK (formula_expression IS NOT NULL AND LEN(LTRIM(RTRIM(formula_expression))) > 0).
+- CHECK ((approval_status = 'APPROVED' AND approved_by IS NOT NULL AND LEN(LTRIM(RTRIM(approved_by))) > 0 AND approved_at IS NOT NULL) OR (approval_status IN ('PENDING', 'REJECTED') AND approved_by IS NULL AND approved_at IS NULL)).
+- approved_by chi la thong tin nguoi phe duyet trong ho so, khong phai khoa ngoai den app_user.
+- Phien ban cong thuc va trang thai phe duyet phai duoc ghi nhan trung thuc; khong tu dong dat APPROVED.
 
 **Quy tac quan ly phien ban:**
 
@@ -884,7 +922,7 @@ DTK = (QT1 + QT2 + QT3 + 2 * GK + 3 * CK) / 8
 
 ## 4. Cac quyet dinh thiet ke theo yeu cau de tai
 
-### 4.1. Quy uoc ten bang PostgreSQL
+### 4.1. Quy uoc ten bang Microsoft SQL Server
 
 - Su dung quy uoc snake_case cho ten bang va cot.
 - Thuc the User duoc trien khai bang bang app_user.
@@ -988,8 +1026,8 @@ DTK = (QT1 + QT2 + QT3 + 2 * GK + 3 * CK) / 8
 
 Tai lieu Data Dictionary da mo ta 12 thuc the chinh va 1 thuc the cau hinh bo sung cua he thong quan ly ket qua hoc tap THPT.
 
-Tai lieu la co so de tong hop ERD, xay dung database schema, trien khai PostgreSQL migrations va kiem tra rang buoc toan ven du lieu.
+Tai lieu la co so de tong hop ERD, xay dung database schema, trien khai Microsoft SQL Server migrations va kiem tra rang buoc toan ven du lieu.
 
-Cac quyet dinh thiet ke tai Muc 4 duoc su dung lam co so khi xay dung ERD, SRS, API Contract va PostgreSQL migrations. Viec trien khai phai bao dam day du cac yeu cau MUST va tieu chi nghiem thu cua de tai.
+Cac quyet dinh thiet ke tai Muc 4 duoc su dung lam co so khi xay dung ERD, SRS, API Contract va Microsoft SQL Server migrations. Viec trien khai phai bao dam day du cac yeu cau MUST va tieu chi nghiem thu cua de tai.
 
 Moi thay doi sau khi thong nhat phai duoc cap nhat dong bo trong Data Dictionary, ERD, SRS va cac API Contract lien quan.

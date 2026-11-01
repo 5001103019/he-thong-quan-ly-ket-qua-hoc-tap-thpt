@@ -6,7 +6,7 @@
 ### Cong nghe du kien
 - Frontend: HTML, CSS, JavaScript
 - Backend: Node.js, Express
-- Database: PostgreSQL
+- Database: Microsoft SQL Server
 - Thiet ke giao dien: Figma
 - Quan ly ma nguon: GitHub
 

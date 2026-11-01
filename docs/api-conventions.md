@@ -4,7 +4,7 @@
 ## 1. Cong nghe
 - Frontend: HTML, CSS, JavaScript
 - Backend: Node.js, Express
-- Database: PostgreSQL
+- Database: Microsoft SQL Server
 - Kieu API: REST
 - Dinh dang du lieu: JSON
 

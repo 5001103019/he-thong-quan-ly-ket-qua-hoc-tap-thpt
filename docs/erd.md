@@ -5,7 +5,7 @@
 
 Tong hop mo hinh du lieu cho He thong quan ly ket qua hoc tap hoc sinh THPT, dua tren tai lieu thiet ke cua cac thanh vien trong nhom.
 
-ERD duoc su dung lam co so cho Data Dictionary, database schema va migrations PostgreSQL.
+ERD duoc su dung lam co so cho Data Dictionary, database schema va migrations Microsoft SQL Server.
 
 ## 2. Danh sach thuc the
 
@@ -516,7 +516,7 @@ erDiagram
 - ScoreComponent luu 5 thanh phan diem QT1, QT2, QT3, GK va CK.
 - LockStatus quan ly trang thai khoa doc lap theo nien khoa, lop, mon hoc va thanh phan diem.
 - AuditLog luu lich su khoa, mo khoa, khoa lai, sua diem va import diem.
-- USER la ten thuc the trong ERD; bang PostgreSQL tuong ung la app_user.
+- USER la ten thuc the trong ERD; bang SQL Server tuong ung la app_user.
 - Cac khoa ngoai tai LockStatus va AuditLog tham chieu app_user(user_id).
 - ScoreFormulaPolicy khong co khoa ngoai truc tiep den ScoreRecord trong thiet ke hien tai.
 - He thong khong bat buoc quan ly diem rieng theo HK1 va HK2.
