@@ -1,5 +1,14 @@
 
+"use strict";
+
 const COMPONENT_TYPES = ["QT1", "QT2", "QT3", "GK", "CK"];
+
+const SCORE_STATUSES = [
+    "NOT_ENTERED",
+    "SCORED",
+    "ABSENT",
+    "EXEMPT"
+];
 
 // Kiem tra loai thanh phan diem
 function validateComponentType(type) {
@@ -8,7 +17,7 @@ function validateComponentType(type) {
 
 // Kiem tra gia tri diem
 function validateScoreValue(value, type) {
-    // NULL nghia la chua nhap diem
+    // NULL nghia la khong co gia tri diem
     if (value === null) {
         return {
             valid: true,
@@ -16,7 +25,7 @@ function validateScoreValue(value, type) {
         };
     }
 
-    // Kiem tra du lieu co phai la so hop le
+    // Diem phai la so hop le
     if (typeof value !== "number" || !Number.isFinite(value)) {
         return {
             valid: false,
@@ -25,7 +34,7 @@ function validateScoreValue(value, type) {
         };
     }
 
-    // Mien diem 0-10: de xuat, cho nhom xac nhan
+    // Diem nam trong khoang 0 den 10
     if (value < 0 || value > 10) {
         return {
             valid: false,
@@ -33,8 +42,8 @@ function validateScoreValue(value, type) {
             message: "Diem phai nam trong khoang 0 den 10"
         };
     }
-    
-    // Kiem tra loai thanh phan diem neu duoc cung cap
+
+    // Kiem tra quy tac theo loai diem
     if (type !== undefined) {
         if (!validateComponentType(type)) {
             return {
@@ -44,7 +53,7 @@ function validateScoreValue(value, type) {
             };
         }
 
-        // QT1, QT2, QT3 chi nhan so nguyen
+        // QT1, QT2, QT3 chi nhan diem nguyen
         if (["QT1", "QT2", "QT3"].includes(type)) {
             if (!Number.isInteger(value)) {
                 return {
@@ -55,7 +64,7 @@ function validateScoreValue(value, type) {
             }
         }
 
-        // GK va CK chi nhan diem theo buoc 0.25
+        // GK va CK nhan diem theo buoc 0.25
         if (["GK", "CK"].includes(type)) {
             if (!Number.isInteger(value * 4)) {
                 return {
@@ -73,6 +82,55 @@ function validateScoreValue(value, type) {
     };
 }
 
+// Kiem tra trang thai va gia tri diem truoc khi luu
+function validateScoreEntry(componentType, scoreValue, scoreStatus) {
+
+    // Kiem tra loai thanh phan diem
+    if (!validateComponentType(componentType)) {
+        return {
+            valid: false,
+            code: "INVALID_COMPONENT",
+            message: "Loai diem khong hop le"
+        };
+    }
+
+    // Kiem tra trang thai diem
+    if (!SCORE_STATUSES.includes(scoreStatus)) {
+        return {
+            valid: false,
+            code: "INVALID_STATUS",
+            message: "Trang thai diem khong hop le"
+        };
+    }
+
+    // SCORED bat buoc co diem so
+    if (scoreStatus === "SCORED") {
+        if (scoreValue === null) {
+            return {
+                valid: false,
+                code: "INVALID_SCORE_STATUS",
+                message: "Trang thai SCORED phai co gia tri diem"
+            };
+        }
+
+        return validateScoreValue(scoreValue, componentType);
+    }
+
+    // NOT_ENTERED, ABSENT, EXEMPT phai co gia tri NULL
+    if (scoreValue !== null) {
+        return {
+            valid: false,
+            code: "INVALID_SCORE_STATUS",
+            message: "Trang thai nay yeu cau gia tri diem la NULL"
+        };
+    }
+
+    return {
+        valid: true,
+        missing: true
+    };
+}
+
 // Kiem tra tinh day du cua 5 thanh phan diem
 function checkScoreCompleteness(scores) {
     const missing = [];
@@ -83,9 +141,7 @@ function checkScoreCompleteness(scores) {
             ? scores[type]
             : null;
 
-        
         const result = validateScoreValue(value, type);
-
 
         if (!result.valid) {
             invalid.push(type);
@@ -103,7 +159,9 @@ function checkScoreCompleteness(scores) {
 
 module.exports = {
     COMPONENT_TYPES,
+    SCORE_STATUSES,
     validateComponentType,
     validateScoreValue,
+    validateScoreEntry,
     checkScoreCompleteness
 };

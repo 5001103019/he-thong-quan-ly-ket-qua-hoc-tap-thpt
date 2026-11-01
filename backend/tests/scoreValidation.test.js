@@ -1,9 +1,11 @@
 
 const assert = require("node:assert/strict");
 
+
 const {
     validateComponentType,
     validateScoreValue,
+    validateScoreEntry,
     checkScoreCompleteness
 } = require("../src/services/scoreValidation");
 
@@ -127,4 +129,48 @@ runTest("Phat hien diem sai", () => {
         assert.equal(validateScoreValue(7.3, "CK").valid, false);
     });
 
-    console.log("\nTong ket: " + passed + "/14 PASS");
+   
+    // TC15: Diem 0 voi trang thai SCORED hop le
+    runTest("SCORED chap nhan diem 0", () => {
+        const result = validateScoreEntry("QT1", 0, "SCORED");
+        assert.equal(result.valid, true);
+    });
+
+    // TC16: SCORED khong duoc co gia tri NULL
+    runTest("SCORED tu choi NULL", () => {
+        const result = validateScoreEntry("QT1", null, "SCORED");
+        assert.equal(result.valid, false);
+    });
+
+    // TC17: Vang thi diem phai la NULL
+    runTest("ABSENT chap nhan NULL", () => {
+        const result = validateScoreEntry("GK", null, "ABSENT");
+        assert.equal(result.valid, true);
+    });
+
+    // TC18: Vang nhung co diem la khong hop le
+    runTest("ABSENT tu choi diem so", () => {
+        const result = validateScoreEntry("GK", 7, "ABSENT");
+        assert.equal(result.valid, false);
+    });
+
+    // TC19: Mien thi diem phai la NULL
+    runTest("EXEMPT chap nhan NULL", () => {
+        const result = validateScoreEntry("CK", null, "EXEMPT");
+        assert.equal(result.valid, true);
+    });
+
+    // TC20: Chua nhap diem thi gia tri la NULL
+    runTest("NOT_ENTERED chap nhan NULL", () => {
+        const result = validateScoreEntry("QT2", null, "NOT_ENTERED");
+        assert.equal(result.valid, true);
+    });
+
+    // TC21: Khong chap nhan trang thai khong hop le
+    runTest("Tu choi trang thai sai", () => {
+        const result = validateScoreEntry("QT3", 8, "ABC");
+        assert.equal(result.valid, false);
+    });
+
+    console.log("\nTong ket: " + passed + "/21 PASS");
+
