@@ -1,0 +1,177 @@
+﻿
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Kiểm thử Shared Components - VT2-02</title>
+
+    <!-- CSS dùng chung -->
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+    <main class="page-content">
+
+        <h1 class="page-title">Kiểm thử Shared Components</h1>
+
+        <p class="page-description">
+            Trang kiểm thử các thành phần giao diện dùng chung.
+        </p>
+
+        <!-- KIỂM THỬ THÔNG BÁO -->
+        <section class="card">
+            <h2>1. Kiểm thử thông báo</h2>
+
+            <div id="alertContainer"></div>
+
+            <button class="btn btn-primary"
+                    type="button"
+                    id="successBtn">
+                Thành công
+            </button>
+
+            <button class="btn btn-secondary"
+                    type="button"
+                    id="warningBtn">
+                Cảnh báo
+            </button>
+
+            <button class="btn btn-secondary"
+                    type="button"
+                    id="errorBtn">
+                Báo lỗi
+            </button>
+        </section>
+
+        <!-- KIỂM THỬ TRẠNG THÁI -->
+        <section class="card">
+            <h2>2. Kiểm thử trạng thái</h2>
+
+            <div id="stateContainer"></div>
+
+            <button class="btn btn-primary"
+                    type="button"
+                    id="loadingBtn">
+                Đang tải
+            </button>
+
+            <button class="btn btn-secondary"
+                    type="button"
+                    id="emptyBtn">
+                Không có dữ liệu
+            </button>
+
+            <button class="btn btn-secondary"
+                    type="button"
+                    id="loadErrorBtn">
+                Lỗi tải dữ liệu
+            </button>
+        </section>
+
+        <!-- KIỂM THỬ FORM -->
+        <section class="card">
+            <h2>3. Kiểm thử ô nhập liệu</h2>
+
+            <div id="formContainer"></div>
+        </section>
+
+        <!-- KIỂM THỬ BẢNG -->
+        <section class="card">
+            <h2>4. Kiểm thử bảng dữ liệu</h2>
+
+            <div id="tableContainer"></div>
+        </section>
+
+    </main>
+
+    <!-- JavaScript dùng chung -->
+    <script src="../js/components.js"></script>
+
+    <!-- JavaScript kiểm thử -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+        // 1. Thong bao
+        document.getElementById("successBtn")
+        .addEventListener("click", function () {
+        UIComponents.showAlert(
+        "alertContainer",
+        "Lưu dữ liệu thành công.",
+        "success"
+        );
+        });
+
+        document.getElementById("warningBtn")
+        .addEventListener("click", function () {
+        UIComponents.showAlert(
+        "alertContainer",
+        "Vui lòng kiểm tra dữ liệu.",
+        "warning"
+        );
+        });
+
+        document.getElementById("errorBtn")
+        .addEventListener("click", function () {
+        UIComponents.showAlert(
+        "alertContainer",
+        "Có lỗi xảy ra.",
+        "error"
+        );
+        });
+
+        // 2. Trang thai
+        document.getElementById("loadingBtn")
+        .addEventListener("click", function () {
+        UIComponents.showLoading("stateContainer");
+        });
+
+        document.getElementById("emptyBtn")
+        .addEventListener("click", function () {
+        UIComponents.showEmpty("stateContainer");
+        });
+
+        document.getElementById("loadErrorBtn")
+        .addEventListener("click", function () {
+        UIComponents.showError("stateContainer");
+        });
+
+        // 3. Form
+        const form = UIComponents.createInput(
+        "Họ và tên học sinh",
+        "studentName",
+        "Nhập họ và tên"
+        );
+
+        document.getElementById("formContainer")
+        .appendChild(form);
+
+        // 4. Bang du lieu mau
+        const columns = [
+        { key: "studentId", label: "Mã học sinh" },
+        { key: "fullName", label: "Họ và tên" },
+        { key: "className", label: "Lớp" }
+        ];
+
+        const rows = [
+        {
+        studentId: "HS001",
+        fullName: "Nguyễn Văn A",
+        className: "10A1"
+        },
+        {
+        studentId: "HS002",
+        fullName: "Trần Thị B",
+        className: "10A1"
+        }
+        ];
+
+        const table = UIComponents.createTable(columns, rows);
+
+        document.getElementById("tableContainer")
+        .appendChild(table);
+        });
+    </script>
+</body>
+</html>

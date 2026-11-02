@@ -1,0 +1,192 @@
+﻿
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Dashboard - Quản lý kết quả học tập</title>
+
+    <!-- CSS dùng chung theo thiết kế Figma -->
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+    <div class="app-layout">
+
+        <!-- THANH MENU BÊN TRÁI -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-icon">◆</div>
+
+                <div>
+                    <strong>HỆ THỐNG</strong>
+                    <small>QUẢN LÝ KẾT QUẢ HỌC TẬP</small>
+                </div>
+            </div>
+
+            <nav class="sidebar-menu" aria-label="Menu quản trị">
+                <a href="dashboard.html" class="active">Trang chủ</a>
+                <a href="#">Niên khóa / Khối / Lớp</a>
+                <a href="#">Học sinh / Tài khoản</a>
+                <a href="#">Môn học</a>
+                <a href="#">Bảng điểm</a>
+                <a href="#">Khóa / Mở khóa</a>
+                <a href="#">Audit Log</a>
+                <a href="#">Import / Export CSV</a>
+            </nav>
+
+            <div class="sidebar-bottom">
+                <a href="#">Cài đặt</a>
+                <a href="#">Đăng xuất</a>
+            </div>
+        </aside>
+
+        <!-- KHU VỰC BÊN PHẢI -->
+        <div class="main-content">
+
+            <!-- HEADER -->
+            <header class="topbar">
+                <strong class="topbar-title">
+                    HỆ THỐNG QUẢN LÝ KẾT QUẢ HỌC TẬP
+                </strong>
+
+                <div class="account-info">
+                    <strong>Phòng Khảo thí</strong>
+                    <span class="avatar">P</span>
+                </div>
+            </header>
+
+                <!-- BỘ LỌC NIÊN KHÓA - KHỐI - LỚP -->
+                <section class="stats-grid" aria-label="Thông tin tổng quan">
+
+                    <!-- Niên khóa -->
+                    <article class="stat-card">
+                        <label class="stat-label" for="academicYear">
+                            Niên khóa
+                        </label>
+
+                        <select id="academicYear" class="form-control">
+                            <option value="2025-2026">
+                                2025–2026
+                            </option>
+
+                            <option value="2026-2027" selected>
+                                2026–2027
+                            </option>
+                        </select>
+                    </article>
+
+                    <!-- Khối học -->
+                    <article class="stat-card">
+                        <label class="stat-label" for="grade">
+                            Khối học
+                        </label>
+
+                        <select id="grade" class="form-control">
+                            <option value="10">Khối 10</option>
+                            <option value="11">Khối 11</option>
+                            <option value="12">Khối 12</option>
+                        </select>
+                    </article>
+
+                    <!-- Lớp học -->
+                    <article class="stat-card">
+                        <label class="stat-label" for="classroom">
+                            Lớp học
+                        </label>
+
+                        <select id="classroom" class="form-control">
+                            <option value="10A1">10A1</option>
+                        </select>
+                    </article>
+
+                    <!-- Học sinh -->
+                    <article class="stat-card">
+                        <div class="stat-label">Học sinh</div>
+
+                        <div class="stat-value">
+                            Theo dữ liệu thực tế
+                        </div>
+                    </article>
+                </section>
+
+                <!-- THÔNG TIN LỰA CHỌN -->
+                <div class="selection-summary" aria-live="polite">
+                    Đang xem:
+                    <strong id="selectedYear">2026–2027</strong>
+                    –
+                    <strong id="selectedGrade">Khối 10</strong>
+                    –
+                    <strong id="selectedClass">10A1</strong>
+                </div>
+
+                <!-- KHU VỰC TRUY CẬP NHANH VÀ LƯU Ý -->
+                <section class="dashboard-grid">
+
+                    <!-- TRUY CẬP NHANH -->
+                    <div class="card quick-access">
+                        <h2>Truy cập nhanh</h2>
+
+                        <div class="quick-links">
+
+                            <button type="button" class="quick-link">
+                                <span class="quick-link-content">
+                                    <strong>Quản lý học sinh</strong>
+                                    <small>Hồ sơ và phân lớp</small>
+                                </span>
+                                <span class="quick-arrow">›</span>
+                            </button>
+
+                            <button type="button" class="quick-link">
+                                <span class="quick-link-content">
+                                    <strong>Quản lý bảng điểm</strong>
+                                    <small>Nhập, sửa, tra cứu điểm</small>
+                                </span>
+                                <span class="quick-arrow">›</span>
+                            </button>
+
+                            <button type="button" class="quick-link">
+                                <span class="quick-link-content">
+                                    <strong>Khóa / Mở khóa</strong>
+                                    <small>Theo từng cột điểm</small>
+                                </span>
+                                <span class="quick-arrow">›</span>
+                            </button>
+
+                            <button type="button" class="quick-link">
+                                <span class="quick-link-content">
+                                    <strong>Nhập dữ liệu CSV</strong>
+                                    <small>Xem trước và kiểm tra lỗi</small>
+                                </span>
+                                <span class="quick-arrow">›</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- LƯU Ý NGHIỆP VỤ -->
+                    <div class="card business-notes">
+                        <h2>Lưu ý nghiệp vụ</h2>
+
+                        <p>Khóa điểm theo từng cột.</p>
+
+                        <p>Thiếu điểm: không tính tổng kết.</p>
+
+                        <p>
+                            Khóa và công bố là hai trạng thái độc lập.
+                        </p>
+
+                        <p>
+                            Học sinh chỉ xem điểm của chính mình
+                            đã được công bố.
+                        </p>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <!-- JavaScript xử lý bộ lọc Dashboard -->
+    <script src="../js/dashboard.js"></script>
+</body>
+</html>
