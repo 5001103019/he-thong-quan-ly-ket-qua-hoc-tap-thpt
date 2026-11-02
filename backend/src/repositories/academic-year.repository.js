@@ -40,6 +40,7 @@ async function getAcademicYearById(id) {
 }
 
 // Them nien khoa moi
+// Chi cho phep toi da 2 nien khoa theo UC02
 async function createAcademicYear(data) {
     const pool = await connectDatabase();
 
@@ -61,15 +62,19 @@ async function createAcademicYear(data) {
                 INSERTED.start_year AS startYear,
                 INSERTED.end_year AS endYear,
                 INSERTED.status
-            VALUES (
+            SELECT
                 @code,
                 @startYear,
                 @endYear,
                 @status
-            )
+            WHERE (
+                SELECT COUNT_BIG(*)
+                FROM dbo.academic_year WITH (TABLOCKX, HOLDLOCK)
+            ) < 2
         `);
 
-    return result.recordset[0];
+    // Khong them neu da du 2 nien khoa
+    return result.recordset[0] || null;
 }
 
 // Cap nhat thong tin nien khoa theo ID

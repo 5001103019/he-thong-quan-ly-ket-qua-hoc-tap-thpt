@@ -451,8 +451,54 @@ async function main() {
         409
     );
 
+    // Test 19: Tu choi tao nien khoa thu ba theo UC02
+    // Gia lap Repository tra ve null khi da co du 2 nien khoa
+    const originalCreateAcademicYear =
+        academicYearRepository.createAcademicYear;
+
+    try {
+        academicYearRepository.createAcademicYear =
+            async (data) => {
+                // Kiem tra du lieu Controller truyen xuong
+                assert.equal(data.code, "2028-2029");
+                assert.equal(data.startYear, 2028);
+                assert.equal(data.endYear, 2029);
+
+                // Gia lap he thong da co du 2 nien khoa
+                return null;
+            };
+
+        await check(
+            "Tu choi tao nien khoa thu ba",
+            academicYearController.createAcademicYear,
+            {
+                body: {
+                    code: "2028-2029",
+                    startYear: 2028,
+                    endYear: 2029,
+                    status: "PLANNED"
+                }
+            },
+            409,
+            body => {
+                // Kiem tra ket qua tra ve
+                assert.equal(body.success, false);
+                assert.equal(body.error.code, "CONFLICT");
+                assert.equal(
+                    body.error.message,
+                    "He thong chi cho phep toi da 2 nien khoa"
+                );
+            }
+        );
+    } finally {
+        // Khoi phuc Repository gia lap ban dau
+        academicYearRepository.createAcademicYear =
+            originalCreateAcademicYear;
+    }
+
+    // Tong ket ket qua kiem thu
     console.log(
-        `\nHOAN THANH: ${passed}/18 TEST PASS`
+        `\nHOAN THANH: ${passed}/19 TEST PASS`
     );
 }
 

@@ -140,6 +140,19 @@ async function createAcademicYear(req, res) {
                 status
             });
 
+        // Theo UC02, he thong chi duoc co toi da 2 nien khoa.
+        // Repository tra ve null khi da du 2 nien khoa.
+        if (!academicYear) {
+            return res.status(409).json({
+                success: false,
+                error: {
+                    code: "CONFLICT",
+                    message: "He thong chi cho phep toi da 2 nien khoa"
+                }
+            });
+        }
+
+        // Them nien khoa thanh cong
         return res.status(201).json({
             success: true,
             data: academicYear
