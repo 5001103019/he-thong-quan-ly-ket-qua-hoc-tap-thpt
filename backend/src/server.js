@@ -12,6 +12,13 @@ const cookieParser = require("cookie-parser");
 const authRoutes = require("./routes/auth-routes");
 const protectedRoutes = require("./routes/protected-routes");
 const demoAccountRoutes = require("./routes/demo-account-routes");
+
+// CV2 - Chau: Router quan ly diem
+const scoreRoutes = require("./routes/scoreRoutes");
+
+// CV2 - Chau: Router chi tiet ban ghi diem
+const scoreRecordRoutes = require("./routes/scoreRecordRoutes");
+
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
 
@@ -32,6 +39,17 @@ app.use(cookieParser());
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1", protectedRoutes);
 app.use("/api/v1/khao-thi/demo-accounts", demoAccountRoutes);
+
+// CV2 - Chau: API lay bang diem
+// GET /api/v1/scores
+// Yeu cau dang nhap va vai tro KHAO_THI
+app.use("/api/v1/scores", scoreRoutes);
+
+// CV2 - Chau: API lay chi tiet ban ghi diem
+// GET /api/v1/score-records/:id
+// Yeu cau dang nhap va vai tro KHAO_THI
+app.use("/api/v1/score-records", scoreRecordRoutes);
+
 // 5. API kiem tra trang thai backend
 app.get("/api/v1/health", (req, res) => {
     return res.status(200).json({
