@@ -293,6 +293,21 @@ async function saveScoreEntry({
             };
         }
 
+        // Neu diem/trang thai da duoc ghi nhan truoc do,
+        // moi thay doi thuc su deu phai co ly do.
+        // NOT_ENTERED duoc xem la chua nhap diem lan dau.
+        if (
+            current !== null &&
+            oldStatus !== "NOT_ENTERED" &&
+            normalizedReason === null
+        ) {
+            throw createError(
+                "REASON_REQUIRED",
+                "Phai nhap ly do khi sua diem da co",
+                400
+            );
+        }
+
         let scoreComponentId;
 
         // 9. Cap nhat neu da co thanh phan diem.
