@@ -19,6 +19,9 @@ const scoreRoutes = require("./routes/scoreRoutes");
 // CV2 - Chau: Router chi tiet ban ghi diem
 const scoreRecordRoutes = require("./routes/scoreRecordRoutes");
 
+// CV2 - Uyen: Router quan ly khoa diem.
+const lockRoutes = require("./routes/lockRoutes");
+
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
 
@@ -49,6 +52,9 @@ app.use("/api/v1/scores", scoreRoutes);
 // GET /api/v1/score-records/:id
 // Yeu cau dang nhap va vai tro KHAO_THI
 app.use("/api/v1/score-records", scoreRecordRoutes);
+
+// Dang ky API truy van va khoa cot diem.
+app.use("/api/v1/locks", lockRoutes);
 
 // 5. API kiem tra trang thai backend
 app.get("/api/v1/health", (req, res) => {
