@@ -20,6 +20,7 @@ Tai lieu duoc su dung de ban giao va tich hop giua backend voi giao dien quan ly
 | GET | `/api/v1/scores` | Lay danh sach diem theo nien khoa, lop va mon hoc |
 | GET | `/api/v1/score-records/:id` | Lay chi tiet mot ban ghi diem |
 | PATCH | `/api/v1/score-records/:id/components/:type` | Nhap hoac cap nhat mot thanh phan diem |
+| GET | `/api/v1/score-records/:id/summary` | Tinh va tra ket qua diem tong ket |
 
 Tat ca API tren chi cho phep tai khoan co vai tro `KHAO_THI` truy cap.
 
@@ -300,4 +301,126 @@ Can thong nhat cach hien thi hoc sinh da chuyen lop de dam bao lich su hoc tap k
 
 **Tai lieu:** `docs/score-api-contract.md`.
 
-**Trang thai:** Da hoan thanh lap trinh va kiem thu, da gui Pull Request de xem xet. Cac noi dung tai Muc 9 can duoc thong nhat truoc khi ket luan viec tich hop hoan chinh.
+
+**Trang thai:** Da hoan thanh lap trinh va kiem thu, PR #14 da duoc merge vao `main`. Cac noi dung tai Muc 9 van can duoc doi chieu voi cac module lien quan truoc khi xac nhan tich hop hoan chinh.
+
+## 12. API tinh diem tong ket
+
+### 12.1. Thong tin yeu cau
+
+- Phuong thuc: `GET`
+- Duong dan: `/api/v1/score-records/:id/summary`
+- Quyen truy cap: `KHAO_THI`.
+- `id`: Ma ban ghi diem, phai la so nguyen duong hop le.
+
+Vi du:
+
+`GET /api/v1/score-records/1/summary`
+
+API doc du lieu diem moi nhat tu SQL Server va tinh diem tong ket. Khong ghi ket qua tong ket vao database.
+
+### 12.2. Cong thuc tinh
+
+Cong thuc da thong nhat:
+
+`DTK = (QT1 + QT2 + QT3 + 2 * GK + 3 * CK) / 8`
+
+He so:
+- QT1, QT2, QT3: He so 1.
+- GK: He so 2.
+- CK: He so 3.
+- Tong he so: 8.
+
+Ket qua duoc lam tron den 2 chu so thap phan.
+
+Diem 0 la gia tri hop le, khac voi `null`.
+
+Chi tinh DTK khi ca 5 thanh phan co trang thai `SCORED` va gia tri diem hop le.
+
+Neu co thanh phan `NOT_ENTERED`, `ABSENT`, `EXEMPT` hoac thieu gia tri diem hop le, API khong tinh DTK.
+
+### 12.3. Du lieu tra ve
+
+Khi thanh cong, API tra ve HTTP `200` va `success: true`.
+
+Du lieu `data` gom:
+
+| Truong | Mo ta |
+|---|---|
+| `scoreRecordId` | Ma ban ghi diem |
+| `version` | Phien ban ban ghi diem |
+| `calculationStatus` | `CALCULATED` hoac `INCOMPLETE` |
+| `finalScore` | Diem tong ket hoac `null` |
+| `formula` | Cong thuc tinh diem tong ket |
+| `totalWeight` | Tong he so, bang 8 |
+| `weightedSum` | Tong diem da nhan he so, hoac `null` neu chua du diem |
+| `components` | Mang chi tiet 5 thanh phan diem |
+| `missingComponents` | Danh sach thanh phan chua du dieu kien tinh |
+
+Moi phan tu trong `components` gom:
+- `componentType`: Loai diem.
+- `scoreValue`: Gia tri diem hoac `null`.
+- `scoreStatus`: Trang thai diem.
+- `weight`: He so.
+- `weightedValue`: Gia tri sau khi nhan he so, hoac `null`.
+
+### 12.4. Truong hop du 5 diem
+
+API tra ve:
+- `calculationStatus`: `CALCULATED`.
+- `finalScore`: Ket qua da lam tron 2 chu so.
+- `weightedSum`: Tong diem co he so.
+- `missingComponents`: Mang rong.
+
+Vi du tinh tay:
+
+- QT1 = 8, QT2 = 7, QT3 = 9.
+- GK = 8, CK = 9.
+
+`DTK = (8 + 7 + 9 + 2 * 8 + 3 * 9) / 8`
+
+`DTK = 67 / 8 = 8.375`
+
+Ket qua: `8.38`.
+
+### 12.5. Truong hop chua du diem
+
+API tra ve:
+- `calculationStatus`: `INCOMPLETE`.
+- `finalScore`: `null`.
+- `weightedSum`: `null`.
+- `missingComponents`: Danh sach thanh phan chua du dieu kien tinh.
+
+Khong tu dong thay diem thieu bang 0.
+
+### 12.6. Tinh lai sau khi sua diem
+
+API khong luu gia tri DTK co dinh.
+
+Moi lan frontend goi API, he thong doc du lieu diem hien tai va tinh lai ket qua.
+
+Khi diem duoc sua hop le, lan goi API tiep theo se phan anh diem moi va version moi nhat.
+
+### 12.7. Xu ly loi
+
+- HTTP `400` - `VALIDATION_ERROR`: Ma ban ghi diem khong hop le.
+- HTTP `401`: Chua dang nhap hop le.
+- HTTP `403`: Khong co quyen truy cap.
+- HTTP `404` - `NOT_FOUND`: Khong tim thay ban ghi diem.
+
+### 12.8. Ket qua kiem thu
+
+- PASS: 5/5 bai kiem thu tu dong ve cong thuc va quy tac tinh.
+- PASS: API khong tinh DTK khi thieu diem.
+- PASS: API tra HTTP 404 khi ban ghi khong ton tai.
+- Chua kiem thu API voi ban ghi du 5 diem tren SQL Server that.
+
+### 12.9. Ban giao tich hop
+
+API duoc phat trien tren nhanh:
+
+`feature/Chau-04-score-summary`
+
+Frontend su dung truong `calculationStatus` de phan biet ket qua da tinh va chua du dieu kien tinh.
+
+Khi `finalScore` bang `null`, frontend khong duoc hien thi thanh diem 0.
