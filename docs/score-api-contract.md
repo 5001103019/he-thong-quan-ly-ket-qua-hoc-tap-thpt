@@ -408,12 +408,22 @@ Khi diem duoc sua hop le, lan goi API tiep theo se phan anh diem moi va version 
 - HTTP `403`: Khong co quyen truy cap.
 - HTTP `404` - `NOT_FOUND`: Khong tim thay ban ghi diem.
 
+
 ### 12.8. Ket qua kiem thu
 
 - PASS: 5/5 bai kiem thu tu dong ve cong thuc va quy tac tinh.
 - PASS: API khong tinh DTK khi thieu diem.
 - PASS: API tra HTTP 404 khi ban ghi khong ton tai.
-- Chua kiem thu API voi ban ghi du 5 diem tren SQL Server that.
+- PASS: API tra HTTP 400 khi ma ban ghi khong hop le.
+- PASS: API tra CALCULATED voi du 5 diem tren SQL Server.
+- PASS: Ket qua tinh tay va API deu bang 7.69.
+- PASS: Sua QT1 tu 7 thanh 8, API tinh lai DTK tu 7.69 thanh 7.81.
+- PASS: Khoi phuc QT1 ve 7, API tinh lai DTK ve 7.69.
+
+Ban ghi kiem thu: score_record_id = 3.
+
+Gia tri diem QT1 da duoc khoi phuc ve ban dau.
+Version tang tu 1 len 3 va AuditLog van luu lich su thay doi.
 
 ### 12.9. Ban giao tich hop
 

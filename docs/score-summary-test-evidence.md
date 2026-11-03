@@ -143,23 +143,47 @@ Ket qua API:
 
 Ket luan: PASS - Ket qua API trung voi ket qua tinh tay.
 
-### 4.4. Noi dung chua kiem thu
 
-- Tinh lai diem tong ket qua API sau khi sua diem
-  tren SQL Server that.
+### 4.4. Kiem thu tinh lai sau khi sua diem
+
+Ban ghi kiem thu: score_record_id = 3.
+
+Truoc khi sua:
+- QT1 = 7.
+- version = 1.
+- weightedSum = 61.5.
+- finalScore = 7.69.
+
+Sau khi sua QT1 tu 7 thanh 8 qua API PATCH:
+- changed = true.
+- version = 2.
+- weightedSum = 62.5.
+- finalScore = 7.81.
+
+Sau khi khoi phuc QT1 tu 8 ve 7 qua API PATCH:
+- changed = true.
+- version = 3.
+- finalScore = 7.69.
+
+Ket qua: PASS.
+
+API da doc du lieu diem moi nhat tu SQL Server va tinh lai
+diem tong ket dung sau moi lan thay doi hop le.
+
+Gia tri QT1 da duoc khoi phuc ve 7.
+Version va AuditLog van ghi nhan lich su chinh sua.
 
 ## 5. Ket luan
 
-Cong thuc va cac quy tac tinh diem tong ket
-da dat 5/5 bai kiem thu tu dong.
+- PASS: 5/5 bai kiem thu tu dong.
+- PASS: Khong tinh tong ket khi chua du diem.
+- PASS: Tinh dung diem tong ket 7.69 khi du 5 diem.
+- PASS: Tu choi ban ghi khong ton tai (HTTP 404).
+- PASS: Tu choi ma ban ghi khong hop le (HTTP 400).
+- PASS: Tinh lai diem tong ket 7.81 sau khi sua QT1.
+- PASS: Diem tong ket tro ve 7.69 sau khi khoi phuc QT1.
 
-API da vuot qua cac truong hop:
-- Chua du diem.
-- Ban ghi khong ton tai.
-- Du 5 diem va tinh tong ket thanh cong.
+Cong thuc, he so, quy tac lam tron va tinh lai sau khi sua diem
+da duoc kiem thu thanh cong tren SQL Server.
 
-Ket qua tinh tay va ket qua API tren SQL Server
-deu bang 7.69 trong truong hop kiem thu du 5 diem.
-
-Can kiem thu bo sung viec tinh lai ket qua qua API
-sau khi cap nhat diem tren SQL Server.
+API va bang doi chieu tinh tay da san sang de nhom review.
