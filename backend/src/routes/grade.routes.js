@@ -23,11 +23,5 @@ router.get("/", gradeController.getAllGrades);
 // Lay thong tin mot khoi theo ID
 router.get("/:id", gradeController.getGradeById);
 
-// Them khoi moi
-router.post("/", gradeController.createGrade);
-
-// Cap nhat so khoi theo ID
-router.patch("/:id", gradeController.updateGrade);
-
 // Xuat Router de server.js su dung
 module.exports = router;

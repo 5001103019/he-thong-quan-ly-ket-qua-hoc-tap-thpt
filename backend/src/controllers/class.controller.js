@@ -449,7 +449,7 @@ async function updateClass(req, res) {
 
         // Giu du lieu cu neu khong duoc gui len
         const updated = {
-            academicYearId: current.academicYearId,
+            academicYearId: Number(current.academicYearId),
             gradeId: current.gradeId,
             code: current.code,
             name: current.name,
