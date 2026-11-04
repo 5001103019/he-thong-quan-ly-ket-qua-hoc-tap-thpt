@@ -293,6 +293,21 @@ async function saveScoreEntry({
             };
         }
 
+        // Neu diem/trang thai da duoc ghi nhan truoc do,
+        // moi thay doi thuc su deu phai co ly do.
+        // NOT_ENTERED duoc xem la chua nhap diem lan dau.
+        if (
+            current !== null &&
+            oldStatus !== "NOT_ENTERED" &&
+            normalizedReason === null
+        ) {
+            throw createError(
+                "REASON_REQUIRED",
+                "Phai nhap ly do khi sua diem da co",
+                400
+            );
+        }
+
         let scoreComponentId;
 
         // 9. Cap nhat neu da co thanh phan diem.
@@ -410,6 +425,16 @@ async function saveScoreEntry({
                 sql.NVarChar(sql.MAX),
                 normalizedReason
             )
+            .input(
+                "oldStatus",
+                sql.VarChar(15),
+                oldStatus
+            )
+            .input(
+                "newStatus",
+                sql.VarChar(15),
+                scoreStatus
+            )
             .query(`
                 INSERT INTO dbo.audit_log (
                     action_type,
@@ -423,6 +448,8 @@ async function saveScoreEntry({
                     score_component_id,
                     old_value,
                     new_value,
+                    old_score_status,
+                    new_score_status,
                     reason,
                     result
                 )
@@ -439,9 +466,12 @@ async function saveScoreEntry({
                     @componentId,
                     @oldValue,
                     @newValue,
+                    @oldStatus,
+                    @newStatus,
                     @reason,
                     'SUCCESS'
                 )
+
             `);
 
         // 12. Luu giao dich.

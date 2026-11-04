@@ -130,8 +130,20 @@ Vi du:
 | `scoreValue` | Co | Gia tri diem hoac `null` |
 | `scoreStatus` | Co | Trang thai diem |
 | `expectedVersion` | Co | Phien ban ban ghi diem hien tai |
-| `reason` | Khong | Ly do thay doi, toi da 1000 ky tu |
+| `reason` | Co dieu kien | Bat buoc khi sua diem hoac trang thai da co (khac NOT_ENTERED) va du lieu thuc su thay doi; toi da 1000 ky tu |
 
+Quy tac su dung `reason`:
+- Nhap diem lan dau: Khong bat buoc ly do.
+- Sua diem hoac trang thai da co: Bat buoc ly do.
+- Du lieu khong thay doi: Khong bat buoc ly do, khong tang version va khong ghi AuditLog moi.
+- Ly do chi chua khoang trang duoc xem la khong hop le khi bat buoc nhap.
+- Thieu ly do khi bat buoc: HTTP 400 - REASON_REQUIRED.
+
+Vi du sua diem CK co ly do:
+
+`{"scoreValue":7.75,"scoreStatus":"SCORED","expectedVersion":7,"reason":"Dieu chinh diem sau khi doi chieu"}`
+
+Luu y: `expectedVersion` trong vi du chi mang tinh minh hoa.
 Vi du nhap diem QT1 bang 8:
 
 `{"scoreValue":8,"scoreStatus":"SCORED","expectedVersion":1}`
