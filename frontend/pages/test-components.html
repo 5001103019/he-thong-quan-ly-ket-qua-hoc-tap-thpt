@@ -173,5 +173,50 @@
         .appendChild(table);
         });
     </script>
+
+    <!-- API client dung chung -->
+    <script src="../js/api.js"></script>
+
+    <!-- Kiem thu xu ly loi API -->
+    <script>
+        async function testApiError() {
+        const originalFetch = window.fetch;
+
+        try {
+        // Gia lap phan hoi loi cua backend
+        window.fetch = async function () {
+        return new Response(
+        JSON.stringify({
+        success: false,
+        error: {
+        code: "VALIDATION_ERROR",
+        message: "Dữ liệu không hợp lệ"
+        }
+        }),
+        {
+        status: 400,
+        headers: {
+        "Content-Type": "application/json"
+        }
+        }
+        );
+        };
+
+        await apiClient.get("/test-error");
+
+        console.log("FAIL: API khong bao loi.");
+        } catch (error) {
+        if (error.message === "Dữ liệu không hợp lệ") {
+        console.log("PASS: Da doc dung data.error.message");
+        } else {
+        console.error("FAIL:", error.message);
+        }
+        } finally {
+        // Khoi phuc fetch ban dau
+        window.fetch = originalFetch;
+        }
+        }
+    </script>
+
 </body>
 </html>

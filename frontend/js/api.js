@@ -57,14 +57,29 @@ async function apiRequest(endpoint, options = {}) {
         }
 
         // Kiem tra loi HTTP
-        if (!response.ok) {
-            const message =
-                data && typeof data.message === "string"
-                    ? data.message
-                    : "Yeu cau that bai. Ma loi: " + response.status;
+        
+if (!response.ok) {
+    let message = "Yeu cau that bai. Ma loi: " + response.status;
 
-            throw new Error(message);
-        }
+    // Uu tien cau truc loi cua backend hien tai
+    if (
+        data &&
+        data.error &&
+        typeof data.error.message === "string"
+    ) {
+        message = data.error.message;
+    }
+    // Ho tro cau truc thong bao cu
+    else if (
+        data &&
+        typeof data.message === "string"
+    ) {
+        message = data.message;
+    }
+
+    throw new Error(message);
+}
+
 
         // Tra ve du lieu cho trang dang su dung
         return data;

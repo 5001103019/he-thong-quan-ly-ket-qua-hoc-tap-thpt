@@ -25,16 +25,13 @@
                 </div>
             </div>
 
-            <nav class="sidebar-menu" aria-label="Menu quản trị">
-                <a href="dashboard.html" class="active">Trang chủ</a>
-                <a href="#">Niên khóa / Khối / Lớp</a>
-                <a href="#">Học sinh / Tài khoản</a>
-                <a href="#">Môn học</a>
-                <a href="#">Bảng điểm</a>
-                <a href="#">Khóa / Mở khóa</a>
-                <a href="#">Audit Log</a>
-                <a href="#">Import / Export CSV</a>
+
+            <!-- Menu duoc tao tu JavaScript theo vai tro -->
+            <nav id="sidebarNavigation"
+                 class="sidebar-menu"
+                 aria-label="Menu quản trị">
             </nav>
+
 
             <div class="sidebar-bottom">
                 <a href="#">Cài đặt</a>
@@ -56,6 +53,9 @@
                     <span class="avatar">P</span>
                 </div>
             </header>
+
+            <main class="page-content">
+
 
                 <!-- BỘ LỌC NIÊN KHÓA - KHỐI - LỚP -->
                 <section class="stats-grid" aria-label="Thông tin tổng quan">
@@ -186,7 +186,19 @@
         </div>
     </div>
 
-    <!-- JavaScript xử lý bộ lọc Dashboard -->
+
+    <!-- Menu dung chung cho hai vai tro -->
+    <script src="../js/navigation.js"></script>
+
+    <!-- Bo loc Dashboard -->
     <script src="../js/dashboard.js"></script>
+
+    <!-- Hien thi menu Khao thi tren Dashboard -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+        renderNavigation("admin", "sidebarNavigation");
+        });
+    </script>
 </body>
 </html>
+

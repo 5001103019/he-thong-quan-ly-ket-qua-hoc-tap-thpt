@@ -516,3 +516,13 @@ input:focus-visible {
         font-size: 14px;
         font-weight: 600;
     }
+
+/* VT2-02 - Menu chua co trang dich */
+
+.sidebar-menu a.menu-placeholder {
+    cursor: default;
+}
+
+    .sidebar-menu a.menu-placeholder:hover {
+        background-color: transparent;
+    }
