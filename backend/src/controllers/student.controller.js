@@ -802,6 +802,61 @@ async function transferStudentToClass(req, res) {
         });
 
     } catch (error) {
+        // Chuyen lop khac khoi khong duoc phep
+        if (
+            error.message ===
+            "Chuyen lop phai trong cung khoi."
+        ) {
+            return sendError(
+                res, 409, "CONFLICT",
+                error.message
+            );
+        }
+
+        // Ma dinh danh khong hop le
+        if (
+            error.message ===
+            "Ma dinh danh khong hop le."
+        ) {
+            return sendError(
+                res, 400, "VALIDATION_ERROR",
+                error.message
+            );
+        }
+
+        // Dinh dang ngay chuyen lop khong hop le
+        if (
+            error.message ===
+            "Ngay chuyen lop phai co dang YYYY-MM-DD."
+        ) {
+            return sendError(
+                res, 400, "VALIDATION_ERROR",
+                error.message
+            );
+        }
+
+        // Nguoi thuc hien khong co quyen chuyen lop
+        if (
+            error.message ===
+            "Tai khoan khong co quyen chuyen lop."
+        ) {
+            return sendError(
+                res, 403, "FORBIDDEN",
+                error.message
+            );
+        }
+
+        // Lop dich trung voi lop hien tai
+        if (
+            error.message ===
+            "Lop moi phai khac lop hien tai."
+        ) {
+            return sendError(
+                res, 409, "CONFLICT",
+                error.message
+            );
+        }
+
         // Ngay chuyen lop khong hop le
         if (
             error.message ===
