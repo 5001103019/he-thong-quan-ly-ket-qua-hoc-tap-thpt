@@ -1,0 +1,517 @@
+
+/* GIAO DIEN IMPORT DIEM CSV */
+
+/* Khu vuc noi dung */
+.csv-import-card {
+    width: 100%;
+    padding: 28px;
+}
+
+    .csv-import-card h2 {
+        margin: 0 0 24px;
+        font-size: 18px;
+        color: var(--color-text);
+    }
+
+/* Bo loc nien khoa, khoi, lop, mon */
+.csv-filter-grid {
+    display: grid;
+    grid-template-columns: 1fr 0.65fr 0.75fr 1.4fr;
+    gap: 18px;
+    margin-bottom: 28px;
+}
+
+    .csv-filter-grid .form-group {
+        margin-bottom: 0;
+    }
+
+    .csv-filter-grid label {
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .csv-filter-grid .form-control {
+        width: 100%;
+        min-height: 42px;
+        font-size: 14px;
+        font-weight: 400;
+    }
+
+/* Khu vuc chon tep CSV */
+.csv-upload-area {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 210px;
+    padding: 28px;
+    border: 2px solid #B7D1FA;
+    border-radius: 10px;
+    background-color: #F7FAFF;
+    text-align: center;
+}
+
+    .csv-upload-area h3 {
+        margin: 0 0 12px;
+        color: var(--color-navy);
+        font-size: 19px;
+        font-weight: 700;
+    }
+
+    .csv-upload-area p {
+        margin: 0 0 18px;
+        color: var(--color-muted);
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+#selectCsvButton {
+    min-width: 170px;
+    padding: 12px 22px;
+    font-weight: 600;
+}
+
+#selectedFileName {
+    margin: 14px 0 0;
+    color: var(--color-muted);
+    font-size: 13px;
+    overflow-wrap: anywhere;
+}
+
+/* Canh bao truoc khi nhap */
+.csv-import-card .alert-warning {
+    margin-top: 28px;
+    margin-bottom: 0;
+    padding: 18px;
+    background-color: #FFF4E5;
+    border-radius: 9px;
+    color: #8B5100;
+}
+
+    .csv-import-card .alert-warning strong {
+        display: block;
+        margin-bottom: 8px;
+        color: #D97706;
+        font-size: 14px;
+    }
+
+    .csv-import-card .alert-warning p {
+        margin: 0;
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+/* Thong bao kiem tra file */
+#csvMessage:empty {
+    display: none;
+}
+
+#csvMessage {
+    margin-top: 14px;
+}
+
+/* Nut tiep tuc */
+.csv-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 24px;
+}
+
+#nextButton {
+    min-width: 150px;
+    padding: 12px 24px;
+    font-weight: 600;
+}
+
+    #nextButton:disabled {
+        background-color: #AABBD3;
+        color: #FFFFFF;
+        cursor: not-allowed;
+        opacity: 0.75;
+    }
+
+/* Man hinh vua */
+@media (max-width: 1100px) {
+    .csv-filter-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+/* Man hinh nho */
+@media (max-width: 640px) {
+    .csv-import-card {
+        padding: 18px;
+    }
+
+    .csv-filter-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .csv-upload-area {
+        min-height: 190px;
+        padding: 20px 14px;
+    }
+
+        .csv-upload-area h3 {
+            font-size: 17px;
+        }
+
+    .csv-actions {
+        justify-content: stretch;
+    }
+
+    #nextButton {
+        width: 100%;
+    }
+}
+
+/* ========================================
+   BUOC 2 - XEM TRUOC DU LIEU CSV
+   ======================================== */
+
+/* An cac buoc chua duoc hien thi */
+[hidden] {
+    display: none !important;
+}
+
+/* Khung xem truoc */
+.csv-preview-card {
+    width: 100%;
+    padding: 28px;
+    background-color: #FFFFFF;
+    border: 1px solid #DCE5F0;
+    border-radius: 10px;
+}
+
+    .csv-preview-card h2 {
+        margin: 0 0 8px;
+        color: #19324F;
+        font-size: 22px;
+        font-weight: 700;
+    }
+
+    .csv-preview-card .page-description {
+        margin-bottom: 24px;
+        color: #64748B;
+        font-size: 14px;
+    }
+
+/* Thong tin tep CSV */
+.csv-preview-info {
+    margin-bottom: 22px;
+}
+
+    .csv-preview-info h3 {
+        margin: 0 0 8px;
+        color: #19324F;
+        font-size: 16px;
+        font-weight: 700;
+    }
+
+    .csv-preview-info p {
+        margin: 0;
+        color: #64748B;
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    .csv-preview-info .csv-demo-note {
+        margin-top: 10px;
+        color: #946200;
+    }
+
+/* Bang xem truoc du lieu */
+.csv-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    margin-top: 18px;
+}
+
+.csv-preview-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    text-align: left;
+}
+
+    .csv-preview-table thead {
+        background-color: #E8F0FB;
+    }
+
+    .csv-preview-table th {
+        padding: 14px 12px;
+        color: #174375;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .csv-preview-table td {
+        padding: 14px 12px;
+        color: #334155;
+        border-bottom: 1px solid #E5EAF2;
+    }
+
+    .csv-preview-table tbody tr:nth-child(even) {
+        background-color: #F5F8FC;
+    }
+
+    .csv-preview-table tbody tr:hover {
+        background-color: #EDF4FF;
+    }
+
+/* Canh bao thieu diem */
+.csv-preview-warning {
+    margin-top: 28px;
+    padding: 18px;
+    background-color: #FFF4E5;
+    border-radius: 9px;
+}
+
+    .csv-preview-warning strong {
+        display: block;
+        margin-bottom: 8px;
+        color: #D97706;
+        font-size: 14px;
+    }
+
+    .csv-preview-warning p {
+        margin: 0;
+        color: #7C4A03;
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+/* Nhom nut dieu huong */
+.csv-preview-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-top: 30px;
+}
+
+    .csv-preview-actions .btn {
+        min-width: 145px;
+        padding: 12px 20px;
+        font-weight: 600;
+    }
+
+/* Nut quay lai */
+#backToImportButton {
+    background-color: #E8EEF7;
+    color: #174375;
+    border: none;
+}
+
+/* Nut xac nhan */
+#confirmImportButton {
+    background-color: #1463E8;
+    color: #FFFFFF;
+}
+
+    /* Khong cho xac nhan khi chua kiem tra API */
+    #confirmImportButton:disabled {
+        background-color: #AABBD3;
+        color: #FFFFFF;
+        cursor: not-allowed;
+        opacity: 0.75;
+    }
+
+/* Hien thi tren man hinh nho */
+@media (max-width: 640px) {
+    .csv-preview-card {
+        padding: 18px;
+    }
+
+    .csv-preview-table {
+        min-width: 700px;
+    }
+
+    .csv-preview-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+        .csv-preview-actions .btn {
+            width: 100%;
+        }
+}
+
+/* ========================================
+   BUOC 3 - KIEM TRA LOI CSV
+   ======================================== */
+
+/* Khung man hinh loi */
+.csv-error-card {
+    width: 100%;
+    padding: 28px;
+    background-color: #FFFFFF;
+    border: 1px solid #DCE5F0;
+    border-radius: 10px;
+}
+
+    .csv-error-card h2 {
+        margin: 0 0 8px;
+        color: #19324F;
+        font-size: 22px;
+        font-weight: 700;
+    }
+
+    .csv-error-card > .page-description {
+        margin-bottom: 24px;
+        color: #64748B;
+        font-size: 14px;
+    }
+
+/* Noi dung chi tiet loi */
+.csv-error-content {
+    width: 100%;
+}
+
+    .csv-error-content h3 {
+        margin: 0 0 20px;
+        color: #19324F;
+        font-size: 17px;
+        font-weight: 700;
+    }
+
+    .csv-error-content .csv-demo-note {
+        margin-bottom: 16px;
+        color: #946200;
+        font-size: 13px;
+    }
+
+/* Bang chi tiet loi */
+.csv-error-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    text-align: left;
+}
+
+    .csv-error-table thead {
+        background-color: #E8F0FB;
+    }
+
+    .csv-error-table th {
+        padding: 14px 12px;
+        color: #174375;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .csv-error-table td {
+        padding: 14px 12px;
+        color: #334155;
+        border-bottom: 1px solid #E5EAF2;
+    }
+
+    .csv-error-table tbody tr:nth-child(even) {
+        background-color: #F5F8FC;
+    }
+
+    .csv-error-table tbody tr:hover {
+        background-color: #EDF4FF;
+    }
+
+    /* Loi gia tri diem */
+    .csv-error-table .csv-error-text {
+        color: #DC2626;
+        font-weight: 600;
+    }
+
+    /* Canh bao cot diem bi khoa */
+    .csv-error-table .csv-locked-text {
+        color: #92400E;
+        font-weight: 500;
+    }
+
+    /* Canh bao thieu diem */
+    .csv-error-table .csv-warning-text {
+        color: #A16207;
+        font-weight: 500;
+    }
+
+/* Hop thong bao loi */
+.csv-error-alert {
+    margin-top: 28px;
+    padding: 18px;
+    background-color: #FDECEC;
+    border-radius: 9px;
+}
+
+    .csv-error-alert strong {
+        display: block;
+        margin-bottom: 8px;
+        color: #DC2626;
+        font-size: 14px;
+    }
+
+    .csv-error-alert p {
+        margin: 0;
+        color: #7F1D1D;
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+/* Ghi chu xu ly du lieu */
+.csv-error-note {
+    margin-top: 20px;
+    color: #64748B;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+/* Nhom nut dieu huong */
+.csv-error-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-top: 30px;
+}
+
+    .csv-error-actions .btn {
+        min-width: 150px;
+        padding: 12px 20px;
+        font-weight: 600;
+    }
+
+/* Nut chon tep khac */
+#chooseAnotherCsvButton {
+    background-color: #E8EEF7;
+    color: #174375;
+    border: none;
+}
+
+/* Nut quay lai xem truoc */
+#backToPreviewButton {
+    background-color: #1463E8;
+    color: #FFFFFF;
+    border: none;
+}
+
+    #backToPreviewButton:hover {
+        background-color: #0F52C4;
+    }
+
+/* Hien thi tren man hinh nho */
+@media (max-width: 640px) {
+    .csv-error-card {
+        padding: 18px;
+    }
+
+    .csv-error-table {
+        min-width: 680px;
+    }
+
+    .csv-error-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+        .csv-error-actions .btn {
+            width: 100%;
+        }
+}
