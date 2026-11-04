@@ -23,7 +23,7 @@ const FORMULA =
 
 // Tinh tong ket tu du lieu diem hien tai.
 // Ham nay khong ghi du lieu vao database.
-function calculateScoreSummary(scoreRecord) {
+function calculateScoreSummary(scoreRecord, formulaPolicy) {
 
     if (
         !scoreRecord ||
@@ -81,7 +81,24 @@ function calculateScoreSummary(scoreRecord) {
             weightedSum += weightedValue;
         }
     }
-
+        // Khong tinh tong ket khi cong thuc chua duoc phe duyet.
+    // Khong co cong thuc cung duoc xem la chua duyet.
+    if (
+        !formulaPolicy ||
+        formulaPolicy.approvalStatus !== "APPROVED"
+    ) {
+        return {
+            scoreRecordId: scoreRecord.scoreRecordId,
+            version: scoreRecord.version,
+            calculationStatus: "FORMULA_NOT_APPROVED",
+            finalScore: null,
+            formula: FORMULA,
+            totalWeight: TOTAL_WEIGHT,
+            weightedSum: null,
+            components: components,
+            missingComponents: missingComponents
+        };
+    }
     // Chua du 5 thanh phan hop le thi khong tinh DTK.
     if (missingComponents.length > 0) {
         return {

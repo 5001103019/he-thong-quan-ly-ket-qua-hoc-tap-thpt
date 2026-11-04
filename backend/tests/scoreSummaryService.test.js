@@ -8,6 +8,12 @@ const {
     calculateScoreSummary
 } = require("../src/services/scoreSummaryService");
 
+ // Gia lap cong thuc da duoc phe duyet.
+ // Chi su dung trong Unit Test, khong sua database.
+ const congThucDaDuyet = {
+     approvalStatus: "APPROVED"
+ };
+
 // Tao ban ghi diem gia lap de kiem thu.
 // Khong ket noi hay thay doi database.
 function taoBanGhi(
@@ -41,7 +47,7 @@ function taoBanGhi(
 test("Tinh DTK dung cong thuc va lam tron", () => {
     const banGhi = taoBanGhi();
 
-    const ketQua = calculateScoreSummary(banGhi);
+    const ketQua = calculateScoreSummary(banGhi, congThucDaDuyet);
 
     // (8 + 7 + 9 + 2*8 + 3*9) / 8
     // = 67 / 8 = 8.375 => 8.38
@@ -62,7 +68,7 @@ test("Diem 0 van duoc tinh tong ket", () => {
         CK: 0
     });
 
-    const ketQua = calculateScoreSummary(banGhi);
+    const ketQua = calculateScoreSummary(banGhi, congThucDaDuyet);
 
     assert.equal(ketQua.calculationStatus, "CALCULATED");
     assert.equal(ketQua.finalScore, 0);
@@ -79,7 +85,7 @@ test("Thieu diem thi khong tinh tong ket", () => {
         CK: 9
     });
 
-    const ketQua = calculateScoreSummary(banGhi);
+    const ketQua = calculateScoreSummary(banGhi, congThucDaDuyet);
 
     assert.equal(ketQua.calculationStatus, "INCOMPLETE");
     assert.equal(ketQua.finalScore, null);
@@ -105,7 +111,7 @@ test("Vang va mien khong du dieu kien tinh", () => {
         }
     );
 
-    const ketQua = calculateScoreSummary(banGhi);
+    const ketQua = calculateScoreSummary(banGhi, congThucDaDuyet);
 
     assert.equal(ketQua.calculationStatus, "INCOMPLETE");
     assert.equal(ketQua.finalScore, null);
@@ -125,7 +131,7 @@ test("Tinh lai tong ket sau khi sua diem", () => {
         CK: 7
     });
 
-    const truocKhiSua = calculateScoreSummary(banGhi);
+    const truocKhiSua = calculateScoreSummary(banGhi, congThucDaDuyet);
 
     // (8 + 7 + 9 + 16 + 21) / 8
     // = 61 / 8 = 7.625 => 7.63
@@ -139,7 +145,7 @@ test("Tinh lai tong ket sau khi sua diem", () => {
     ck.scoreValue = 9;
     banGhi.version = 2;
 
-    const sauKhiSua = calculateScoreSummary(banGhi);
+    const sauKhiSua = calculateScoreSummary(banGhi, congThucDaDuyet);
 
     assert.equal(sauKhiSua.finalScore, 8.38);
     assert.equal(sauKhiSua.version, 2);
@@ -147,3 +153,56 @@ test("Tinh lai tong ket sau khi sua diem", () => {
     // Ban ghi cu khong bi thay doi ket qua da tra.
     assert.equal(truocKhiSua.finalScore, 7.63);
 });
+
+ // 6. Chua co cong thuc thi khong tinh tong ket.
+ test("Khong tinh khi chua co cong thuc", () => {
+     const banGhi = taoBanGhi();
+
+     const ketQua = calculateScoreSummary(banGhi, null);
+
+     assert.equal(
+         ketQua.calculationStatus,
+         "FORMULA_NOT_APPROVED"
+     );
+     assert.equal(ketQua.finalScore, null);
+ });
+
+ // 7. Cong thuc PENDING thi khong tinh tong ket.
+ test("Khong tinh khi cong thuc dang cho duyet", () => {
+     const banGhi = taoBanGhi();
+
+     const congThuc = {
+         approvalStatus: "PENDING"
+     };
+
+     const ketQua = calculateScoreSummary(
+         banGhi,
+         congThuc
+     );
+
+     assert.equal(
+         ketQua.calculationStatus,
+         "FORMULA_NOT_APPROVED"
+     );
+     assert.equal(ketQua.finalScore, null);
+ });
+
+ // 8. Cong thuc REJECTED thi khong tinh tong ket.
+ test("Khong tinh khi cong thuc bi tu choi", () => {
+     const banGhi = taoBanGhi();
+
+     const congThuc = {
+         approvalStatus: "REJECTED"
+     };
+
+     const ketQua = calculateScoreSummary(
+         banGhi,
+         congThuc
+     );
+
+     assert.equal(
+         ketQua.calculationStatus,
+         "FORMULA_NOT_APPROVED"
+     );
+     assert.equal(ketQua.finalScore, null);
+ });

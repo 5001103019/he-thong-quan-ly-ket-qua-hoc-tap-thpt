@@ -11,7 +11,8 @@ const {
 
 // Ham lay chi tiet diem cua Chau.
 const {
-    getScoreRecordById
+    getScoreRecordById,
+    getLatestFormulaPolicy
 } = require("../repositories/scoreRecordRepository");
 
 // Ham nhap va cap nhat diem cua Chau.
@@ -233,9 +234,13 @@ router.get(
                 });
             }
 
-            // Tinh tong ket tu 5 thanh phan diem.
+                      // Lay chinh sach cong thuc moi nhat tu SQL Server.
+            const formulaPolicy = await getLatestFormulaPolicy();
+
+            // Chi tinh tong ket khi cong thuc da duoc phe duyet.
             const summary = calculateScoreSummary(
-                scoreRecord
+                scoreRecord,
+                formulaPolicy
             );
 
             // Tra ket qua, cong thuc va tung thanh phan.
