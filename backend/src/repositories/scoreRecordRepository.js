@@ -86,16 +86,20 @@ async function getScoreRecordById(scoreRecordId) {
  async function getLatestFormulaPolicy() {
      const pool = await connectDatabase();
 
-     const result = await pool.request().query(`
-         SELECT TOP (1)
-             formula_policy_id,
-             version,
-             approval_status,
-             approved_by,
-             approved_at
-         FROM dbo.score_formula_policy
-         ORDER BY version DESC
-     `);
+   
+    // Lay phien ban cong thuc da duoc phe duyet moi nhat.
+    // Bo qua cac phien ban PENDING va REJECTED.
+    const result = await pool.request().query(`
+        SELECT TOP (1)
+            formula_policy_id,
+            version,
+            approval_status,
+            approved_by,
+            approved_at
+        FROM dbo.score_formula_policy
+        WHERE approval_status = 'APPROVED'
+        ORDER BY version DESC
+    `);
 
      const policy = result.recordset[0];
 
