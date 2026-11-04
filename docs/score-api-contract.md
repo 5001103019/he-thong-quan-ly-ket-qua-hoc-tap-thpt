@@ -20,6 +20,7 @@ Tai lieu duoc su dung de ban giao va tich hop giua backend voi giao dien quan ly
 | GET | `/api/v1/scores` | Lay danh sach diem theo nien khoa, lop va mon hoc |
 | GET | `/api/v1/score-records/:id` | Lay chi tiet mot ban ghi diem |
 | PATCH | `/api/v1/score-records/:id/components/:type` | Nhap hoac cap nhat mot thanh phan diem |
+| GET | `/api/v1/score-records/:id/summary` | Tinh va tra ket qua diem tong ket |
 
 Tat ca API tren chi cho phep tai khoan co vai tro `KHAO_THI` truy cap.
 
@@ -312,4 +313,172 @@ Can thong nhat cach hien thi hoc sinh da chuyen lop de dam bao lich su hoc tap k
 
 **Tai lieu:** `docs/score-api-contract.md`.
 
-**Trang thai:** Da hoan thanh lap trinh va kiem thu, da gui Pull Request de xem xet. Cac noi dung tai Muc 9 can duoc thong nhat truoc khi ket luan viec tich hop hoan chinh.
+
+**Trang thai:** Da hoan thanh lap trinh va kiem thu, PR #14 da duoc merge vao `main`. Cac noi dung tai Muc 9 van can duoc doi chieu voi cac module lien quan truoc khi xac nhan tich hop hoan chinh.
+
+## 12. API tinh diem tong ket
+
+### 12.1. Thong tin yeu cau
+
+- Phuong thuc: `GET`
+- Duong dan: `/api/v1/score-records/:id/summary`
+- Quyen truy cap: `KHAO_THI`.
+- `id`: Ma ban ghi diem, phai la so nguyen duong hop le.
+
+Vi du:
+
+`GET /api/v1/score-records/1/summary`
+
+API doc du lieu diem moi nhat tu SQL Server va tinh diem tong ket. Khong ghi ket qua tong ket vao database.
+
+### 12.2. Cong thuc tinh
+
+Cong thuc da thong nhat:
+
+`DTK = (QT1 + QT2 + QT3 + 2 * GK + 3 * CK) / 8`
+
+He so:
+- QT1, QT2, QT3: He so 1.
+- GK: He so 2.
+- CK: He so 3.
+- Tong he so: 8.
+
+Ket qua duoc lam tron den 2 chu so thap phan.
+
+Diem 0 la gia tri hop le, khac voi `null`.
+
+Chi tinh DTK khi ca 5 thanh phan co trang thai `SCORED` va gia tri diem hop le.
+
+Neu co thanh phan `NOT_ENTERED`, `ABSENT`, `EXEMPT` hoac thieu gia tri diem hop le, API khong tinh DTK.
+
+### 12.2.1. Kiem tra phe duyet cong thuc
+
+API doc trang thai phe duyet cong thuc tu bang `score_formula_policy` tren SQL Server.
+
+Quy tac lua chon:
+
+- Chi su dung phien ban co `approval_status = 'APPROVED'`.
+- Neu co nhieu phien ban APPROVED, chon phien ban co `version` lon nhat.
+- Phien ban moi dang PENDING hoac REJECTED khong thay the phien ban APPROVED truoc do.
+- Neu khong co phien ban APPROVED, khong tinh diem tong ket.
+
+Khi chua co cong thuc duoc duyet:
+
+- `calculationStatus`: `FORMULA_NOT_APPROVED`.
+- `finalScore`: `null`.
+- `weightedSum`: `null`.
+
+Ham tinh diem hien su dung cong thuc va he so co dinh da duoc nhom thong nhat. Bang `score_formula_policy` duoc su dung de kiem tra trang thai phe duyet, khong thuc thi truc tiep bieu thuc cong thuc duoc luu trong bang.
+
+Chuc nang khong tu dong phe duyet cong thuc.
+  
+### 12.3. Du lieu tra ve
+
+Khi thanh cong, API tra ve HTTP `200` va `success: true`.
+
+Du lieu `data` gom:
+
+| Truong | Mo ta |
+|---|---|
+| `scoreRecordId` | Ma ban ghi diem |
+| `version` | Phien ban ban ghi diem |
+| `calculationStatus` | `CALCULATED`, `INCOMPLETE` hoac `FORMULA_NOT_APPROVED` |
+| `finalScore` | Diem tong ket hoac `null` |
+| `formula` | Cong thuc tinh diem tong ket |
+| `totalWeight` | Tong he so, bang 8 |
+| `weightedSum` | Tong diem da nhan he so, hoac `null` neu chua du diem |
+| `components` | Mang chi tiet 5 thanh phan diem |
+| `missingComponents` | Danh sach thanh phan chua du dieu kien tinh |
+
+Moi phan tu trong `components` gom:
+- `componentType`: Loai diem.
+- `scoreValue`: Gia tri diem hoac `null`.
+- `scoreStatus`: Trang thai diem.
+- `weight`: He so.
+- `weightedValue`: Gia tri sau khi nhan he so, hoac `null`.
+
+### 12.4. Truong hop du 5 diem
+
+API tra ve:
+- `calculationStatus`: `CALCULATED`.
+- `finalScore`: Ket qua da lam tron 2 chu so.
+- `weightedSum`: Tong diem co he so.
+- `missingComponents`: Mang rong.
+
+Vi du tinh tay:
+
+- QT1 = 8, QT2 = 7, QT3 = 9.
+- GK = 8, CK = 9.
+
+`DTK = (8 + 7 + 9 + 2 * 8 + 3 * 9) / 8`
+
+`DTK = 67 / 8 = 8.375`
+
+Ket qua: `8.38`.
+
+### 12.5. Truong hop chua du diem
+
+API tra ve:
+- `calculationStatus`: `INCOMPLETE`.
+- `finalScore`: `null`.
+- `weightedSum`: `null`.
+- `missingComponents`: Danh sach thanh phan chua du dieu kien tinh.
+
+Khong tu dong thay diem thieu bang 0.
+
+### 12.6. Tinh lai sau khi sua diem
+
+API khong luu gia tri DTK co dinh.
+
+Moi lan frontend goi API, he thong doc du lieu diem hien tai va tinh lai ket qua.
+
+Khi diem duoc sua hop le, lan goi API tiep theo se phan anh diem moi va version moi nhat.
+
+### 12.7. Xu ly loi
+
+- HTTP `400` - `VALIDATION_ERROR`: Ma ban ghi diem khong hop le.
+- HTTP `401`: Chua dang nhap hop le.
+- HTTP `403`: Khong co quyen truy cap.
+- HTTP `404` - `NOT_FOUND`: Khong tim thay ban ghi diem.
+
+
+### 12.8. Ket qua kiem thu
+
+- PASS: 9/9 bai kiem thu tu dong, 0 FAIL.
+- PASS: Kiem tra cong thuc, he so va lam tron 2 chu so thap phan.
+- PASS: Phan biet diem 0 va NULL.
+- PASS: Khong tinh DTK khi thieu diem hoac co trang thai Vang/Mien.
+- PASS: Tinh lai DTK sau khi sua diem.
+- PASS: Khong tinh DTK khi chua co cong thuc APPROVED.
+- PASS: Phien ban moi PENDING hoac REJECTED khong thay the phien ban APPROVED truoc do.
+- PASS: Lua chon phien ban APPROVED moi nhat.
+- PASS: API tra HTTP 404 khi ban ghi khong ton tai.
+- PASS: API tra HTTP 400 khi ma ban ghi khong hop le.
+
+Ket qua kiem thu SQL Server that:
+
+- Khong co cong thuc APPROVED: `FORMULA_NOT_APPROVED`, `finalScore = null`, `weightedSum = null` - PASS.
+- Co cong thuc APPROVED va du diem: `CALCULATED`, `finalScore = 7.69`, `weightedSum = 61.5` - PASS.
+- Phien ban 1 APPROVED, phien ban 2 PENDING: API van tinh theo phien ban 1 - PASS.
+- Sua QT1 tu 7 thanh 8: DTK thay doi tu 7.69 thanh 7.81 - PASS.
+- Khoi phuc QT1 ve 7: DTK tro ve 7.69 - PASS.
+
+Ban ghi kiem thu: `score_record_id = 3`.
+
+Gia tri QT1 da duoc khoi phuc. Version tang tu 1 len 3 va AuditLog van luu lich su thay doi.
+
+Du lieu chinh sach cong thuc gia lap da duoc xoa sau kiem thu.
+
+### 12.9. Ban giao tich hop
+
+API duoc phat trien tren nhanh:
+
+`feature/Chau-04-score-summary`
+
+Frontend su dung truong `calculationStatus` de phan biet:
+
+- `CALCULATED`: Da tinh diem tong ket.
+- `INCOMPLETE`: Chua du diem hop le.
+- `FORMULA_NOT_APPROVED`: Chua co phien ban cong thuc duoc phe duyet.
+
+Khi `finalScore` bang `null`, frontend khong duoc hien thi thanh diem 0.

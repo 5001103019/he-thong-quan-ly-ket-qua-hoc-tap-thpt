@@ -11,13 +11,19 @@ const {
 
 // Ham lay chi tiet diem cua Chau.
 const {
-    getScoreRecordById
+    getScoreRecordById,
+    getLatestFormulaPolicy
 } = require("../repositories/scoreRecordRepository");
 
 // Ham nhap va cap nhat diem cua Chau.
 const {
     saveScoreEntry
 } = require("../services/scoreEntryService");
+
+// Ham tinh diem tong ket.
+const {
+    calculateScoreSummary
+} = require("../services/scoreSummaryService");
 
 const router = express.Router();
 
@@ -181,6 +187,69 @@ router.patch(
             }
 
             // Chuyen cac loi khac sang Express.
+            next(error);
+        }
+    }
+);
+
+
+// ============================================
+// 3. API TINH DIEM TONG KET
+// GET /api/v1/score-records/:id/summary
+// ============================================
+
+router.get(
+    "/:id/summary",
+    requireAuth,
+    requireRole("KHAO_THI"),
+    async (req, res, next) => {
+        try {
+            // Kiem tra ma ban ghi diem.
+            const scoreRecordId = parsePositiveId(
+                req.params.id
+            );
+
+            if (scoreRecordId === null) {
+                return res.status(400).json({
+                    success: false,
+                    error: {
+                        code: "VALIDATION_ERROR",
+                        message: "Ma ban ghi diem khong hop le"
+                    }
+                });
+            }
+
+            // Lay du lieu diem moi nhat tu SQL Server.
+            const scoreRecord = await getScoreRecordById(
+                scoreRecordId
+            );
+
+            if (scoreRecord === null) {
+                return res.status(404).json({
+                    success: false,
+                    error: {
+                        code: "NOT_FOUND",
+                        message: "Khong tim thay ban ghi diem"
+                    }
+                });
+            }
+
+                      // Lay chinh sach cong thuc moi nhat tu SQL Server.
+            const formulaPolicy = await getLatestFormulaPolicy();
+
+            // Chi tinh tong ket khi cong thuc da duoc phe duyet.
+            const summary = calculateScoreSummary(
+                scoreRecord,
+                formulaPolicy
+            );
+
+            // Tra ket qua, cong thuc va tung thanh phan.
+            return res.status(200).json({
+                success: true,
+                data: summary
+            });
+
+        } catch (error) {
             next(error);
         }
     }

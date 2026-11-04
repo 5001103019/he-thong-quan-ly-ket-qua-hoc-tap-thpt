@@ -80,6 +80,45 @@ async function getScoreRecordById(scoreRecordId) {
     };
 }
 
-module.exports = {
-    getScoreRecordById
-};
+
+ // Lay phien ban cong thuc moi nhat tu SQL Server.
+ // Khong tu dong phe duyet cong thuc.
+ async function getLatestFormulaPolicy() {
+     const pool = await connectDatabase();
+
+   
+    // Lay phien ban cong thuc da duoc phe duyet moi nhat.
+    // Bo qua cac phien ban PENDING va REJECTED.
+    const result = await pool.request().query(`
+        SELECT TOP (1)
+            formula_policy_id,
+            version,
+            approval_status,
+            approved_by,
+            approved_at
+        FROM dbo.score_formula_policy
+        WHERE approval_status = 'APPROVED'
+        ORDER BY version DESC
+    `);
+
+     const policy = result.recordset[0];
+
+     // Chua co cong thuc trong database.
+     if (!policy) {
+         return null;
+     }
+
+     return {
+         formulaPolicyId: String(policy.formula_policy_id),
+         version: policy.version,
+         approvalStatus: policy.approval_status,
+         approvedBy: policy.approved_by,
+         approvedAt: policy.approved_at
+     };
+ }
+
+ module.exports = {
+     getScoreRecordById,
+     getLatestFormulaPolicy
+ };
+
