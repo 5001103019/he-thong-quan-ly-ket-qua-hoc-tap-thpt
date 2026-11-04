@@ -24,7 +24,7 @@ const classRoutes = require("./routes/class.routes");
 
 // Router quan ly mon hoc
 const subjectRoutes = require("./routes/subject.routes");
-
+const studentRoutes = require("./routes/student.routes");
 
 // CV2 - Chau: Router quan ly diem
 const scoreRoutes = require("./routes/scoreRoutes");
@@ -79,6 +79,7 @@ app.use("/api/v1/classes", classRoutes);
 // 8. API quan ly mon hoc
 // Chi vai tro KHAO_THI duoc phep truy cap
 app.use("/api/v1/subjects", subjectRoutes);
+app.use("/api/v1/students", studentRoutes);
 
 // 9. Dang ky API truy van va khoa cot diem
 app.use("/api/v1/locks", lockRoutes);
