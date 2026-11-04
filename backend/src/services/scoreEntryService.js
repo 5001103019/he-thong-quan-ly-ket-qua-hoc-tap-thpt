@@ -425,6 +425,16 @@ async function saveScoreEntry({
                 sql.NVarChar(sql.MAX),
                 normalizedReason
             )
+            .input(
+                "oldStatus",
+                sql.VarChar(15),
+                oldStatus
+            )
+            .input(
+                "newStatus",
+                sql.VarChar(15),
+                scoreStatus
+            )
             .query(`
                 INSERT INTO dbo.audit_log (
                     action_type,
@@ -438,6 +448,8 @@ async function saveScoreEntry({
                     score_component_id,
                     old_value,
                     new_value,
+                    old_score_status,
+                    new_score_status,
                     reason,
                     result
                 )
@@ -454,9 +466,12 @@ async function saveScoreEntry({
                     @componentId,
                     @oldValue,
                     @newValue,
+                    @oldStatus,
+                    @newStatus,
                     @reason,
                     'SUCCESS'
                 )
+
             `);
 
         // 12. Luu giao dich.
