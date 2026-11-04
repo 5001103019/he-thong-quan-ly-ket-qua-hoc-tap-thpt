@@ -6,6 +6,10 @@ const studentController = require(
     "../controllers/student.controller"
 );
 
+const studentCsvController = require(
+    "../controllers/student-csv.controller"
+);
+
 const {
     requireAuth,
     requireRole
@@ -15,6 +19,18 @@ const router = express.Router();
 
 // Chi Phong Khao thi duoc quan ly ho so hoc sinh
 router.use(requireAuth, requireRole("KHAO_THI"));
+
+// Xem truoc Import hoc sinh tu CSV
+router.post(
+    "/import/preview",
+    studentCsvController.previewStudentImport
+);
+
+// Xac nhan Import hoc sinh tu CSV
+router.post(
+    "/import/confirm",
+    studentCsvController.confirmStudentImport
+);
 
 // Them ho so hoc sinh moi
 router.post("/", studentController.createStudent);
