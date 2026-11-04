@@ -18,6 +18,11 @@ Quy tac:
 - Lam tron ket qua den 2 chu so thap phan.
 - Diem 0 la hop le, khac voi null.
 - Chua du 5 thanh phan diem hop le thi khong tinh DTK.
+- Chi tinh DTK khi co phien ban cong thuc APPROVED.
+- Neu co nhieu phien ban APPROVED, su dung phien ban co version lon nhat.
+- Phien ban moi PENDING hoac REJECTED khong thay the phien ban APPROVED truoc do.
+- Neu khong co phien ban APPROVED, tra FORMULA_NOT_APPROVED va finalScore = null.
+- Ham tinh diem hien ap dung cong thuc va he so co dinh da thong nhat; bang score_formula_policy dung de kiem tra phe duyet, khong thuc thi truc tiep bieu thuc cong thuc luu trong bang.
 
 ## 2. Bang du lieu tinh tay
 
@@ -87,34 +92,79 @@ Ket qua tong ket phai thay doi theo diem moi.
 
 ## 4. Ket qua kiem thu
 
+
 ### 4.1. Kiem thu tu dong
 
-File: backend/tests/scoreSummaryService.test.js
+Cac file kiem thu:
+
+- backend/tests/scoreSummaryService.test.js
+- backend/tests/scoreFormulaPolicy.test.js
 
 Ket qua:
-- Tong so bai kiem thu: 5.
-- PASS: 5.
+- Tong so bai kiem thu: 9.
+- PASS: 9.
 - FAIL: 0.
 
-Cac truong hop da kiem tra:
-1. Cong thuc, he so va lam tron.
-2. Diem 0 hop le.
-3. Khong tinh khi thieu diem.
-4. Khong tinh khi co trang thai ABSENT, EXEMPT.
-5. Tinh lai sau khi thay doi diem trong du lieu gia lap.
+Phan bo:
+- 8 bai kiem thu cong thuc, tinh toan va dieu kien tinh tong ket.
+- 1 bai kiem thu Repository ve lua chon phien ban cong thuc APPROVED, gom 3 tinh huong.
 
+Cac noi dung da kiem tra:
+
+1. Cong thuc, he so va lam tron 2 chu so thap phan.
+2. Diem 0 la gia tri hop le.
+3. Khong tinh khi thieu thanh phan diem.
+4. Khong tinh khi co trang thai ABSENT, EXEMPT.
+5. Tinh lai diem tong ket sau khi thay doi diem.
+6. Khong tinh tong ket khi chua co cong thuc APPROVED.
+7. Phien ban 1 APPROVED, phien ban 2 PENDING: tiep tuc su dung phien ban 1.
+8. Khi phien ban 2 duoc APPROVED: lua chon phien ban 2.
+9. Khong co phien ban APPROVED: Repository khong tra ve cong thuc duoc duyet.
+
+Ket luan: PASS 9/9, 0 FAIL.
 
 ### 4.2. Kiem thu API tren SQL Server
 
 API: GET /api/v1/score-records/:id/summary
 
+Co so du lieu: thpt_grade_management.
+
 Da kiem thu:
-- PASS: Ban ghi thieu diem tra INCOMPLETE.
-- PASS: finalScore bang null khi thieu diem.
+
+- PASS: Khi co cong thuc APPROVED nhung thieu diem, API tra INCOMPLETE va finalScore = null.
 - PASS: Ban ghi khong ton tai tra HTTP 404.
-- PASS: API tra CALCULATED khi du 5 diem hop le.
+- PASS: Ma ban ghi diem khong hop le tra HTTP 400 - VALIDATION_ERROR.
+- PASS: Khi co cong thuc APPROVED va du 5 diem hop le, API tra CALCULATED.
 - PASS: Diem tong ket trung voi ket qua tinh tay.
-- PASS: API tra HTTP 400 - VALIDATION_ERROR khi ma ban ghi diem khong hop le.
+
+Kiem thu phe duyet cong thuc:
+
+Truong hop 1: Chua co cong thuc APPROVED.
+- calculationStatus = FORMULA_NOT_APPROVED.
+- finalScore = null.
+- weightedSum = null.
+- Ket qua: PASS.
+
+Truong hop 2: Co cong thuc APPROVED.
+- calculationStatus = CALCULATED.
+- weightedSum = 61.5.
+- finalScore = 7.69.
+- Ket qua: PASS.
+
+Truong hop 3: Nhieu phien ban cong thuc.
+- Phien ban 1: APPROVED.
+- Phien ban 2: PENDING.
+- API tiep tuc su dung phien ban 1.
+- calculationStatus = CALCULATED.
+- finalScore = 7.69.
+- Ket qua: PASS.
+
+Kiem thu tu dong tai Repository da xac nhan:
+- Phien ban 2 APPROVED duoc uu tien khi co version cao hon.
+- Khong co phien ban APPROVED thi khong lua chon cong thuc.
+
+Sau kiem thu, da xoa cac ban ghi chinh sach cong thuc gia lap.
+Bang score_formula_policy tro ve 0 dong.
 
 ### 4.3. Doi chieu ket qua thuc te
 
@@ -173,17 +223,27 @@ diem tong ket dung sau moi lan thay doi hop le.
 Gia tri QT1 da duoc khoi phuc ve 7.
 Version va AuditLog van ghi nhan lich su chinh sua.
 
+
 ## 5. Ket luan
 
-- PASS: 5/5 bai kiem thu tu dong.
-- PASS: Khong tinh tong ket khi chua du diem.
-- PASS: Tinh dung diem tong ket 7.69 khi du 5 diem.
+- PASS: 9/9 bai kiem thu tu dong, 0 FAIL.
+- PASS: Cong thuc, he so va quy tac lam tron.
+- PASS: Diem 0 hop le, khac voi null.
+- PASS: Khong tinh tong ket khi thieu diem hoac co trang thai ABSENT, EXEMPT.
+- PASS: Khong tinh tong ket khi chua co cong thuc APPROVED.
+- PASS: Lua chon phien ban APPROVED moi nhat.
+- PASS: Phien ban PENDING khong thay the phien ban APPROVED truoc do.
+- PASS: Lua chon cong thuc khi co nhieu phien ban duoc kiem thu tu dong.
+- PASS: API tinh dung diem tong ket 7.69 tren SQL Server.
 - PASS: Tu choi ban ghi khong ton tai (HTTP 404).
 - PASS: Tu choi ma ban ghi khong hop le (HTTP 400).
 - PASS: Tinh lai diem tong ket 7.81 sau khi sua QT1.
 - PASS: Diem tong ket tro ve 7.69 sau khi khoi phuc QT1.
 
-Cong thuc, he so, quy tac lam tron va tinh lai sau khi sua diem
-da duoc kiem thu thanh cong tren SQL Server.
+Ket qua kiem thu xac nhan chuc nang tinh diem tong ket dap ung cong thuc va quy tac phe duyet da thong nhat.
 
-API va bang doi chieu tinh tay da san sang de nhom review.
+Ham tinh diem su dung cong thuc co dinh da duoc nhom chot. Bang score_formula_policy duoc su dung de kiem tra va lua chon phien ban APPROVED, khong thuc thi cong thuc dong.
+
+Du lieu chinh sach cong thuc gia lap da duoc xoa sau kiem thu.
+
+API va bang doi chieu tinh tay da san sang de nhom review va merge PR #19.

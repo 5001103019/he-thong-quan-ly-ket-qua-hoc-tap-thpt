@@ -351,6 +351,27 @@ Chi tinh DTK khi ca 5 thanh phan co trang thai `SCORED` va gia tri diem hop le.
 
 Neu co thanh phan `NOT_ENTERED`, `ABSENT`, `EXEMPT` hoac thieu gia tri diem hop le, API khong tinh DTK.
 
+### 12.2.1. Kiem tra phe duyet cong thuc
+
+API doc trang thai phe duyet cong thuc tu bang `score_formula_policy` tren SQL Server.
+
+Quy tac lua chon:
+
+- Chi su dung phien ban co `approval_status = 'APPROVED'`.
+- Neu co nhieu phien ban APPROVED, chon phien ban co `version` lon nhat.
+- Phien ban moi dang PENDING hoac REJECTED khong thay the phien ban APPROVED truoc do.
+- Neu khong co phien ban APPROVED, khong tinh diem tong ket.
+
+Khi chua co cong thuc duoc duyet:
+
+- `calculationStatus`: `FORMULA_NOT_APPROVED`.
+- `finalScore`: `null`.
+- `weightedSum`: `null`.
+
+Ham tinh diem hien su dung cong thuc va he so co dinh da duoc nhom thong nhat. Bang `score_formula_policy` duoc su dung de kiem tra trang thai phe duyet, khong thuc thi truc tiep bieu thuc cong thuc duoc luu trong bang.
+
+Chuc nang khong tu dong phe duyet cong thuc.
+  
 ### 12.3. Du lieu tra ve
 
 Khi thanh cong, API tra ve HTTP `200` va `success: true`.
@@ -361,7 +382,7 @@ Du lieu `data` gom:
 |---|---|
 | `scoreRecordId` | Ma ban ghi diem |
 | `version` | Phien ban ban ghi diem |
-| `calculationStatus` | `CALCULATED` hoac `INCOMPLETE` |
+| `calculationStatus` | `CALCULATED`, `INCOMPLETE` hoac `FORMULA_NOT_APPROVED` |
 | `finalScore` | Diem tong ket hoac `null` |
 | `formula` | Cong thuc tinh diem tong ket |
 | `totalWeight` | Tong he so, bang 8 |
@@ -423,19 +444,30 @@ Khi diem duoc sua hop le, lan goi API tiep theo se phan anh diem moi va version 
 
 ### 12.8. Ket qua kiem thu
 
-- PASS: 5/5 bai kiem thu tu dong ve cong thuc va quy tac tinh.
-- PASS: API khong tinh DTK khi thieu diem.
+- PASS: 9/9 bai kiem thu tu dong, 0 FAIL.
+- PASS: Kiem tra cong thuc, he so va lam tron 2 chu so thap phan.
+- PASS: Phan biet diem 0 va NULL.
+- PASS: Khong tinh DTK khi thieu diem hoac co trang thai Vang/Mien.
+- PASS: Tinh lai DTK sau khi sua diem.
+- PASS: Khong tinh DTK khi chua co cong thuc APPROVED.
+- PASS: Phien ban moi PENDING hoac REJECTED khong thay the phien ban APPROVED truoc do.
+- PASS: Lua chon phien ban APPROVED moi nhat.
 - PASS: API tra HTTP 404 khi ban ghi khong ton tai.
 - PASS: API tra HTTP 400 khi ma ban ghi khong hop le.
-- PASS: API tra CALCULATED voi du 5 diem tren SQL Server.
-- PASS: Ket qua tinh tay va API deu bang 7.69.
-- PASS: Sua QT1 tu 7 thanh 8, API tinh lai DTK tu 7.69 thanh 7.81.
-- PASS: Khoi phuc QT1 ve 7, API tinh lai DTK ve 7.69.
 
-Ban ghi kiem thu: score_record_id = 3.
+Ket qua kiem thu SQL Server that:
 
-Gia tri diem QT1 da duoc khoi phuc ve ban dau.
-Version tang tu 1 len 3 va AuditLog van luu lich su thay doi.
+- Khong co cong thuc APPROVED: `FORMULA_NOT_APPROVED`, `finalScore = null`, `weightedSum = null` - PASS.
+- Co cong thuc APPROVED va du diem: `CALCULATED`, `finalScore = 7.69`, `weightedSum = 61.5` - PASS.
+- Phien ban 1 APPROVED, phien ban 2 PENDING: API van tinh theo phien ban 1 - PASS.
+- Sua QT1 tu 7 thanh 8: DTK thay doi tu 7.69 thanh 7.81 - PASS.
+- Khoi phuc QT1 ve 7: DTK tro ve 7.69 - PASS.
+
+Ban ghi kiem thu: `score_record_id = 3`.
+
+Gia tri QT1 da duoc khoi phuc. Version tang tu 1 len 3 va AuditLog van luu lich su thay doi.
+
+Du lieu chinh sach cong thuc gia lap da duoc xoa sau kiem thu.
 
 ### 12.9. Ban giao tich hop
 
@@ -443,6 +475,10 @@ API duoc phat trien tren nhanh:
 
 `feature/Chau-04-score-summary`
 
-Frontend su dung truong `calculationStatus` de phan biet ket qua da tinh va chua du dieu kien tinh.
+Frontend su dung truong `calculationStatus` de phan biet:
+
+- `CALCULATED`: Da tinh diem tong ket.
+- `INCOMPLETE`: Chua du diem hop le.
+- `FORMULA_NOT_APPROVED`: Chua co phien ban cong thuc duoc phe duyet.
 
 Khi `finalScore` bang `null`, frontend khong duoc hien thi thanh diem 0.
