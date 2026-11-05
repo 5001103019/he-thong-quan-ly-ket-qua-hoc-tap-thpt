@@ -700,6 +700,8 @@ await writeAuditLog({
 | 403 | FORBIDDEN | Khong co quyen truy cap (khong phai vai tro KHAO_THI) |
 | 404 | NOT_FOUND | Khong tim thay thong tin nien khoa, lop, mon hoc hoac cot diem |
 | 409 | CONFLICT | Trang thai cot diem khong phu hop voi thao tac (VD: mo khoa cot dang UNLOCKED hoac khoa lai cot da LOCKED) |
+| 409 | RELOCK_REQUIRED | Cot diem da tung duoc mo khoa; khong cho phep su dung LOCK thong thuong de khoa lai. Phai su dung thao tac RELOCK. |
+| 409 | LOCK_TIMEOUT | Khong lay duoc khoa giao dich khi cap nhat diem; thao tac bi tu choi de tranh xung dot du lieu. |
 | 409 | SCORE_LOCKED | Cot diem dang bi khoa (LOCKED), backend chan tuyet doi thao tac sua diem |
 | 409 | VERSION_CONFLICT | Xung dot phien ban du lieu do co nguoi khac da thao tac dong thoi |
 | 422 | INVALID_SCORE | Gia tri diem khong hop le (ngoai mien 0-10 hoac cot QT co so thap phan) |

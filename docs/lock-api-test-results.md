@@ -35,3 +35,84 @@ API hoat dong dung trong cac truong hop da thu: khoa doc lap theo tung cot, canh
 
 - `backend/src/routes/lockRoutes.js`
 - `backend/src/server.js`
+
+## 5. Kiem thu bo sung cac tinh huong ngoai le
+
+### 5.1. Ket qua kiem thu
+
+| STT | Truong hop kiem thu | Ket qua thuc te | Trang thai |
+|---|---|---|---|
+| 13 | Mo khoa QT1 lap lai | Lan dau UNLOCK thanh cong, version = 11; lan thu hai tra HTTP 409 CONFLICT | PASS |
+| 14 | Mo khoa voi version cu | Gui expectedVersion = 11 khi version hien tai = 12; API tra HTTP 409 VERSION_CONFLICT | PASS |
+| 15 | Luu diem va khoa lai gan nhu dong thoi | SAVE_SCORE tra 409 SCORE_LOCKED; RELOCK tra 200, QT1 LOCKED version = 14 | PASS |
+| 16 | Loi ghi AuditLog khi LOCK | API tra HTTP 500; transaction rollback, khong tao ban ghi khoa QT3 | PASS |
+
+### 5.2. Minh chung kiem tra du lieu
+
+**Truong hop mo khoa lap lai:**
+
+- Lan UNLOCK dau tien thanh cong, QT1 chuyen sang UNLOCKED.
+- Goi UNLOCK lan hai tra HTTP 409 CONFLICT.
+- Trang thai va version khong bi thay doi boi lan goi thu hai.
+- Khong phat sinh AuditLog UNLOCK cho lan bi tu choi.
+
+**Truong hop xung dot version:**
+
+- QT1 dang LOCKED, version = 12.
+- Goi UNLOCK voi expectedVersion = 11.
+- API tra HTTP 409 VERSION_CONFLICT.
+- QT1 van LOCKED, version = 12.
+- Khong phat sinh AuditLog cho thao tac that bai.
+
+**Truong hop tranh chap giua khoa va luu diem:**
+
+- Gui hai yeu cau SAVE_SCORE va RELOCK gan nhu dong thoi.
+- SAVE_SCORE tra HTTP 409 SCORE_LOCKED.
+- RELOCK tra HTTP 200, QT1 LOCKED, version = 14.
+- Kiem tra SSMS: diem QT1 van la 8.00, trang thai SCORED.
+- AuditLog co UNLOCK ID 14 va RELOCK ID 15.
+- Khong phat sinh SCORE_EDIT tu yeu cau bi tu choi.
+
+Luu y: Ket qua PASS cho kich ban da chay, chua chung minh
+tat ca truong hop tranh chap dong thoi.
+
+**Truong hop rollback khi ghi AuditLog cua LOCK that bai:**
+
+- Su dung cot QT3, ban dau chua co ban ghi lock_status.
+- Tam thoi gia lap loi SQL TEST_LOCK_AUDIT_FAILURE
+  truoc lenh INSERT AuditLog, trong cung transaction.
+- API tra HTTP 500.
+- Kiem tra SSMS sau loi:
+  + Khong co ban ghi khoa QT3.
+  + So AuditLog LOCK cua QT3 bang 0.
+- Da xoa lenh gia lap loi va khoi dong lai backend thanh cong.
+- Ket luan: Transaction rollback thanh cong.
+
+### 5.3. Ra soat quy tac tinh diem thieu
+
+Da doi chieu cau SQL tinh missingCount trong lockRoutes.js:
+
+| Trang thai | Tinh la thieu diem |
+|---|---|
+| NOT_ENTERED | Co |
+| SCORED | Khong |
+| ABSENT | Khong |
+| EXEMPT | Khong |
+| Chua co ban ghi score_component | Co |
+
+Ket luan: Dat khi ra soat ma nguon.
+Chua kiem thu API rieng cho tung trang thai diem.
+
+### 5.4. Nhan xet
+
+Cac tinh huong ngoai le da kiem thu cho thay:
+
+- API tu choi mo khoa lap lai va thao tac dung version cu.
+- API ngan cap nhat diem sau khi cot diem da bi khoa.
+- Trang thai khoa va diem duoc giu nhat quan trong
+  kich ban gui yeu cau gan nhu dong thoi.
+- Khi ghi AuditLog cua LOCK that bai, transaction rollback,
+  khong de lai ban ghi khoa chua hoan tat.
+
+Phan gia lap loi chi phuc vu kiem thu tren moi truong phat trien.
+Ma nguon da duoc khoi phuc sau khi kiem thu.
