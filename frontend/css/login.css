@@ -1,0 +1,262 @@
+﻿
+/* VT1-04 - Giao dien dang nhap */
+
+.login-body,
+.login-body * {
+    box-sizing: border-box;
+}
+
+body.login-body {
+    margin: 0;
+    padding: 20px 30px;
+    min-height: 100vh;
+    background: #E5E7EB;
+    font-family: Arial, sans-serif;
+}
+
+/* Bo cuc hai cot */
+.login-layout {
+    display: grid;
+    grid-template-columns: 53% 47%;
+    max-width: 1200px;
+    min-height: 650px;
+    margin: 0 auto;
+    border: 1px solid #D2D9E3;
+}
+
+/* Ben trai */
+.login-intro {
+    padding: 60px 45px;
+    border-top: 9px solid #1463E6;
+    background: #E8F2FF;
+}
+
+.login-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    margin-bottom: 15px;
+    border-radius: 14px;
+    background: #1463E6;
+    color: white;
+    font-size: 32px;
+}
+
+.login-intro h1 {
+    margin: 0;
+    color: #123F72;
+    font-size: 28px;
+    line-height: 1.2;
+}
+
+.login-description {
+    margin: 18px 0 50px;
+    color: #66758A;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.login-features {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.login-feature {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    min-height: 50px;
+    padding: 10px 13px;
+    border-radius: 9px;
+    background: white;
+    color: #123F72;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.feature-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 32px;
+    height: 30px;
+    border-radius: 7px;
+    background: #ECF4FF;
+    color: #1463E6;
+}
+
+/* Ben phai */
+.login-right {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+    background: #F5F8FC;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 400px;
+    padding: 40px 36px 24px;
+    border: 1px solid #D9E2EF;
+    border-radius: 17px;
+    background: white;
+}
+
+.login-heading {
+    margin-bottom: 45px;
+    text-align: center;
+}
+
+    .login-heading h2 {
+        margin: 0 0 12px;
+        color: #123F72;
+        font-size: 24px;
+    }
+
+    .login-heading p {
+        margin: 0;
+        color: #66758A;
+        font-size: 12px;
+    }
+
+/* O nhap */
+.login-field {
+    margin-bottom: 25px;
+}
+
+    .login-field label {
+        display: block;
+        margin-bottom: 8px;
+        color: #17283E;
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+    .login-field input {
+        width: 100%;
+        height: 35px;
+        padding: 8px 10px;
+        border: 1px solid #D9E2EF;
+        border-radius: 7px;
+        background: white;
+        color: #17283E;
+        font-size: 12px;
+    }
+
+/* Tuy chon */
+.login-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin: 28px 0 23px;
+    font-size: 11px;
+}
+
+.remember-option {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #66758A;
+}
+
+.forgot-password {
+    color: #1463E6;
+    font-weight: bold;
+}
+
+/* Hai nut dang nhap */
+.login-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+}
+
+.login-role-button {
+    width: 100%;
+    min-height: 36px;
+    padding: 8px 4px;
+    border: none;
+    border-radius: 5px;
+    background: #1463E6;
+    color: white;
+    font-size: 11px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+    .login-role-button:hover {
+        background: #123F72;
+    }
+
+    .login-role-button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+.login-message {
+    margin: 12px 0;
+    color: #C62828;
+    font-size: 12px;
+}
+
+    .login-message:empty {
+        display: none;
+    }
+
+/* Ghi chu */
+.login-notice {
+    margin-top: 40px;
+    padding: 13px;
+    border-radius: 8px;
+    background: #ECF4FF;
+}
+
+    .login-notice strong {
+        color: #123F72;
+        font-size: 11px;
+    }
+
+    .login-notice p {
+        margin: 6px 0 0;
+        color: #66758A;
+        font-size: 11px;
+    }
+
+/* Man hinh nho */
+@media (max-width: 800px) {
+    .login-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .login-intro {
+        padding: 35px 25px;
+    }
+
+    .login-right {
+        padding: 30px 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    body.login-body {
+        padding: 0;
+    }
+
+    .login-card {
+        padding: 28px 20px;
+    }
+
+    .login-buttons {
+        gap: 10px;
+    }
+
+    .login-role-button {
+        font-size: 10px;
+    }
+}
