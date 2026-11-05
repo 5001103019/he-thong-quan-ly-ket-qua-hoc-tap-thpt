@@ -23,8 +23,8 @@ CV8 khong thay doi code nghiep vu va khong yeu cau chay lai cac test CV7 da nghi
 | Tai lieu | Noi dung | Nguoi su dung |
 |---|---|---|
 | `docs/cv8-score-srs-nfr-review.md` | Doi chieu SRS/NFR, de xuat noi dung can dong bo | Giang |
-| `docs/cv8-score-api-test-report.md` | Bao cao API diem, validation, DTK, kiem thu va nguon minh chung | Giang |
-| `docs/cv8-handoff-Giang-Yen.md` | Huong dan tich hop bao cao va tom tat slide | Giang, Yen |
+| `docs/cv8-score-api-test-report.md` | Bao cao API diem, kiem thu va nguon minh chung | Giang |
+| `docs/cv8-handoff-giang-yen.md` | Noi dung ban giao bao cao va slide | Giang, Yen |
 
 Tai lieu tham chieu co san trong repository:
 
@@ -142,8 +142,7 @@ Khong danh PASS cho cac noi dung tren khi chua co bang chung.
 
 | Uu tien | Cong viec |
 |---|---|
-| 1 | Doi chieu quy tac khoa lan dau tu dong voi SRS muc 2.4, AS-13 va quyet dinh nhom |
-| 2 | Bo sung lua chon phien ban cong thuc APPROVED moi nhat vao FR09/Business Rules |
+| 1 | Giu quy tac khoa thu cong la MUST; chi xem xet tu dong khoa khi co quyet dinh va CR duoc duyet || 2 | Bo sung lua chon phien ban cong thuc APPROVED moi nhat vao FR09/Business Rules |
 | 3 | Doi chieu validation, expectedVersion va reason voi API Contract |
 | 4 | Lam ro tham chieu AuditLog khi sua diem sau mo khoa |
 | 5 | Map minh chung CV6-CV7 voi TC-01 den TC-29 theo noi dung, khong theo so thu tu |

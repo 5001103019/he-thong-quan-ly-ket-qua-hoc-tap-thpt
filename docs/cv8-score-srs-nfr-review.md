@@ -38,8 +38,11 @@
 
 - LockStatus doc lap theo nien khoa, lop, mon, cot; backend tu choi PATCH cot dang LOCKED bang `409 SCORE_LOCKED`.
 - UNLOCK can quyen, nguoi yeu cau, ly do va AuditLog; sau sua diem ghi SCORE_EDIT va RELOCK theo quy tac.
-- **Diem can Giang dong bo:** SRS muc 2.4 va AS-13 ghi khong tu dong khoa theo thoi han. Quy tac nhom da chot sau do la khoa lan dau khi den han neu du diem; thieu diem thi canh bao va chua khoa; RELOCK sau chinh sua la thu cong.
-- Giang can doi chieu quyet dinh va code hien hanh truoc khi sua SRS; khong tu coi auto-lock da duoc lap trinh hoac kiem thu.
+- Khoa diem thu cong la luong MUST. Nguoi co quyen thuc hien khoa tung cot diem theo nien khoa, lop va mon hoc.
+- Neu cot con thieu diem, he thong hien thi canh bao va yeu cau xac nhan; van cho phep khoa thu cong theo quy tac nhom da thong nhat.
+- Tu dong khoa diem theo thoi han khong thuoc pham vi MUST hien tai. Chi bo sung khi co quyet dinh cua nhom va Change Request (CR) duoc duyet.
+- RELOCK sau khi mo khoa va chinh sua diem la thao tac thu cong, phai ghi AuditLog.
+
 
 ### 3.3. Cong thuc DTK va phien ban
 
@@ -83,8 +86,7 @@
 
 | Uu tien | Noi dung | Yeu cau |
 |---|---|---|
-| Cao | SRS 2.4 va AS-13 voi quy tac khoa lan dau theo han | Dong bo quyet dinh nhom va trang thai implement, neu can thi ghi CR |
-| Cao | FR09/BR36-BR41 | Bo sung version APPROVED moi nhat va PENDING/REJECTED |
+| Cao | Khoa diem thu cong va canh bao thieu diem | Giu luong MUST; chi bo sung tu dong khoa khi co CR duoc duyet || Cao | FR09/BR36-BR41 | Bo sung version APPROVED moi nhat va PENDING/REJECTED |
 | Cao | SRS muc 10.2, RTM, muc 13 | Map tung TC theo noi dung, khong theo so TC cua bo test khac |
 | Trung binh | FR05/NFR-DI02 | Dan chieu expectedVersion va reason theo API Contract |
 | Trung binh | NFR-AU02-AU04 | Lam ro lien ket UNLOCK va SCORE_EDIT |
