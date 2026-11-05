@@ -35,6 +35,9 @@ const scoreRecordRoutes = require("./routes/scoreRecordRoutes");
 // CV2 - Uyen: Router quan ly khoa diem.
 const lockRoutes = require("./routes/lockRoutes");
 
+ // Chau: Router nhap diem tu tep CSV
+const scoreCsvImportRoutes = require("./routes/scoreCsvImportRoutes");
+
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
 
@@ -63,6 +66,9 @@ app.use("/api/v1/scores", scoreRoutes);
 // GET /api/v1/score-records/:id
 // Yeu cau dang nhap va vai tro KHAO_THI
 app.use("/api/v1/score-records", scoreRecordRoutes);
+
+// Chau: API xem truoc va nhap diem CSV
+app.use("/api/v1/score-import", scoreCsvImportRoutes);
 
 // 5. API quan ly nien khoa
 // Chi vai tro KHAO_THI duoc phep truy cap
