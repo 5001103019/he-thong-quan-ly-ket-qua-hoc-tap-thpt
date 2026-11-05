@@ -1,7 +1,4 @@
 
-cd "E:\SPTINHOC\CNPM_CV7"
-
-@'
 # BAO CAO KIEM THU E2E NHAP DIEM VA KHOA DIEM
 
 ## 1. Muc tieu
@@ -84,7 +81,7 @@ Doi chieu tren SQL Server:
 ## 6. Minh chung khoa diem
 
 API:
-POST /api/v1/score-records/40/components/QT1
+PATCH /api/v1/score-records/40/components/QT1
 
 Khi cot QT1 dang LOCKED, yeu cau sua diem tu 8 thanh 9 tra ve:
 - HTTP: 409
