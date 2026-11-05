@@ -5,6 +5,7 @@
 require("dotenv").config();
 
 const express = require("express");
+const path = require("node:path");
 const helmet = require("helmet");
 const cookieParser = require("cookie-parser");
 
@@ -99,7 +100,13 @@ app.get("/api/v1/health", (req, res) => {
         }
     });
 });
-
+// VT1-04 - Phuc vu giao dien web cung dia chi voi API
+// Chi phuc vu thu muc frontend, khong phuc vu file .env
+app.use(
+    express.static(
+        path.join(__dirname, "../../frontend")
+    )
+);
 // 10. Khoi dong backend
 app.listen(PORT, () => {
     console.log(
