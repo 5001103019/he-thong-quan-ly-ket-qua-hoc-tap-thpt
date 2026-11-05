@@ -94,9 +94,9 @@ router.post(
                 warnings: validation.warnings,
                 totalRows: validation.rows.length,
                 eligibleRows: validation.eligibleRows,
-                validationStage:
-                    validation.validationStage,
-                readyToImport: false
+               validationStage:
+                validation.validationStage,
+                readyToImport: validation.eligibleRows > 0
             }
             });
 

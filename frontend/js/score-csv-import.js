@@ -72,27 +72,152 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const message = $("csvMessage");
     const previewStatus = $("csvPreviewStatus");
+    
 
     // Du lieu cua mot lan Import
     let csvText = "";
     let previewData = null;
     let busy = false;
 
-    // Cap nhat lop theo khoi trong du lieu demo
-    function updateClassByGrade() {
-        const className = gradeSelect.value + "A1";
+   
+    // Lay du lieu bo loc tu API that.
+    let allClasses = [];
 
-        classSelect.replaceChildren(
-            new Option(className, className)
+    function setOptions(select, items, getValue, getLabel) {
+        select.replaceChildren(
+            new Option("-- Chon --", "")
+        );
+
+        for (const item of items) {
+            select.add(new Option(
+                getLabel(item),
+                String(getValue(item))
+            ));
+        }
+
+        select.disabled = items.length === 0;
+
+        if (items.length > 0) {
+            select.selectedIndex = 1;
+        }
+    }
+
+    // Chi hien thi lop thuoc nien khoa va khoi da chon.
+    function updateClassByGrade() {
+        const classes = allClasses.filter(function (item) {
+            return (
+                item.academicYearCode === yearSelect.value &&
+                String(item.gradeNumber) === gradeSelect.value
+            );
+        });
+
+        setOptions(
+            classSelect,
+            classes,
+            item => item.code,
+            item => item.name + " (" + item.code + ")"
         );
     }
+
+    async function loadFiltersFromApi() {
+        const selects = [
+            yearSelect,
+            gradeSelect,
+            classSelect,
+            subjectSelect
+        ];
+
+        for (const select of selects) {
+            select.replaceChildren(
+                new Option("Dang tai du lieu...", "")
+            );
+            select.disabled = true;
+        }
+
+        try {
+            const paths = [
+                "academic-years",
+                "grades",
+                "classes",
+                "subjects"
+            ];
+
+            const datasets = await Promise.all(
+                paths.map(async function (path) {
+                    const response = await fetch(
+                        "/api/v1/" + path,
+                        { credentials: "same-origin" }
+                    );
+
+                    if (!response.ok) {
+                        throw new Error(
+                            path + ": HTTP " + response.status
+                        );
+                    }
+
+                    const result = await response.json();
+
+                    if (
+                        result.success !== true ||
+                        !Array.isArray(result.data)
+                    ) {
+                        throw new Error(
+                            path + ": Du lieu khong hop le"
+                        );
+                    }
+
+                    return result.data;
+                })
+            );
+
+            const [years, grades, classes, subjects] =
+                datasets;
+
+            allClasses = classes;
+
+            setOptions(
+                yearSelect,
+                years,
+                item => item.code,
+                item => item.code
+            );
+
+            setOptions(
+                gradeSelect,
+                grades,
+                item => item.gradeNumber,
+                item => "Khoi " + item.gradeNumber
+            );
+
+            setOptions(
+                subjectSelect,
+                subjects,
+                item => item.code,
+                item => item.name
+            );
+
+            updateClassByGrade();
+
+        } catch (error) {
+            report(
+                message,
+                "Khong tai duoc bo loc: " + error.message,
+                true
+            );
+        }
+    }
+
+    yearSelect.addEventListener(
+        "change",
+        updateClassByGrade
+    );
 
     gradeSelect.addEventListener(
         "change",
         updateClassByGrade
     );
 
-    updateClassByGrade();
+    loadFiltersFromApi();
 
     // Chuyen giua ba man hinh
     function showStep(step) {
@@ -932,9 +1057,10 @@ document.addEventListener("DOMContentLoaded", function () {
                         };
                     }
                 );
-
-                // Khong them ly do mo khoa vao giao dien Import.
-                // Backend tu kiem tra REASON_REQUIRED neu can.
+               
+                
+                // Import khong yeu cau ly do rieng.
+                // Backend truy vet qua related_log_id cua UNLOCK.
                 const result = await apiPost(
                     "/confirm",
                     {

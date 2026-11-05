@@ -344,25 +344,59 @@ async function saveConfirmedCsvRow({
                 continue;
             }
 
-            if (
-                oldStatus !== "NOT_ENTERED" &&
-                normalizedReason === null
-            ) {
+            // Xac dinh chu ky mo khoa hien hanh.
+            // Chua tung khoa: relatedLogId = null.
+            // Da UNLOCK hop le: lien ket den UNLOCK moi nhat.
+            // Khong su dung UNLOCK cu sau RELOCK.
+            let relatedLogId = null;
+
+            const lockEvents = await new sql.Request(tx)
+                .input("yearId", sql.BigInt,
+                    scope.academic_year_id)
+                .input("classId", sql.BigInt,
+                    scope.class_id)
+                .input("subjectId", sql.BigInt,
+                    scope.subject_id)
+                .input("component", sql.VarChar(10), type)
+                .query(`
+                    SELECT TOP (1)
+                        audit_log_id,
+                        action_type
+                    FROM dbo.audit_log
+                    WHERE academic_year_id = @yearId
+                      AND class_id = @classId
+                      AND subject_id = @subjectId
+                      AND component = @component
+                      AND action_type IN (
+                          'LOCK', 'UNLOCK', 'RELOCK'
+                      )
+                      AND result = 'SUCCESS'
+                    ORDER BY audit_log_id DESC
+                `);
+
+            const lastEvent = lockEvents.recordset[0] ?? null;
+
+            if (lastEvent?.action_type === "UNLOCK") {
+                relatedLogId = lastEvent.audit_log_id;
+            } else if (lastEvent !== null) {
+                // Co lich su khoa nhung khong co UNLOCK
+                // hien hanh: khong cho phep cap nhat.
                 throw businessError(
-                    "REASON_REQUIRED",
-                    "Sua diem da nhap phai co ly do",
-                    400,
+                    "UNLOCK_REQUIRED",
+                    "Cot diem chua co lan mo khoa hop le",
+                    409,
                     type
                 );
             }
-
-            changes.push({
+             changes.push({
                 ...update,
                 oldValue,
                 oldStatus,
+                relatedLogId,
                 componentId:
                     current?.score_component_id ?? null
             });
+
         }
 
         if (changes.length === 0) {
@@ -473,6 +507,8 @@ async function saveConfirmedCsvRow({
                     change.scoreStatus)
                 .input("reason", sql.NVarChar(sql.MAX),
                     normalizedReason)
+                .input("relatedLogId", sql.BigInt,
+                    change.relatedLogId)
                 .query(`
                     INSERT INTO dbo.audit_log (
                         action_type,
@@ -488,6 +524,7 @@ async function saveConfirmedCsvRow({
                         new_value,
                         old_score_status,
                         new_score_status,
+                        related_log_id,
                         reason,
                         result
                     )
@@ -506,6 +543,7 @@ async function saveConfirmedCsvRow({
                         @newValue,
                         @oldStatus,
                         @newStatus,
+                        @relatedLogId,
                         @reason,
                         'SUCCESS'
                     )
