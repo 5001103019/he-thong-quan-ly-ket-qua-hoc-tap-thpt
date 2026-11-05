@@ -86,7 +86,8 @@
 
 | Uu tien | Noi dung | Yeu cau |
 |---|---|---|
-| Cao | Khoa diem thu cong va canh bao thieu diem | Giu luong MUST; chi bo sung tu dong khoa khi co CR duoc duyet || Cao | FR09/BR36-BR41 | Bo sung version APPROVED moi nhat va PENDING/REJECTED |
+| Cao | Khoa diem thu cong va canh bao thieu diem | Giu luong MUST; chi bo sung tu dong khoa khi co CR duoc duyet |
+| Cao | FR09/BR36-BR41 | Bo sung version APPROVED moi nhat va PENDING/REJECTED |
 | Cao | SRS muc 10.2, RTM, muc 13 | Map tung TC theo noi dung, khong theo so TC cua bo test khac |
 | Trung binh | FR05/NFR-DI02 | Dan chieu expectedVersion va reason theo API Contract |
 | Trung binh | NFR-AU02-AU04 | Lam ro lien ket UNLOCK va SCORE_EDIT |

@@ -142,7 +142,8 @@ Khong danh PASS cho cac noi dung tren khi chua co bang chung.
 
 | Uu tien | Cong viec |
 |---|---|
-| 1 | Giu quy tac khoa thu cong la MUST; chi xem xet tu dong khoa khi co quyet dinh va CR duoc duyet || 2 | Bo sung lua chon phien ban cong thuc APPROVED moi nhat vao FR09/Business Rules |
+| 1 | Giu quy tac khoa thu cong la MUST; chi xem xet tu dong khoa khi co quyet dinh va CR duoc duyet |
+| 2 | Bo sung lua chon phien ban cong thuc APPROVED moi nhat vao FR09/Business Rules |
 | 3 | Doi chieu validation, expectedVersion va reason voi API Contract |
 | 4 | Lam ro tham chieu AuditLog khi sua diem sau mo khoa |
 | 5 | Map minh chung CV6-CV7 voi TC-01 den TC-29 theo noi dung, khong theo so thu tu |
