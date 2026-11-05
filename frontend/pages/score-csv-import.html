@@ -1,5 +1,4 @@
-﻿
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
@@ -14,7 +13,7 @@
 <body>
     <div class="app-layout">
 
-        <!-- Menu dùng chung -->
+        <!-- Khung menu dùng chung của nhóm -->
         <aside class="sidebar">
             <div class="sidebar-brand">
                 <div class="brand-icon">◆</div>
@@ -35,7 +34,6 @@
             </div>
         </aside>
 
-        <!-- Nội dung chính -->
         <div class="main-content">
 
             <header class="topbar">
@@ -49,7 +47,7 @@
                 </div>
             </header>
 
-            <main class="page-content">
+            <main class="page-content csv-page">
 
                 <h1 class="page-title">
                     Import điểm từ CSV
@@ -59,19 +57,20 @@
                     Tải tệp điểm lên để kiểm tra trước khi ghi dữ liệu.
                 </p>
 
+                <!-- TRANG 17: CHỌN TỆP CSV -->
                 <section class="card csv-import-card">
 
                     <h2>Bước 1 – Chọn tệp CSV</h2>
 
-                    <!-- Bộ lọc dữ liệu -->
                     <div class="csv-filter-grid">
 
                         <div class="form-group">
                             <label for="academicYear">
                                 Niên khóa
                             </label>
-                            <select id="academicYear" class="form-control">
-                                <option value="2026-2027">
+                            <select id="academicYear"
+                                    class="form-control">
+                                <option value="2026-2027" selected>
                                     2026–2027
                                 </option>
                                 <option value="2025-2026">
@@ -95,7 +94,8 @@
                             <label for="classroom">
                                 Lớp
                             </label>
-                            <select id="classroom" class="form-control">
+                            <select id="classroom"
+                                    class="form-control">
                                 <option value="11A1">11A1</option>
                             </select>
                         </div>
@@ -104,22 +104,27 @@
                             <label for="subject">
                                 Môn học
                             </label>
-
-                            <select id="subject" class="form-control">
-                                <option value="TOAN">Toán</option>
-                                <option value="NGUVAN">Ngữ văn</option>
-                                <option value="TINHOC">Tin học</option>
+                            <select id="subject"
+                                    class="form-control">
+                                <option value="TOAN" selected>
+                                    Toán
+                                </option>
+                                <option value="NGUVAN">
+                                    Ngữ văn
+                                </option>
+                                <option value="TINHOC">
+                                    Tin học
+                                </option>
                             </select>
                         </div>
 
                     </div>
 
-                    <!-- Khu vực chọn file -->
                     <div class="csv-upload-area">
 
                         <h3>Chọn tệp .csv để nhập điểm</h3>
 
-                        <p>
+                        <p class="csv-upload-description">
                             Hỗ trợ các cột:
                             Mã HS, QT1, QT2, QT3, GK, CK
                         </p>
@@ -135,14 +140,12 @@
                             Chọn tệp CSV
                         </button>
 
-                        <p id="selectedFileName" aria-live="polite">
-                            Chưa chọn tệp.
-                        </p>
+                        <p id="selectedFileName"
+                           aria-live="polite"></p>
 
                     </div>
 
-                    <!-- Cảnh báo nghiệp vụ -->
-                    <div class="alert alert-warning">
+                    <div class="alert alert-warning csv-import-warning">
                         <strong>Kiểm tra trước khi nhập</strong>
 
                         <p>
@@ -151,11 +154,13 @@
                         </p>
                     </div>
 
-                    <div id="csvMessage" aria-live="polite"></div>
+                    <p id="csvMessage"
+                       class="csv-status"
+                       role="status"
+                       aria-live="polite"></p>
 
                 </section>
 
-                <!-- Điều hướng -->
                 <div class="csv-actions">
                     <button type="button"
                             id="nextButton"
@@ -165,33 +170,26 @@
                     </button>
                 </div>
 
-                <!-- BUOC 2: XEM TRUOC DU LIEU CSV -->
+                <!-- TRANG 18: XEM TRƯỚC DỮ LIỆU CSV -->
                 <section id="csvPreviewStep"
                          class="card csv-preview-card"
                          hidden>
-                    <h2>Xem trước dữ liệu CSV</h2>
-
-                    <p class="page-description">
-                        Bước 2 – Kiểm tra từng dòng trước khi xác nhận nhập.
-                    </p>
 
                     <div class="csv-preview-info">
+
                         <h3 id="csvPreviewFileName">
-                            Xem trước dữ liệu
+                            Xem trước dữ liệu CSV
                         </h3>
 
                         <p id="csvPreviewScope">
                             Niên khóa • Lớp • Môn học
                         </p>
 
-                        <p class="csv-demo-note">
-                            Dữ liệu minh họa theo Figma.
-                            Chưa đọc hoặc kiểm tra nội dung tệp CSV thực tế.
-                        </p>
                     </div>
 
                     <div class="csv-table-wrapper">
                         <table class="csv-preview-table">
+
                             <thead>
                                 <tr>
                                     <th>Dòng</th>
@@ -205,53 +203,36 @@
                                 </tr>
                             </thead>
 
-                            <tbody id="csvPreviewBody">
-                                <tr>
-                                    <td>2</td>
-                                    <td>HS001</td>
-                                    <td>8</td>
-                                    <td>9</td>
-                                    <td>7</td>
-                                    <td>8</td>
-                                    <td>9</td>
-                                    <td>Hợp lệ (minh họa)</td>
-                                </tr>
+                            <tbody id="csvPreviewBody"></tbody>
 
-                                <tr>
-                                    <td>3</td>
-                                    <td>HS002</td>
-                                    <td>0</td>
-                                    <td>8</td>
-                                    <td>7</td>
-                                    <td>6</td>
-                                    <td>8</td>
-                                    <td>Hợp lệ (minh họa)</td>
-                                </tr>
-
-                                <tr>
-                                    <td>4</td>
-                                    <td>HS003</td>
-                                    <td>9</td>
-                                    <td>—</td>
-                                    <td>8</td>
-                                    <td>7</td>
-                                    <td>9</td>
-                                    <td>Thiếu QT2 (minh họa)</td>
-                                </tr>
-                            </tbody>
                         </table>
                     </div>
 
                     <div class="alert alert-warning csv-preview-warning">
-                        <strong>Có 1 dòng thiếu điểm (dữ liệu minh họa)</strong>
+
+                        <strong>Kiểm tra dữ liệu CSV</strong>
 
                         <p>
-                            Dòng thiếu điểm cần được kiểm tra trước khi nhập.
-                            Không tự động thay điểm thiếu bằng 0.
+                            Chỉ những dòng đủ điều kiện mới được nhập.
+                            Dữ liệu bị khóa không được ghi đè.
                         </p>
+
+                        <p id="csvPreviewStatus"
+                           class="csv-status"
+                           role="status"
+                           aria-live="polite"></p>
+
+                        <button type="button"
+                                id="showCsvErrorsButton"
+                                class="csv-detail-link"
+                                hidden>
+                            Xem chi tiết lỗi/cảnh báo
+                        </button>
+
                     </div>
 
                     <div class="csv-preview-actions">
+
                         <button type="button"
                                 id="backToImportButton"
                                 class="btn btn-secondary">
@@ -265,36 +246,22 @@
                             Xác nhận nhập
                         </button>
 
-                        <button type="button"
-                                id="showCsvErrorsButton"
-                                class="btn btn-secondary">
-                            Xem lỗi minh họa
-                        </button>
-
                     </div>
+
                 </section>
 
-                <!-- BUOC 3: KIEM TRA LOI CSV -->
+                <!-- TRANG 19: KIỂM TRA LỖI CSV -->
                 <section id="csvErrorStep"
                          class="card csv-error-card"
                          hidden>
-                    <h2>Kiểm tra lỗi CSV</h2>
-
-                    <p class="page-description">
-                        Các bản ghi không hợp lệ cần được sửa trước khi nhập.
-                    </p>
 
                     <div class="csv-error-content">
 
                         <h3>Chi tiết lỗi theo dòng</h3>
 
-                        <p class="csv-demo-note">
-                            Dữ liệu minh họa theo Figma.
-                            Chưa kiểm tra nội dung tệp CSV thực tế.
-                        </p>
-
                         <div class="csv-table-wrapper">
                             <table class="csv-error-table">
+
                                 <thead>
                                     <tr>
                                         <th>Dòng</th>
@@ -305,58 +272,29 @@
                                     </tr>
                                 </thead>
 
-                                <tbody id="csvErrorBody">
-                                    <tr>
-                                        <td>4</td>
-                                        <td>HS003</td>
-                                        <td>QT2</td>
-                                        <td>11</td>
-                                        <td class="csv-error-text">
-                                            Lỗi: giá trị ngoài 0–10
-                                        </td>
-                                    </tr>
+                                <tbody id="csvErrorBody"></tbody>
 
-                                    <tr>
-                                        <td>5</td>
-                                        <td>HS001</td>
-                                        <td>QT1</td>
-                                        <td>9</td>
-                                        <td class="csv-locked-text">
-                                            Khóa: không cho ghi đè
-                                        </td>
-                                    </tr>
-
-                                    <tr>
-                                        <td>6</td>
-                                        <td>HS004</td>
-                                        <td>GK</td>
-                                        <td>trống</td>
-                                        <td class="csv-warning-text">
-                                            Thiếu điểm: cần kiểm tra
-                                        </td>
-                                    </tr>
-                                </tbody>
                             </table>
                         </div>
 
-                        <!-- Thong bao loi -->
                         <div class="csv-error-alert">
+
                             <strong>
                                 Không thể nhập toàn bộ dữ liệu
                             </strong>
 
                             <p>
-                                Bản ghi đã khóa phải bị bỏ qua.
-                                Dữ liệu lỗi phải được xử lý rõ ràng.
+                                Bản ghi đã khóa phải được bỏ qua;
+                                dữ liệu lỗi phải được xử lý rõ ràng.
                             </p>
+
                         </div>
 
                         <p class="csv-error-note">
-                            Các dòng hợp lệ chỉ được nhập theo quy tắc
-                            nhóm đã thống nhất và sau khi xác nhận.
+                            Các dòng hợp lệ chỉ được nhập theo
+                            quy tắc nhóm đã thống nhất.
                         </p>
 
-                        <!-- Nut dieu huong -->
                         <div class="csv-error-actions">
 
                             <button type="button"
@@ -372,225 +310,17 @@
                             </button>
 
                         </div>
+
                     </div>
                 </section>
+
             </main>
         </div>
     </div>
 
     <script src="../js/navigation.js"></script>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-        renderNavigation("admin", "sidebarNavigation");
-
-        const menu = document.querySelectorAll(
-        "#sidebarNavigation a"
-        );
-
-        menu.forEach(function (link) {
-        if (link.textContent.trim() === "Import / Export CSV") {
-        link.href = "score-csv-import.html";
-        link.classList.remove("menu-placeholder");
-        link.removeAttribute("aria-disabled");
-        link.classList.add("active");
-        }
-        });
-
-        
-            // Cap nhat lop theo khoi da chon
-            const gradeSelect = document.getElementById("grade");
-            const classSelect = document.getElementById("classroom");
-
-            function updateClassByGrade() {
-                const grade = gradeSelect.value;
-                const className = grade + "A1";
-
-                classSelect.replaceChildren(
-                    new Option(className, className)
-                );
-            }
-
-            gradeSelect.addEventListener("change", updateClassByGrade);
-
-            // Dong bo lop ngay khi mo trang
-            updateClassByGrade();
-
-            // Lay cac thanh phan giao dien
-            const fileInput = document.getElementById("csvFile");
-            const fileButton = document.getElementById("selectCsvButton");
-            const fileName = document.getElementById("selectedFileName");
-
-            const nextButton = document.getElementById("nextButton");
-            const backButton = document.getElementById("backToImportButton");
-
-            const importCard = document.querySelector(".csv-import-card");
-            const importActions = document.querySelector(".csv-actions");
-            const previewStep = document.getElementById("csvPreviewStep");
-
-            const pageTitle = document.querySelector(".page-title");
-            const pageDescription = document.querySelector(
-                ".page-content > .page-description"
-            );
-
-            const previewFileName = document.getElementById(
-                "csvPreviewFileName"
-            );
-
-            const previewScope = document.getElementById(
-                "csvPreviewScope"
-            );
-
-            // Mo cua so chon file
-            fileButton.addEventListener("click", function () {
-                fileInput.click();
-            });
-
-            // Kiem tra tep da chon
-            fileInput.addEventListener("change", function () {
-                const file = fileInput.files[0];
-
-                nextButton.disabled = true;
-
-                if (!file) {
-                    fileName.textContent = "Chưa chọn tệp.";
-                    return;
-                }
-
-                // Chi chap nhan tep co duoi .csv
-                if (!file.name.toLowerCase().endsWith(".csv")) {
-                    fileName.textContent = "Vui lòng chọn tệp CSV.";
-                    fileInput.value = "";
-                    return;
-                }
-
-                fileName.textContent = "Đã chọn: " + file.name;
-
-                // Cho phep chuyen sang man hinh minh hoa
-                nextButton.disabled = false;
-            });
-
-            // Chuyen sang man hinh Preview
-            nextButton.addEventListener("click", function () {
-                const file = fileInput.files[0];
-
-                if (!file || !file.name.toLowerCase().endsWith(".csv")) {
-                    return;
-                }
-
-                const academicYear = document.getElementById(
-                    "academicYear"
-                ).selectedOptions[0].textContent.trim();
-
-                const classroom = document.getElementById(
-                    "classroom"
-                ).selectedOptions[0].textContent.trim();
-
-                const subject = document.getElementById(
-                    "subject"
-                ).selectedOptions[0].textContent.trim();
-
-                previewFileName.textContent = "Xem trước: " + file.name;
-
-                previewScope.textContent =
-                    "Niên khóa " + academicYear +
-                    " • Lớp " + classroom +
-                    " • Môn " + subject;
-
-                // An man hinh chon file
-                importCard.hidden = true;
-                importActions.hidden = true;
-
-                // Hien man hinh Preview
-                previewStep.hidden = false;
-
-                pageTitle.textContent = "Xem trước dữ liệu CSV";
-
-                pageDescription.textContent =
-                    "Dữ liệu minh họa theo Figma, chưa kiểm tra tệp thực tế.";
-
-                window.scrollTo(0, 0);
-            });
-
-            // Quay lai man hinh chon file
-            backButton.addEventListener("click", function () {
-                previewStep.hidden = true;
-
-                importCard.hidden = false;
-                importActions.hidden = false;
-
-                pageTitle.textContent = "Import điểm từ CSV";
-
-                pageDescription.textContent =
-                    "Tải tệp điểm lên để kiểm tra trước khi ghi dữ liệu.";
-
-                // Giu nguyen tep da chon
-                nextButton.disabled = !fileInput.files.length;
-
-                window.scrollTo(0, 0);
-            });
-        
-            // Cac thanh phan man hinh kiem tra loi
-            const errorStep = document.getElementById("csvErrorStep");
-
-            const showErrorsButton = document.getElementById(
-                "showCsvErrorsButton"
-            );
-
-            const backToPreviewButton = document.getElementById(
-                "backToPreviewButton"
-            );
-
-            const chooseAnotherButton = document.getElementById(
-                "chooseAnotherCsvButton"
-            );
-
-            // Mo man hinh kiem tra loi minh hoa
-            showErrorsButton.addEventListener("click", function () {
-                previewStep.hidden = true;
-                errorStep.hidden = false;
-
-                pageTitle.textContent = "Kiểm tra lỗi CSV";
-                pageDescription.textContent =
-                    "Dữ liệu lỗi minh họa theo Figma, chưa kiểm tra tệp thực tế.";
-
-                window.scrollTo(0, 0);
-            });
-
-            // Quay lai man hinh xem truoc
-            backToPreviewButton.addEventListener("click", function () {
-                errorStep.hidden = true;
-                previewStep.hidden = false;
-
-                pageTitle.textContent = "Xem trước dữ liệu CSV";
-                pageDescription.textContent =
-                    "Dữ liệu minh họa theo Figma, chưa kiểm tra tệp thực tế.";
-
-                window.scrollTo(0, 0);
-            });
-
-            // Chon tep CSV khac
-            chooseAnotherButton.addEventListener("click", function () {
-                errorStep.hidden = true;
-                previewStep.hidden = true;
-
-                importCard.hidden = false;
-                importActions.hidden = false;
-
-                pageTitle.textContent = "Import điểm từ CSV";
-                pageDescription.textContent =
-                    "Tải tệp điểm lên để kiểm tra trước khi ghi dữ liệu.";
-
-                fileInput.value = "";
-                fileName.textContent = "Chưa chọn tệp.";
-                nextButton.disabled = true;
-
-                fileInput.click();
-
-                window.scrollTo(0, 0);
-            });
-        });
-    </script>
+    <script src="../js/score-csv-import.js?v=cv5-20261105-02"></script>
 
 </body>
 </html>
+không có được
