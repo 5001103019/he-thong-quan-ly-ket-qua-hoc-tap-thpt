@@ -308,7 +308,37 @@ async function saveScoreEntry({
             );
         }
 
+
+        // Tim phien mo khoa hien tai cua dung cot diem.
+        // Neu chua tung mo khoa, related_log_id de NULL.
+        const lastLockEvent = await new sql.Request(transaction)
+            .input("yearId", sql.BigInt, scope.academic_year_id)
+            .input("classId", sql.BigInt, scope.class_id)
+            .input("subjectId", sql.BigInt, scope.subject_id)
+            .input("component", sql.VarChar(10), componentType)
+            .query(`
+                SELECT TOP (1)
+                    audit_log_id,
+                    action_type
+                FROM dbo.audit_log
+                WHERE academic_year_id = @yearId
+                  AND class_id = @classId
+                  AND subject_id = @subjectId
+                  AND component = @component
+                  AND action_type IN ('LOCK', 'UNLOCK', 'RELOCK')
+                  AND result = 'SUCCESS'
+                ORDER BY audit_log_id DESC
+            `);
+
+        const lastEvent = lastLockEvent.recordset[0] || null;
+
+        const relatedLogId =
+            lastEvent && lastEvent.action_type === "UNLOCK"
+                ? lastEvent.audit_log_id
+                : null;
+
         let scoreComponentId;
+
 
         // 9. Cap nhat neu da co thanh phan diem.
         if (current) {
@@ -430,10 +460,16 @@ async function saveScoreEntry({
                 sql.VarChar(15),
                 oldStatus
             )
+
             .input(
                 "newStatus",
                 sql.VarChar(15),
                 scoreStatus
+            )
+            .input(
+                "relatedLogId",
+                sql.BigInt,
+                relatedLogId
             )
             .query(`
                 INSERT INTO dbo.audit_log (
@@ -450,6 +486,7 @@ async function saveScoreEntry({
                     new_value,
                     old_score_status,
                     new_score_status,
+                    related_log_id,
                     reason,
                     result
                 )
@@ -468,6 +505,7 @@ async function saveScoreEntry({
                     @newValue,
                     @oldStatus,
                     @newStatus,
+                    @relatedLogId,
                     @reason,
                     'SUCCESS'
                 )
