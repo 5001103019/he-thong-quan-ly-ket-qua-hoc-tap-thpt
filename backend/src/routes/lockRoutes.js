@@ -93,16 +93,57 @@ router.get(
                 .input("subjectId", sql.BigInt, subjectId)
                 .query(`
                     SELECT
-                        component,
-                        status,
-                        locked_by,
-                        locked_at,
-                        version
-                    FROM dbo.lock_status
-                    WHERE academic_year_id = @yearId
-                      AND class_id = @classId
-                      AND subject_id = @subjectId
+                        ls.component,
+                        ls.status,
+                        ls.locked_by,
+                        u_lock.username AS locked_by_name,
+                        ls.locked_at,
+                        ls.unlocked_by,
+                        u_unlock.username AS unlocked_by_name,
+                        ls.unlocked_at,
+                        ls.unlock_reason,
+                        ls.version
+                    FROM dbo.lock_status ls
+                    LEFT JOIN dbo.app_user u_lock
+                        ON u_lock.user_id = ls.locked_by
+                    LEFT JOIN dbo.app_user u_unlock
+                        ON u_unlock.user_id = ls.unlocked_by
+                    WHERE ls.academic_year_id = @yearId
+                      AND ls.class_id = @classId
+                      AND ls.subject_id = @subjectId
                 `);
+
+            // Tinh so hoc sinh con thieu diem cho tung thanh phan diem
+            const missingStats = await pool.request()
+                .input("yearId", sql.BigInt, academicYearId)
+                .input("classId", sql.BigInt, classId)
+                .input("subjectId", sql.BigInt, subjectId)
+                .query(`
+                    SELECT
+                        comps.component,
+                        COUNT_BIG(CASE WHEN sc.score_component_id IS NULL OR sc.score_status = 'NOT_ENTERED' THEN 1 END) AS missing_count
+                    FROM (
+                        VALUES ('QT1'), ('QT2'), ('QT3'), ('GK'), ('CK')
+                    ) AS comps(component)
+                    CROSS JOIN dbo.enrollment e
+                    LEFT JOIN dbo.score_record sr
+                        ON sr.enrollment_id = e.enrollment_id
+                       AND sr.subject_id = @subjectId
+                    LEFT JOIN dbo.score_component sc
+                        ON sc.score_record_id = sr.score_record_id
+                       AND sc.component_type = comps.component
+                    WHERE e.academic_year_id = @yearId
+                      AND e.class_id = @classId
+                      AND e.end_date IS NULL
+                    GROUP BY comps.component
+                `);
+
+            const missingMap = new Map(
+                missingStats.recordset.map(item => [
+                    item.component,
+                    Number(item.missing_count || 0)
+                ])
+            );
 
             // Neu chua co ban ghi khoa, cot diem duoc xem la UNLOCKED.
             const rows = new Map(
@@ -121,7 +162,15 @@ router.get(
                     lockedBy: item && item.locked_by != null
                         ? String(item.locked_by)
                         : null,
+                    lockedByName: item ? item.locked_by_name : null,
                     lockedAt: item ? item.locked_at : null,
+                    unlockedBy: item && item.unlocked_by != null
+                        ? String(item.unlocked_by)
+                        : null,
+                    unlockedByName: item ? item.unlocked_by_name : null,
+                    unlockedAt: item ? item.unlocked_at : null,
+                    unlockReason: item ? item.unlock_reason : null,
+                    missingCount: missingMap.get(component) || 0,
                     version: item ? item.version : 1
                 };
             });
@@ -142,7 +191,7 @@ router.get(
 );
 
 /*
- * CV2 - API khoa doc lap mot cot diem.
+ * API khoa doc lap mot cot diem.
  * POST /api/v1/locks/lock
  */
 router.post(
@@ -155,8 +204,7 @@ router.post(
             classId,
             subjectId,
             component,
-            expectedVersion,
-            confirmed = false
+            expectedVersion
         } = req.body || {};
 
         // Chuyen ID hop le sang chuoi de giu do chinh xac BIGINT.
@@ -184,8 +232,7 @@ router.post(
             !COMPONENTS.includes(component) ||
             !Number.isInteger(expectedVersion) ||
             expectedVersion < 1 ||
-            expectedVersion > 2147483647 ||
-            typeof confirmed !== "boolean"
+            expectedVersion > 2147483647
         ) {
             return res.status(400).json({
                 success: false,
@@ -364,18 +411,17 @@ router.post(
                 missingResult.recordset[0].missing_count
             );
 
-            // Con thieu diem va chua xac nhan: khong khoa.
-            if (missingCount > 0 && !confirmed) {
+            // Con thieu diem: khong cho khoa.
+            if (missingCount > 0) {
                 await transaction.rollback();
                 started = false;
 
                 return res.status(200).json({
                     success: false,
-                    requiresConfirmation: true,
                     data: {
                         hasMissingScores: true,
                         missingCount,
-                        message: "Con hoc sinh chua co diem. Can xac nhan de khoa."
+                        message: "Vui long nhap day du truoc khi khoa."
                     }
                 });
             }
@@ -523,8 +569,6 @@ router.post(
             subjectId,
             component,
             expectedVersion,
-            requestedBy,
-            requestedByName,
             reason
         } = req.body || {};
 
@@ -543,13 +587,9 @@ router.post(
         const classKey = normalizeId(classId);
         const subjectKey = normalizeId(subjectId);
 
-        const requesterId = requestedBy == null
-            ? null
-            : normalizeId(requestedBy);
-
-        const requesterName = typeof requestedByName === "string"
-            ? requestedByName.trim() || null
-            : null;
+        // Giu tuong thich cac cot du lieu cu, khong nhan tu client.
+        const requesterId = null;
+        const requesterName = null;
 
         const reasonText = typeof reason === "string"
             ? reason.trim()
@@ -564,11 +604,6 @@ router.post(
             !Number.isInteger(expectedVersion) ||
             expectedVersion < 1 ||
             expectedVersion > 2147483647 ||
-            (requestedBy != null && !isPositiveId(requesterId)) ||
-            (requestedByName != null &&
-                typeof requestedByName !== "string") ||
-            (requesterName != null && requesterName.length > 150) ||
-            (requesterId === null && !requesterName) ||
             !reasonText
         ) {
             return res.status(400).json({
@@ -653,24 +688,6 @@ router.post(
                 return await reject(
                     404, "NOT_FOUND", "Khong tim thay pham vi mo khoa"
                 );
-            }
-
-            // Neu nguoi yeu cau co tai khoan, kiem tra tai khoan ton tai.
-            if (requesterId !== null) {
-                const userResult = await new sql.Request(transaction)
-                    .input("requestedBy", sql.BigInt, requesterId)
-                    .query(`
-                        SELECT user_id
-                        FROM dbo.app_user
-                        WHERE user_id = @requestedBy
-                    `);
-
-                if (userResult.recordset.length === 0) {
-                    return await reject(
-                        400, "VALIDATION_ERROR",
-                        "Nguoi yeu cau khong ton tai"
-                    );
-                }
             }
 
             // Lay dung cot diem va khoa ban ghi trong transaction.
@@ -796,8 +813,6 @@ router.post(
                     version: unlocked.version,
                     unlockedBy: String(req.auth.userId),
                     unlockedAt: unlocked.unlocked_at,
-                    requestedBy: requesterId,
-                    requestedByName: requesterName,
                     reason: reasonText,
                     auditLogId: String(
                         auditResult.recordset[0].audit_log_id
@@ -1000,6 +1015,48 @@ router.post(
                 );
             }
 
+            // Kiem tra diem thieu truoc khi khoa lai.
+            const missingResult = await new sql.Request(transaction)
+                .input("yearId", sql.BigInt, yearId)
+                .input("classId", sql.BigInt, classKey)
+                .input("subjectId", sql.BigInt, subjectKey)
+                .input("component", sql.VarChar(10), component)
+                .query(`
+                    SELECT COUNT_BIG(*) AS missing_count
+                    FROM dbo.enrollment e
+                    LEFT JOIN dbo.score_record sr
+                        ON sr.enrollment_id = e.enrollment_id
+                    AND sr.subject_id = @subjectId
+                    LEFT JOIN dbo.score_component sc
+                        ON sc.score_record_id = sr.score_record_id
+                    AND sc.component_type = @component
+                    WHERE e.academic_year_id = @yearId
+                    AND e.class_id = @classId
+                    AND e.end_date IS NULL
+                    AND (
+                        sc.score_component_id IS NULL
+                        OR sc.score_status = 'NOT_ENTERED'
+                    )
+                `);
+
+            const missingCount = Number(
+                missingResult.recordset[0].missing_count
+            );
+
+            if (missingCount > 0) {
+                await transaction.rollback();
+                started = false;
+
+                return res.status(200).json({
+                    success: false,
+                    data: {
+                        hasMissingScores: true,
+                        missingCount,
+                        message: "Vui long nhap day du truoc khi khoa lai."
+                    }
+                });
+            }
+
             // Khoa lai thu cong, tang version.
             const relockResult = await new sql.Request(transaction)
                 .input("lockId", sql.BigInt, current.lock_status_id)
@@ -1093,6 +1150,201 @@ router.post(
                 }
             }
 
+            next(error);
+        }
+    }
+);
+
+/*
+ * API truy van danh sach Audit Log.
+ * GET /api/v1/locks/audit-logs
+ * Ho tro loc theo nien khoa, lop, mon, cot diem, loai thao tac, nguoi thuc hien, thoi gian.
+ */
+router.get(
+    "/audit-logs",
+    requireAuth,
+    requireRole("KHAO_THI"),
+    async (req, res, next) => {
+        try {
+            const pool = await connectDatabase();
+            const request = pool.request();
+
+            const conditions = [];
+
+            const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+            const limit = Math.min(100, Math.max(1, parseInt(req.query.limit, 10) || 20));
+            const offset = (page - 1) * limit;
+
+            if (req.query.academicYearId && isPositiveId(req.query.academicYearId)) {
+                conditions.push("a.academic_year_id = @academicYearId");
+                request.input("academicYearId", sql.BigInt, req.query.academicYearId);
+            }
+
+            if (req.query.classId && isPositiveId(req.query.classId)) {
+                conditions.push("a.class_id = @classId");
+                request.input("classId", sql.BigInt, req.query.classId);
+            }
+
+            if (req.query.subjectId && isPositiveId(req.query.subjectId)) {
+                conditions.push("a.subject_id = @subjectId");
+                request.input("subjectId", sql.BigInt, req.query.subjectId);
+            }
+
+            if (req.query.component && COMPONENTS.includes(req.query.component)) {
+                conditions.push("a.component = @component");
+                request.input("component", sql.VarChar(10), req.query.component);
+            }
+
+            if (req.query.actionType && typeof req.query.actionType === "string") {
+                const actionType = req.query.actionType.trim().toUpperCase();
+                const allowedActions = [
+                    "LOCK",
+                    "UNLOCK",
+                    "RELOCK",
+                    "SCORE_EDIT",
+                    "SCORE_IMPORT"
+                ];
+                if (allowedActions.includes(actionType)) {
+                    conditions.push("a.action_type = @actionType");
+                    request.input("actionType", sql.VarChar(50), actionType);
+                }
+            }
+
+            if (req.query.performedBy) {
+                const performedByVal = String(req.query.performedBy).trim();
+                if (isPositiveId(performedByVal)) {
+                    conditions.push("(a.performed_by = @performedBy OR u.username LIKE @performedByName)");
+                    request.input("performedBy", sql.BigInt, performedByVal);
+                    request.input("performedByName", sql.NVarChar(50), `%${performedByVal}%`);
+                } else if (performedByVal.length > 0) {
+                    conditions.push("u.username LIKE @performedByName");
+                    request.input("performedByName", sql.NVarChar(50), `%${performedByVal}%`);
+                }
+            }
+
+            if (req.query.from && typeof req.query.from === "string") {
+                const fromDate = new Date(req.query.from);
+                if (!isNaN(fromDate.getTime())) {
+                    conditions.push("a.created_at >= @fromDate");
+                    request.input("fromDate", sql.DateTimeOffset, fromDate);
+                }
+            }
+
+            if (req.query.to && typeof req.query.to === "string") {
+                const toDate = new Date(req.query.to);
+                if (!isNaN(toDate.getTime())) {
+                    conditions.push("a.created_at <= @toDate");
+                    request.input("toDate", sql.DateTimeOffset, toDate);
+                }
+            }
+
+            const whereClause = conditions.length > 0
+                ? "WHERE " + conditions.join(" AND ")
+                : "";
+
+            // 1. Dem tong so ban ghi thoa man dieu kien loc
+            const countResult = await request.query(`
+                SELECT COUNT_BIG(*) AS total
+                FROM dbo.audit_log a
+                LEFT JOIN dbo.app_user u
+                    ON u.user_id = a.performed_by
+                ${whereClause}
+            `);
+
+            const totalItems = Number(countResult.recordset[0].total);
+            const totalPages = Math.ceil(totalItems / limit) || 1;
+
+            // 2. Lay du lieu phan trang
+            request.input("offset", sql.Int, offset);
+            request.input("limit", sql.Int, limit);
+
+            const listResult = await request.query(`
+                SELECT
+                    a.audit_log_id,
+                    a.action_type,
+                    a.performed_by,
+                    u.username AS performed_by_name,
+                    a.requested_by,
+                    a.requested_by_name,
+                    a.academic_year_id,
+                    ay.code AS academic_year_code,
+                    a.class_id,
+                    c.name AS class_name,
+                    a.subject_id,
+                    s.name AS subject_name,
+                    a.component,
+                    a.student_id,
+                    st.student_code,
+                    st.full_name AS student_name,
+                    a.score_record_id,
+                    a.score_component_id,
+                    a.old_value,
+                    a.new_value,
+                    a.old_score_status,
+                    a.new_score_status,
+                    a.reason,
+                    a.related_log_id,
+                    a.result,
+                    a.created_at
+                FROM dbo.audit_log a
+                LEFT JOIN dbo.app_user u
+                    ON u.user_id = a.performed_by
+                LEFT JOIN dbo.academic_year ay
+                    ON ay.academic_year_id = a.academic_year_id
+                LEFT JOIN dbo.[class] c
+                    ON c.class_id = a.class_id
+                LEFT JOIN dbo.subject s
+                    ON s.subject_id = a.subject_id
+                LEFT JOIN dbo.student st
+                    ON st.student_id = a.student_id
+                ${whereClause}
+                ORDER BY a.audit_log_id DESC
+                OFFSET @offset ROWS
+                FETCH NEXT @limit ROWS ONLY
+            `);
+
+            const items = listResult.recordset.map(row => ({
+                auditLogId: String(row.audit_log_id),
+                actionType: row.action_type,
+                performedBy: String(row.performed_by),
+                performedByName: row.performed_by_name || String(row.performed_by),
+                requestedBy: row.requested_by ? String(row.requested_by) : null,
+                requestedByName: row.requested_by_name || null,
+                academicYearId: String(row.academic_year_id),
+                academicYearCode: row.academic_year_code || null,
+                classId: String(row.class_id),
+                className: row.class_name || null,
+                subjectId: String(row.subject_id),
+                subjectName: row.subject_name || null,
+                component: row.component || null,
+                studentId: row.student_id ? String(row.student_id) : null,
+                studentCode: row.student_code || null,
+                studentName: row.student_name || null,
+                scoreRecordId: row.score_record_id ? String(row.score_record_id) : null,
+                scoreComponentId: row.score_component_id ? String(row.score_component_id) : null,
+                oldValue: row.old_value != null ? Number(row.old_value) : null,
+                newValue: row.new_value != null ? Number(row.new_value) : null,
+                oldScoreStatus: row.old_score_status || null,
+                newScoreStatus: row.new_score_status || null,
+                reason: row.reason || null,
+                relatedLogId: row.related_log_id ? String(row.related_log_id) : null,
+                result: row.result,
+                createdAt: row.created_at
+            }));
+
+            return res.status(200).json({
+                success: true,
+                data: {
+                    items,
+                    pagination: {
+                        page,
+                        limit,
+                        totalItems,
+                        totalPages
+                    }
+                }
+            });
+        } catch (error) {
             next(error);
         }
     }
