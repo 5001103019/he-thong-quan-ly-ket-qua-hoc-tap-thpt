@@ -35,6 +35,7 @@ API hoat dong dung trong cac truong hop da thu: khoa doc lap theo tung cot, canh
 
 - `backend/src/routes/lockRoutes.js`
 - `backend/src/server.js`
+- `backend/src/services/scoreEntryService.js`
 
 ## 5. Kiem thu bo sung cac tinh huong ngoai le
 
@@ -46,6 +47,9 @@ API hoat dong dung trong cac truong hop da thu: khoa doc lap theo tung cot, canh
 | 14 | Mo khoa voi version cu | Gui expectedVersion = 11 khi version hien tai = 12; API tra HTTP 409 VERSION_CONFLICT | PASS |
 | 15 | Luu diem va khoa lai gan nhu dong thoi | SAVE_SCORE tra 409 SCORE_LOCKED; RELOCK tra 200, QT1 LOCKED version = 14 | PASS |
 | 16 | Loi ghi AuditLog khi LOCK | API tra HTTP 500; transaction rollback, khong tao ban ghi khoa QT3 | PASS |
+| 17 | UNLOCK chi nhap reason, khong gui requestedBy/requestedByName | HTTP 200, QT1 chuyen UNLOCKED, version 14 -> 15, unlockedBy = 1, AuditLog ID 17 | PASS |
+| 18 | RELOCK sau khi UNLOCK thanh cong | HTTP 200, QT1 chuyen LOCKED, version 15 -> 16, lockedBy = 1, AuditLog ID 18 | PASS |
+| 19 | LOCK QT3 khi thieu 2 diem du gui confirmed = true | API tra success = false, missingCount = 2; QT3 van UNLOCKED, version = 1; khong phat sinh AuditLog LOCK moi | PASS |
 
 ### 5.2. Minh chung kiem tra du lieu
 
@@ -88,6 +92,29 @@ tat ca truong hop tranh chap dong thoi.
 - Da xoa lenh gia lap loi va khoi dong lai backend thanh cong.
 - Ket luan: Transaction rollback thanh cong.
 
+**Kiem thu UNLOCK chi nhap ly do va RELOCK:**
+
+- Pham vi: nien khoa 2, lop 4, mon 3, cot QT1.
+- Dang nhap bang tai khoan KHAO_THI, userId = 1.
+- UNLOCK chi gui reason va cac tham so xac dinh cot diem; khong gui requestedBy/requestedByName.
+- UNLOCK thanh cong, version 14 -> 15, AuditLog ID 17.
+- RELOCK thanh cong, version 15 -> 16, AuditLog ID 18.
+- Doi chieu SSMS: hai ban ghi deu co performed_by = 1, requested_by = NULL, requested_by_name = NULL, result = SUCCESS.
+- AuditLog UNLOCK luu dung ly do mo khoa.
+- QT1 da duoc khoa lai sau kiem thu.
+- Ket luan: PASS cho luong UNLOCK -> RELOCK da thu.
+
+**Kiem thu khoa diem khi con thieu du lieu:**
+
+- Pham vi: nien khoa 2, lop 4, mon 3, cot QT3.
+- So hoc sinh hien tai: 2.
+- So hoc sinh thieu diem QT3: 2.
+- Gui yeu cau LOCK voi expectedVersion = 1 va confirmed = true.
+- API tra success = false, hasMissingScores = true, missingCount = 2.
+- GET /locks xac nhan QT3 van UNLOCKED, version = 1.
+- Truy van SSMS khong co AuditLog LOCK moi cua QT3 voi audit_log_id > 18.
+- Ket luan: PASS. Backend tu choi khoa khi thieu diem, khong cho phep confirmed = true bo qua dieu kien.
+
 ### 5.3. Ra soat quy tac tinh diem thieu
 
 Da doi chieu cau SQL tinh missingCount trong lockRoutes.js:
@@ -116,3 +143,17 @@ Cac tinh huong ngoai le da kiem thu cho thay:
 
 Phan gia lap loi chi phuc vu kiem thu tren moi truong phat trien.
 Ma nguon da duoc khoi phuc sau khi kiem thu.
+
+## 6. Gioi han kiem thu
+
+Cac noi dung duoi day chua duoc kiem thu API hoac moi kiem thu mot phan:
+
+- Tranh chap giua khoa va luu diem: moi thu thu tu RELOCK thang. Thu tu SAVE_SCORE thang roi RELOCK chay sau chua thu.
+- Rollback khi ghi AuditLog loi: moi thu voi LOCK. UNLOCK va RELOCK chua thu.
+- missingCount: da kiem thu API voi QT3 thieu 2 diem (PASS); chua kiem thu rieng cho tung trang thai NOT_ENTERED, SCORED, ABSENT va EXEMPT.
+- Tu dong khoa theo thoi han: chua lap trinh, cho CR duoc duyet.
+- Kiem tra du lieu QT2: nien khoa 2, lop 4, mon 3 co 2 hoc sinh, ca 2 deu thieu diem QT2.
+- QT2 dang LOCKED tu lan kiem thu theo quy tac cu cho phep khoa khi thieu diem.
+- Chua thuc hien UNLOCK -> RELOCK tren QT2 vi neu mo khoa, quy tac moi se khong cho RELOCK khi con thieu diem.
+- Da bo sung kiem tra missingCount trong ma nguon API RELOCK; chua xac nhan PASS bang kiem thu API thuc te cho tinh huong nay.
+- Can kiem thu rieng tren du lieu thu co the khoi phuc, khong thay doi diem hoac trang thai khoa hien tai cua nhom.

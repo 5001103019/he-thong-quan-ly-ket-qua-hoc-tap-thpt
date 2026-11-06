@@ -155,8 +155,7 @@ router.post(
             classId,
             subjectId,
             component,
-            expectedVersion,
-            confirmed = false
+            expectedVersion
         } = req.body || {};
 
         // Chuyen ID hop le sang chuoi de giu do chinh xac BIGINT.
@@ -184,8 +183,7 @@ router.post(
             !COMPONENTS.includes(component) ||
             !Number.isInteger(expectedVersion) ||
             expectedVersion < 1 ||
-            expectedVersion > 2147483647 ||
-            typeof confirmed !== "boolean"
+            expectedVersion > 2147483647
         ) {
             return res.status(400).json({
                 success: false,
@@ -364,18 +362,17 @@ router.post(
                 missingResult.recordset[0].missing_count
             );
 
-            // Con thieu diem va chua xac nhan: khong khoa.
-            if (missingCount > 0 && !confirmed) {
+            // Con thieu diem: khong cho khoa.
+            if (missingCount > 0) {
                 await transaction.rollback();
                 started = false;
 
                 return res.status(200).json({
                     success: false,
-                    requiresConfirmation: true,
                     data: {
                         hasMissingScores: true,
                         missingCount,
-                        message: "Con hoc sinh chua co diem. Can xac nhan de khoa."
+                        message: "Vui long nhap day du truoc khi khoa."
                     }
                 });
             }
@@ -523,8 +520,6 @@ router.post(
             subjectId,
             component,
             expectedVersion,
-            requestedBy,
-            requestedByName,
             reason
         } = req.body || {};
 
@@ -543,13 +538,9 @@ router.post(
         const classKey = normalizeId(classId);
         const subjectKey = normalizeId(subjectId);
 
-        const requesterId = requestedBy == null
-            ? null
-            : normalizeId(requestedBy);
-
-        const requesterName = typeof requestedByName === "string"
-            ? requestedByName.trim() || null
-            : null;
+        // Giu tuong thich cac cot du lieu cu, khong nhan tu client.
+        const requesterId = null;
+        const requesterName = null;
 
         const reasonText = typeof reason === "string"
             ? reason.trim()
@@ -564,11 +555,6 @@ router.post(
             !Number.isInteger(expectedVersion) ||
             expectedVersion < 1 ||
             expectedVersion > 2147483647 ||
-            (requestedBy != null && !isPositiveId(requesterId)) ||
-            (requestedByName != null &&
-                typeof requestedByName !== "string") ||
-            (requesterName != null && requesterName.length > 150) ||
-            (requesterId === null && !requesterName) ||
             !reasonText
         ) {
             return res.status(400).json({
@@ -653,24 +639,6 @@ router.post(
                 return await reject(
                     404, "NOT_FOUND", "Khong tim thay pham vi mo khoa"
                 );
-            }
-
-            // Neu nguoi yeu cau co tai khoan, kiem tra tai khoan ton tai.
-            if (requesterId !== null) {
-                const userResult = await new sql.Request(transaction)
-                    .input("requestedBy", sql.BigInt, requesterId)
-                    .query(`
-                        SELECT user_id
-                        FROM dbo.app_user
-                        WHERE user_id = @requestedBy
-                    `);
-
-                if (userResult.recordset.length === 0) {
-                    return await reject(
-                        400, "VALIDATION_ERROR",
-                        "Nguoi yeu cau khong ton tai"
-                    );
-                }
             }
 
             // Lay dung cot diem va khoa ban ghi trong transaction.
@@ -796,8 +764,6 @@ router.post(
                     version: unlocked.version,
                     unlockedBy: String(req.auth.userId),
                     unlockedAt: unlocked.unlocked_at,
-                    requestedBy: requesterId,
-                    requestedByName: requesterName,
                     reason: reasonText,
                     auditLogId: String(
                         auditResult.recordset[0].audit_log_id
@@ -998,6 +964,48 @@ router.post(
                     "CONFLICT",
                     "Cot diem chua o trang thai cho khoa lai"
                 );
+            }
+
+            // Kiem tra diem thieu truoc khi khoa lai.
+            const missingResult = await new sql.Request(transaction)
+                .input("yearId", sql.BigInt, yearId)
+                .input("classId", sql.BigInt, classKey)
+                .input("subjectId", sql.BigInt, subjectKey)
+                .input("component", sql.VarChar(10), component)
+                .query(`
+                    SELECT COUNT_BIG(*) AS missing_count
+                    FROM dbo.enrollment e
+                    LEFT JOIN dbo.score_record sr
+                        ON sr.enrollment_id = e.enrollment_id
+                    AND sr.subject_id = @subjectId
+                    LEFT JOIN dbo.score_component sc
+                        ON sc.score_record_id = sr.score_record_id
+                    AND sc.component_type = @component
+                    WHERE e.academic_year_id = @yearId
+                    AND e.class_id = @classId
+                    AND e.end_date IS NULL
+                    AND (
+                        sc.score_component_id IS NULL
+                        OR sc.score_status = 'NOT_ENTERED'
+                    )
+                `);
+
+            const missingCount = Number(
+                missingResult.recordset[0].missing_count
+            );
+
+            if (missingCount > 0) {
+                await transaction.rollback();
+                started = false;
+
+                return res.status(200).json({
+                    success: false,
+                    data: {
+                        hasMissingScores: true,
+                        missingCount,
+                        message: "Vui long nhap day du truoc khi khoa lai."
+                    }
+                });
             }
 
             // Khoa lai thu cong, tang version.

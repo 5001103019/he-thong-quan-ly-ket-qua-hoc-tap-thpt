@@ -288,18 +288,16 @@ Cac thao tac LOCK, UNLOCK, RELOCK va SCORE_EDIT/SCORE_IMPORT phai bao dam cap nh
     * Khong tu dong khoa cot diem khi du lieu chua day du.
     * Can bo Khao thi tiep tuc nhap bo sung cac diem con thieu.
 
-  + **Truong hop 3 - Da bo sung day du diem sau canh bao:**
-    * Can bo Khao thi thuc hien khoa thu cong cot diem do.
-    * Backend kiem tra lai `missingCount = 0` truoc khi cho phep khoa.
-    * Neu du lieu van con thieu, he thong tiep tuc canh bao va khong cho phep khoa.
-    * Neu du lieu da day du, he thong cap nhat trang thai `LOCKED` va ghi AuditLog trong cung transaction.
+  + **Truong hop 3 - Con thieu diem khi Khao thi khoa thu cong:**
+    * He thong khong tu dong khoa khi `missingCount > 0`.
+    * Khi goi LOCK voi `confirmed = false`, backend tinh lai `missingCount` trong transaction. Neu `missingCount > 0`, API tra `requiresConfirmation = true` kem `missingCount`, khong thay doi LockStatus va khong ghi AuditLog.
+    * Can bo Khao thi co the nhap bo sung diem, hoac xac nhan canh bao (`confirmed = true`) de khoa thu cong du con thieu.
+    * Khi khoa thanh cong, LockStatus va AuditLog duoc ghi trong cung mot transaction.
 
   + **Quy tac xac dinh diem thieu:**
     * `NOT_ENTERED` duoc tinh la chua nhap diem.
     * Chua ton tai ban ghi ScoreComponent duoc tinh la chua nhap diem.
     * `SCORED`, `ABSENT` va `EXEMPT` khong duoc tinh la chua nhap diem.
-    * Khong cho phep bo qua dieu kien day du diem chi bang co `confirmed: true`.
-
   + Viec khoa diem khong dong nghia voi cong bo diem cho hoc sinh.
 
 ### 4.2. Quy tac mo khoa va sua diem
@@ -779,7 +777,7 @@ await writeAuditLog({
 | 404 | NOT_FOUND | Khong tim thay thong tin nien khoa, lop, mon hoc hoac cot diem |
 | 409 | CONFLICT | Trang thai cot diem khong phu hop voi thao tac (VD: mo khoa cot dang UNLOCKED hoac khoa lai cot da LOCKED) |
 | 409 | RELOCK_REQUIRED | Cot diem da tung duoc mo khoa; khong cho phep su dung LOCK thong thuong de khoa lai. Phai su dung thao tac RELOCK. |
-| 409 | LOCK_TIMEOUT | Khong lay duoc khoa giao dich khi cap nhat diem; thao tac bi tu choi de tranh xung dot du lieu. |
+| 409 | LOCK_TIMEOUT | Khong lay duoc khoa giao dich khi cap nhat diem; thao tac bi tu choi de tranh xung dot du lieu. | Hien chi ap dung cho API luu diem. Cac API lock/unlock/relock tra 409 CONFLICT khi khong lay duoc khoa giao dich. |
 | 409 | SCORE_LOCKED | Cot diem dang bi khoa (LOCKED), backend chan tuyet doi thao tac sua diem |
 | 409 | VERSION_CONFLICT | Xung dot phien ban du lieu do co nguoi khac da thao tac dong thoi |
 | 422 | INVALID_SCORE | Gia tri diem khong hop le (ngoai mien 0-10 hoac cot QT co so thap phan) |
@@ -1129,4 +1127,4 @@ Muc dich: Luu lich su thao tac khoa, mo khoa, khoa lai, sua diem va import diem 
 | Quy tac tu dong khoa theo thoi han khi du diem | DA THONG NHAT NGHIEP VU; CHUA XAC NHAN TRIEN KHAI CODE | Khoa diem, Kien truc he thong |
 | Trien khai chuc nang tu dong khoa theo thoi han | CHI THUC HIEN KHI CO CR DUOC DUYET | Khoa diem, Kien truc he thong |
 | Co che cong bo diem theo lich | CHUA CHOT PHAM VI | Kien truc he thong |
-
+| Khoa thu cong khi con thieu diem sau khi xac nhan canh bao | DA THONG NHAT | Khoa diem, Quan ly diem |
