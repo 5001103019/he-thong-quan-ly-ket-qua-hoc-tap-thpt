@@ -17,7 +17,7 @@ function createError(code, message, status) {
 // Dam bao ScoreRecord ton tai cho Enrollment va Subject.
 // Neu da ton tai thi tra lai ban ghi hien tai.
 // Neu chua co thi tao moi voi version = 1.
-async function ensureScoreRecord({
+async function ensureScoreRecordCore({
     enrollmentId,
     subjectId
 }) {
@@ -41,11 +41,39 @@ async function ensureScoreRecord({
 
     try {
         // 2. Bat dau transaction.
+
         await transaction.begin(
-            sql.ISOLATION_LEVEL.SERIALIZABLE
+            sql.ISOLATION_LEVEL.READ_COMMITTED
         );
+
         started = true;
 
+        // Khoa giao dich theo Enrollment va Subject.
+        // Cac POST cung cap ID se duoc xu ly lan luot.
+        const lockKey =
+            `score-record:init:${enrollmentId}:${subjectId}`;
+
+        const appLock = await new sql.Request(transaction)
+            .input("lockKey", sql.NVarChar(255), lockKey)
+            .query(`
+                DECLARE @result INT;
+
+                EXEC @result = sys.sp_getapplock
+                    @Resource = @lockKey,
+                    @LockMode = 'Exclusive',
+                    @LockOwner = 'Transaction',
+                    @LockTimeout = 15000;
+
+                SELECT @result AS lock_result;
+            `);
+
+        if (appLock.recordset[0].lock_result < 0) {
+            throw createError(
+                "LOCK_TIMEOUT",
+                "Khong the lay khoa khoi tao ScoreRecord",
+                409
+            );
+        }
         // 3. Kiem tra Enrollment ton tai.
         const enrollment = await new sql.Request(transaction)
             .input("enrollmentId", sql.BigInt, enrollmentId)
@@ -144,6 +172,37 @@ async function ensureScoreRecord({
         }
 
         throw error;
+    }
+}
+
+// Hang doi khoi tao ScoreRecord trong cung mot tien trinh.
+const pendingScoreRecordInit = new Map();
+
+async function ensureScoreRecord(params) {
+    const key = `${params.enrollmentId}:${params.subjectId}`;
+
+    const previous =
+        pendingScoreRecordInit.get(key) || Promise.resolve();
+
+    let release;
+
+    const current = new Promise((resolve) => {
+        release = resolve;
+    });
+
+    pendingScoreRecordInit.set(key, current);
+
+    // Cho yeu cau truoc hoan tat.
+    await previous;
+
+    try {
+        return await ensureScoreRecordCore(params);
+    } finally {
+        release();
+
+        if (pendingScoreRecordInit.get(key) === current) {
+            pendingScoreRecordInit.delete(key);
+        }
     }
 }
 
