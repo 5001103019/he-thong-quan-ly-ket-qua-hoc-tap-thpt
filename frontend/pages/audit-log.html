@@ -108,7 +108,7 @@
 
                     </div>
 
-                    <!-- Dong 2: Nien khoa, Lop, Mon -->
+                    <!-- Dong 2: Nien khoa, Lop, Mon, Nguoi thuc hien -->
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-top: 12px;">
 
                         <div class="form-group">
@@ -132,15 +132,20 @@
                             </select>
                         </div>
 
-                        <div class="form-group" style="display: flex; align-items: flex-end; gap: 8px;">
-                            <button type="button" id="applyFilterBtn" class="btn btn-primary" style="flex: 1;">
-                                Tìm kiếm
-                            </button>
-                            <button type="button" id="resetFilterBtn" class="btn btn-secondary">
-                                Đặt lại
-                            </button>
+                        <div class="form-group">
+                            <label for="performedByInput">Người thực hiện</label>
+                            <input type="text" id="performedByInput" class="form-control" placeholder="Tên tài khoản hoặc mã số...">
                         </div>
 
+                    </div>
+
+                    <div style="margin-top: 16px; display: flex; justify-content: flex-end; gap: 8px;">
+                        <button type="button" id="resetFilterBtn" class="btn btn-secondary">
+                            Đặt lại
+                        </button>
+                        <button type="button" id="applyFilterBtn" class="btn btn-primary" style="min-width: 120px;">
+                            Tìm kiếm
+                        </button>
                     </div>
                 </section>
 

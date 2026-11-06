@@ -12,6 +12,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const academicYearSelect = document.getElementById("academicYearSelect");
     const classSelect = document.getElementById("classSelect");
     const subjectSelect = document.getElementById("subjectSelect");
+    const performedByInput = document.getElementById("performedByInput");
 
     const applyFilterBtn = document.getElementById("applyFilterBtn");
     const resetFilterBtn = document.getElementById("resetFilterBtn");
@@ -89,6 +90,7 @@ document.addEventListener("DOMContentLoaded", function () {
         academicYearSelect.value = "";
         classSelect.value = "";
         subjectSelect.value = "";
+        if (performedByInput) performedByInput.value = "";
 
         currentPage = 1;
         loadAuditLogs(currentPage);
@@ -138,6 +140,9 @@ document.addEventListener("DOMContentLoaded", function () {
         if (subjectSelect.value) {
             params.append("subjectId", subjectSelect.value);
         }
+        if (performedByInput && performedByInput.value.trim()) {
+            params.append("performedBy", performedByInput.value.trim());
+        }
 
         try {
             const res = await apiClient.get(`/locks/audit-logs?${params.toString()}`);
@@ -169,6 +174,17 @@ document.addEventListener("DOMContentLoaded", function () {
             UIComponents.showError("auditLogTableContainer");
             logSummaryLabel.textContent = "Lỗi tải dữ liệu";
         }
+    }
+
+    // Ham ma hoa tranh XSS khi render du lieu tu API
+    function escapeHtml(str) {
+        if (str == null) return "";
+        return String(str)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
     }
 
     // 5. Render bang Audit Log
@@ -217,18 +233,19 @@ document.addEventListener("DOMContentLoaded", function () {
             else if (log.actionType === "SCORE_EDIT") actionClass = "action-score-edit";
             else if (log.actionType === "SCORE_IMPORT") actionClass = "action-score-import";
 
-            const actionTag = `<span class="tag-action ${actionClass}">${log.actionType}</span>`;
+            const safeActionType = escapeHtml(log.actionType || "");
+            const actionTag = `<span class="tag-action ${actionClass}">${safeActionType}</span>`;
 
             // Pham vi: Lop - Mon - Cot diem
             const scopeParts = [];
-            if (log.className) scopeParts.push(log.className);
-            if (log.subjectName) scopeParts.push(log.subjectName);
-            if (log.component) scopeParts.push(`<strong>${log.component}</strong>`);
+            if (log.className) scopeParts.push(escapeHtml(log.className));
+            if (log.subjectName) scopeParts.push(escapeHtml(log.subjectName));
+            if (log.component) scopeParts.push(`<strong>${escapeHtml(log.component)}</strong>`);
             const scopeText = scopeParts.length > 0 ? scopeParts.join(" &bull; ") : "-";
 
             // Hoc sinh
             const studentText = log.studentName
-                ? `${log.studentName} <small style="color: #64748B;">(${log.studentCode || ""})</small>`
+                ? `${escapeHtml(log.studentName)} <small style="color: #64748B;">(${escapeHtml(log.studentCode || "")})</small>`
                 : "-";
 
             // Thay doi gia tri
@@ -236,24 +253,27 @@ document.addEventListener("DOMContentLoaded", function () {
             if (log.oldValue !== null || log.newValue !== null) {
                 const oldVal = log.oldValue !== null ? Number(log.oldValue).toFixed(2) : "-";
                 const newVal = log.newValue !== null ? Number(log.newValue).toFixed(2) : "-";
-                changeText = `<code>${oldVal}</code> &rarr; <strong><code>${newVal}</code></strong>`;
+                changeText = `<code>${escapeHtml(oldVal)}</code> &rarr; <strong><code>${escapeHtml(newVal)}</code></strong>`;
             }
 
             // Ly do
-            let reasonText = log.reason || "-";
+            let reasonText = log.reason ? escapeHtml(log.reason) : "-";
             if (log.requestedByName) {
-                reasonText += `<br/><small style="color: #2563EB;">Yêu cầu: ${log.requestedByName}</small>`;
+                reasonText += `<br/><small style="color: #2563EB;">Yêu cầu: ${escapeHtml(log.requestedByName)}</small>`;
             }
 
             // Ket qua
+            const safeResult = escapeHtml(log.result || "FAILED");
             const resultBadge = log.result === "SUCCESS"
                 ? `<span class="badge-result result-success">SUCCESS</span>`
-                : `<span class="badge-result result-failed">${log.result || "FAILED"}</span>`;
+                : `<span class="badge-result result-failed">${safeResult}</span>`;
+
+            const safePerformedBy = escapeHtml(log.performedByName || ("User #" + log.performedBy));
 
             tr.innerHTML = `
                 <td style="font-size: 13px; color: #475569;">${dateStr}</td>
                 <td>${actionTag}</td>
-                <td><strong>${log.performedByName || "User #" + log.performedBy}</strong></td>
+                <td><strong>${safePerformedBy}</strong></td>
                 <td style="font-size: 13px;">${scopeText}</td>
                 <td style="font-size: 13px;">${studentText}</td>
                 <td>${changeText}</td>

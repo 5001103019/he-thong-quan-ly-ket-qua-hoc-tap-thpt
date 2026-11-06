@@ -321,12 +321,12 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             if (res && res.success) {
+                await loadLockStatus();
                 UIComponents.showAlert(
                     "alertContainer",
                     `Đã khóa thành công cột điểm ${component} (${COMPONENT_NAMES[component] || ""})!`,
                     "success"
                 );
-                await loadLockStatus();
             }
         } catch (error) {
             UIComponents.showAlert(
@@ -367,12 +367,12 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             if (res && res.success) {
+                await loadLockStatus();
                 UIComponents.showAlert(
                     "alertContainer",
                     `Đã khóa lại thành công cột điểm ${component}! Trạng thái hiện tại: ĐÃ KHÓA.`,
                     "success"
                 );
-                await loadLockStatus();
             }
         } catch (error) {
             UIComponents.showAlert(
@@ -444,12 +444,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (res && res.success) {
                 closeUnlockModal();
+                await loadLockStatus();
                 UIComponents.showAlert(
                     "alertContainer",
                     `Đã mở khóa thành công cột điểm ${targetComponent}! Dữ liệu điểm hiện đã có thể điều chỉnh và lý do đã được ghi vào Audit Log.`,
                     "success"
                 );
-                await loadLockStatus();
             }
         } catch (error) {
             alert("Mở khóa thất bại: " + error.message);

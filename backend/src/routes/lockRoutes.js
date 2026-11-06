@@ -1210,9 +1210,16 @@ router.get(
                 }
             }
 
-            if (req.query.performedBy && isPositiveId(req.query.performedBy)) {
-                conditions.push("a.performed_by = @performedBy");
-                request.input("performedBy", sql.BigInt, req.query.performedBy);
+            if (req.query.performedBy) {
+                const performedByVal = String(req.query.performedBy).trim();
+                if (isPositiveId(performedByVal)) {
+                    conditions.push("(a.performed_by = @performedBy OR u.username LIKE @performedByName)");
+                    request.input("performedBy", sql.BigInt, performedByVal);
+                    request.input("performedByName", sql.NVarChar(50), `%${performedByVal}%`);
+                } else if (performedByVal.length > 0) {
+                    conditions.push("u.username LIKE @performedByName");
+                    request.input("performedByName", sql.NVarChar(50), `%${performedByVal}%`);
+                }
             }
 
             if (req.query.from && typeof req.query.from === "string") {
