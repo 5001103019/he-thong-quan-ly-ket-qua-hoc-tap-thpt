@@ -1246,6 +1246,8 @@ router.get(
             const countResult = await request.query(`
                 SELECT COUNT_BIG(*) AS total
                 FROM dbo.audit_log a
+                LEFT JOIN dbo.app_user u
+                    ON u.user_id = a.performed_by
                 ${whereClause}
             `);
 

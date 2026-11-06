@@ -46,6 +46,28 @@ document.addEventListener("DOMContentLoaded", function () {
     // State noi bo
     let currentLocksData = [];
     let activeComponentToUnlock = null;
+    let loadedFilterContext = null; // Luu lai { yearId, classId, subjectId } khi tai bang
+
+    // Kiem tra bo loc dropdown co bi nguoi dung thay doi ma chua bam Xem trang thai khoa
+    function isFilterUnchanged() {
+        if (!loadedFilterContext) return false;
+        return (
+            academicYearSelect.value === loadedFilterContext.yearId &&
+            classSelect.value === loadedFilterContext.classId &&
+            subjectSelect.value === loadedFilterContext.subjectId
+        );
+    }
+
+    // Ham ma hoa tranh XSS khi render du lieu vao innerHTML
+    function escapeHtml(str) {
+        if (str == null) return "";
+        return String(str)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
 
     const COMPONENT_NAMES = {
         QT1: "Điểm quá trình 1",
@@ -179,12 +201,19 @@ document.addEventListener("DOMContentLoaded", function () {
             );
 
             if (res && res.success && res.data && Array.isArray(res.data.components)) {
+                loadedFilterContext = {
+                    yearId,
+                    classId,
+                    subjectId
+                };
                 currentLocksData = res.data.components;
                 renderLocksTable(currentLocksData);
             } else {
+                loadedFilterContext = null;
                 UIComponents.showEmpty("locksTableContainer");
             }
         } catch (error) {
+            loadedFilterContext = null;
             UIComponents.showAlert(
                 "alertContainer",
                 "Lỗi tải trạng thái khóa: " + error.message,
@@ -229,7 +258,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const isLocked = item.status === "LOCKED";
             const missingCount = Number(item.missingCount || 0);
-            const componentFullName = COMPONENT_NAMES[item.component] || item.component;
+            const safeComponent = escapeHtml(item.component);
+            const componentFullName = escapeHtml(COMPONENT_NAMES[item.component] || item.component);
 
             // Huy hieu trang thai
             const statusBadge = isLocked
@@ -238,37 +268,39 @@ document.addEventListener("DOMContentLoaded", function () {
 
             // Chi bao diem thieu
             const missingHtml = missingCount > 0
-                ? `<span class="missing-indicator has-missing">⚠️ Còn ${missingCount} học sinh</span>`
+                ? `<span class="missing-indicator has-missing">⚠️ Còn ${escapeHtml(missingCount)} học sinh</span>`
                 : `<span class="missing-indicator no-missing">✓ Đầy đủ (0 thiếu)</span>`;
 
             // Thong tin nguoi thuc hien
             let auditInfo = "-";
             if (isLocked && item.lockedAt) {
-                const dateStr = new Date(item.lockedAt).toLocaleString("vi-VN");
-                const actorName = item.lockedByName || (item.lockedBy ? `Cán bộ #${item.lockedBy}` : "Khảo thí");
+                const dateStr = escapeHtml(new Date(item.lockedAt).toLocaleString("vi-VN"));
+                const rawActor = item.lockedByName || (item.lockedBy ? `Cán bộ #${item.lockedBy}` : "Khảo thí");
+                const actorName = escapeHtml(rawActor);
                 auditInfo = `Khóa lúc ${dateStr} (${actorName})`;
             } else if (!isLocked && item.unlockedAt) {
-                const dateStr = new Date(item.unlockedAt).toLocaleString("vi-VN");
-                const actorName = item.unlockedByName || (item.unlockedBy ? `Cán bộ #${item.unlockedBy}` : "Khảo thí");
+                const dateStr = escapeHtml(new Date(item.unlockedAt).toLocaleString("vi-VN"));
+                const rawActor = item.unlockedByName || (item.unlockedBy ? `Cán bộ #${item.unlockedBy}` : "Khảo thí");
+                const actorName = escapeHtml(rawActor);
                 auditInfo = `Mở lúc ${dateStr} (${actorName})`;
             }
 
             // Nut hanh dong
             let actionBtnHtml = "";
             if (isLocked) {
-                actionBtnHtml = `<button type="button" class="btn-action-unlock" data-component="${item.component}">Mở khóa</button>`;
+                actionBtnHtml = `<button type="button" class="btn-action-unlock" data-component="${safeComponent}">Mở khóa</button>`;
             } else if (item.version > 1) {
-                actionBtnHtml = `<button type="button" class="btn-action-relock" data-component="${item.component}">Khóa lại</button>`;
+                actionBtnHtml = `<button type="button" class="btn-action-relock" data-component="${safeComponent}">Khóa lại</button>`;
             } else {
-                actionBtnHtml = `<button type="button" class="btn-action-lock" data-component="${item.component}">Khóa điểm</button>`;
+                actionBtnHtml = `<button type="button" class="btn-action-lock" data-component="${safeComponent}">Khóa điểm</button>`;
             }
 
             tr.innerHTML = `
-                <td><strong>${item.component}</strong></td>
+                <td><strong>${safeComponent}</strong></td>
                 <td>${componentFullName}</td>
                 <td>${statusBadge}</td>
                 <td>${missingHtml}</td>
-                <td><span style="font-family: monospace;">v${item.version}</span></td>
+                <td><span style="font-family: monospace;">v${escapeHtml(item.version)}</span></td>
                 <td style="font-size: 13px; color: #475569;">${auditInfo}</td>
                 <td style="text-align: center;">${actionBtnHtml}</td>
             `;
@@ -294,12 +326,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // 5. Xu ly KHOA DIEM (POST /locks/lock)
     async function handleLock(component) {
+        if (!isFilterUnchanged()) {
+            UIComponents.showAlert(
+                "alertContainer",
+                "Bộ lọc (Niên khóa / Lớp / Môn) đã thay đổi. Vui lòng bấm 'Xem trạng thái khóa' để cập nhật dữ liệu trước khi thao tác!",
+                "warning"
+            );
+            return;
+        }
+
         const item = currentLocksData.find(c => c.component === component);
         if (!item) return;
 
-        const yearId = academicYearSelect.value;
-        const classId = classSelect.value;
-        const subjectId = subjectSelect.value;
+        const { yearId, classId, subjectId } = loadedFilterContext;
 
         try {
             const res = await apiClient.post("/locks/lock", {
@@ -329,23 +368,30 @@ document.addEventListener("DOMContentLoaded", function () {
                 );
             }
         } catch (error) {
+            await loadLockStatus();
             UIComponents.showAlert(
                 "alertContainer",
                 "Không thể khóa cột điểm: " + error.message,
                 "error"
             );
-            await loadLockStatus();
         }
     }
 
     // 6. Xu ly KHOA LAI DIEM (POST /locks/relock)
     async function handleRelock(component) {
+        if (!isFilterUnchanged()) {
+            UIComponents.showAlert(
+                "alertContainer",
+                "Bộ lọc (Niên khóa / Lớp / Môn) đã thay đổi. Vui lòng bấm 'Xem trạng thái khóa' để cập nhật dữ liệu trước khi thao tác!",
+                "warning"
+            );
+            return;
+        }
+
         const item = currentLocksData.find(c => c.component === component);
         if (!item) return;
 
-        const yearId = academicYearSelect.value;
-        const classId = classSelect.value;
-        const subjectId = subjectSelect.value;
+        const { yearId, classId, subjectId } = loadedFilterContext;
 
         try {
             const res = await apiClient.post("/locks/relock", {
@@ -375,17 +421,26 @@ document.addEventListener("DOMContentLoaded", function () {
                 );
             }
         } catch (error) {
+            await loadLockStatus();
             UIComponents.showAlert(
                 "alertContainer",
                 "Không thể khóa lại cột điểm: " + error.message,
                 "error"
             );
-            await loadLockStatus();
         }
     }
 
     // 7. Modal MO KHOA DIEM
     function openUnlockModal(component) {
+        if (!isFilterUnchanged()) {
+            UIComponents.showAlert(
+                "alertContainer",
+                "Bộ lọc (Niên khóa / Lớp / Môn) đã thay đổi. Vui lòng bấm 'Xem trạng thái khóa' để cập nhật dữ liệu trước khi mở khóa!",
+                "warning"
+            );
+            return;
+        }
+
         const item = currentLocksData.find(c => c.component === component);
         if (!item) return;
 
@@ -417,6 +472,12 @@ document.addEventListener("DOMContentLoaded", function () {
     confirmUnlockBtn.addEventListener("click", async function () {
         if (!activeComponentToUnlock) return;
 
+        if (!isFilterUnchanged()) {
+            alert("Bộ lọc đã thay đổi so với bảng dữ liệu đang hiển thị. Vui lòng bấm 'Xem trạng thái khóa' để làm mới dữ liệu!");
+            closeUnlockModal();
+            return;
+        }
+
         const reason = unlockReasonInput.value.trim();
         if (!reason) {
             alert("Vui lòng nhập lý do giải trình để mở khóa cột điểm!");
@@ -424,9 +485,7 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        const yearId = academicYearSelect.value;
-        const classId = classSelect.value;
-        const subjectId = subjectSelect.value;
+        const { yearId, classId, subjectId } = loadedFilterContext;
 
         confirmUnlockBtn.disabled = true;
         confirmUnlockBtn.textContent = "Đang xử lý...";
