@@ -23,7 +23,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const modalComponentLabel = document.getElementById("modalComponentLabel");
     const modalScopeLabel = document.getElementById("modalScopeLabel");
     const modalVersionLabel = document.getElementById("modalVersionLabel");
-    const unlockRequestedByNameInput = document.getElementById("unlockRequestedByNameInput");
     const unlockReasonInput = document.getElementById("unlockReasonInput");
 
     // Modal Tu choi khi thieu diem
@@ -387,7 +386,6 @@ document.addEventListener("DOMContentLoaded", function () {
         modalScopeLabel.textContent = `${classText} - Môn: ${subjectText}`;
         modalVersionLabel.textContent = `Phiên bản v${item.version}`;
 
-        unlockRequestedByNameInput.value = "";
         unlockReasonInput.value = "";
 
         unlockModal.hidden = false;

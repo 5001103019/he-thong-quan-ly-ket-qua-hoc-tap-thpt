@@ -1,9 +1,4 @@
-
-
 // Menu dung chung
-
-
-
 
 // Danh sach menu theo tung vai tro
 const NAVIGATION_MENUS = {

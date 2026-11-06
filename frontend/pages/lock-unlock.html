@@ -144,28 +144,17 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="unlockRequestedByNameInput">
-                        Người yêu cầu mở khóa (nếu có):
-                    </label>
-                    <input type="text"
-                           id="unlockRequestedByNameInput"
-                           class="form-control"
-                           placeholder="Ví dụ: Thầy Nguyễn Văn A - Giáo viên bộ môn"
-                           maxlength="150">
-                    <small style="color: #64748B; font-size: 12px; margin-top: 4px; display: block;">
-                        Người thực hiện sẽ được hệ thống tự động ghi nhận từ tài khoản Khảo thí đang đăng nhập.
-                    </small>
-                </div>
-
-                <div class="form-group">
                     <label for="unlockReasonInput">
-                        Lý do mở khóa giải trình <span style="color: #DC2626;">*</span>:
+                        Lý do mở khóa <span style="color: #DC2626;">*</span>:
                     </label>
                     <textarea id="unlockReasonInput"
                               class="form-control"
                               rows="3"
                               placeholder="Nhập chi tiết lý do mở khóa điểm (bắt buộc)..."
                               required></textarea>
+                    <small style="color: #64748B; font-size: 12px; margin-top: 4px; display: block;">
+                        Tài khoản thực hiện mở khóa sẽ được hệ thống tự động ghi nhận từ phiên đăng nhập vào Audit Log.
+                    </small>
                 </div>
             </div>
 

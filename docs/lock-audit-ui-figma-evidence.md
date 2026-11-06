@@ -26,8 +26,8 @@
      * Cột `LOCKED`: Nút cam `Mở khóa` (`POST /locks/unlock`).
      * Cột `UNLOCKED` đã từng sửa: Nút xanh lá đậm `Khóa lại` (`POST /locks/relock`).
   6. **Modal popup Mở khóa điểm (`#unlockModal`):**
-     * Ô nhập thông tin Người yêu cầu mở khóa (`unlockRequestedByNameInput`).
      * Ô nhập Lý do mở khóa giải trình bắt buộc (`unlockReasonInput`).
+     * Tài khoản thực hiện mở khóa được hệ thống tự động ghi nhận từ Session đăng nhập.
      * Nút [Hủy bỏ] và [Xác nhận mở khóa].
   7. **Hộp thoại Từ chối khi khóa do thiếu điểm (`#missingScoreModal`):**
      * Bật lên khi cán bộ bấm Khóa mà cột còn `missingCount > 0`.
