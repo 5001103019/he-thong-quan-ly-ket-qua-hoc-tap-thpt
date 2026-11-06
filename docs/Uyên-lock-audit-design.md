@@ -289,9 +289,10 @@ Cac thao tac LOCK, UNLOCK, RELOCK va SCORE_EDIT/SCORE_IMPORT phai bao dam cap nh
     * Can bo Khao thi tiep tuc nhap bo sung cac diem con thieu.
 
   + **Truong hop 3 - Con thieu diem khi Khao thi khoa thu cong:**
-    * He thong khong tu dong khoa khi `missingCount > 0`.
-    * Khi goi LOCK voi `confirmed = false`, backend tinh lai `missingCount` trong transaction. Neu `missingCount > 0`, API tra `requiresConfirmation = true` kem `missingCount`, khong thay doi LockStatus va khong ghi AuditLog.
-    * Can bo Khao thi co the nhap bo sung diem, hoac xac nhan canh bao (`confirmed = true`) de khoa thu cong du con thieu.
+    * He thong kiem tra `missingCount` trong transaction truoc khi khoa.
+    * Neu `missingCount > 0`, backend tu choi khoa, transaction rollback va tra thong bao yeu cau nhap day du diem truoc khi khoa.
+    * Khong cho phep bo qua dieu kien nay (ke ca khi client gui `confirmed = true`).
+    * Can bo Khao thi chi duoc phep khoa sau khi da nhap day du diem cho tat ca hoc sinh (`missingCount == 0`).
     * Khi khoa thanh cong, LockStatus va AuditLog duoc ghi trong cung mot transaction.
 
   + **Quy tac xac dinh diem thieu:**
@@ -1127,4 +1128,4 @@ Muc dich: Luu lich su thao tac khoa, mo khoa, khoa lai, sua diem va import diem 
 | Quy tac tu dong khoa theo thoi han khi du diem | DA THONG NHAT NGHIEP VU; CHUA XAC NHAN TRIEN KHAI CODE | Khoa diem, Kien truc he thong |
 | Trien khai chuc nang tu dong khoa theo thoi han | CHI THUC HIEN KHI CO CR DUOC DUYET | Khoa diem, Kien truc he thong |
 | Co che cong bo diem theo lich | CHUA CHOT PHAM VI | Kien truc he thong |
-| Khoa thu cong khi con thieu diem sau khi xac nhan canh bao | DA THONG NHAT | Khoa diem, Quan ly diem |
+| Chan tuyet doi khoa va khoa lai khi con thieu diem (missingCount > 0) | DA THONG NHAT | Khoa diem, Quan ly diem |
