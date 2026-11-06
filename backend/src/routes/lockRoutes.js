@@ -142,7 +142,7 @@ router.get(
 );
 
 /*
- * CV2 - API khoa doc lap mot cot diem.
+ * API khoa doc lap mot cot diem.
  * POST /api/v1/locks/lock
  */
 router.post(
@@ -1101,6 +1101,192 @@ router.post(
                 }
             }
 
+            next(error);
+        }
+    }
+);
+
+/*
+ * API truy van danh sach Audit Log.
+ * GET /api/v1/locks/audit-logs
+ * Ho tro loc theo nien khoa, lop, mon, cot diem, loai thao tac, nguoi thuc hien, thoi gian.
+ */
+router.get(
+    "/audit-logs",
+    requireAuth,
+    requireRole("KHAO_THI"),
+    async (req, res, next) => {
+        try {
+            const pool = await connectDatabase();
+            const request = pool.request();
+
+            const conditions = [];
+
+            const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+            const limit = Math.min(100, Math.max(1, parseInt(req.query.limit, 10) || 20));
+            const offset = (page - 1) * limit;
+
+            if (req.query.academicYearId && isPositiveId(req.query.academicYearId)) {
+                conditions.push("a.academic_year_id = @academicYearId");
+                request.input("academicYearId", sql.BigInt, req.query.academicYearId);
+            }
+
+            if (req.query.classId && isPositiveId(req.query.classId)) {
+                conditions.push("a.class_id = @classId");
+                request.input("classId", sql.BigInt, req.query.classId);
+            }
+
+            if (req.query.subjectId && isPositiveId(req.query.subjectId)) {
+                conditions.push("a.subject_id = @subjectId");
+                request.input("subjectId", sql.BigInt, req.query.subjectId);
+            }
+
+            if (req.query.component && COMPONENTS.includes(req.query.component)) {
+                conditions.push("a.component = @component");
+                request.input("component", sql.VarChar(10), req.query.component);
+            }
+
+            if (req.query.actionType && typeof req.query.actionType === "string") {
+                const actionType = req.query.actionType.trim().toUpperCase();
+                const allowedActions = [
+                    "LOCK",
+                    "UNLOCK",
+                    "RELOCK",
+                    "SCORE_EDIT",
+                    "SCORE_IMPORT"
+                ];
+                if (allowedActions.includes(actionType)) {
+                    conditions.push("a.action_type = @actionType");
+                    request.input("actionType", sql.VarChar(50), actionType);
+                }
+            }
+
+            if (req.query.performedBy && isPositiveId(req.query.performedBy)) {
+                conditions.push("a.performed_by = @performedBy");
+                request.input("performedBy", sql.BigInt, req.query.performedBy);
+            }
+
+            if (req.query.from && typeof req.query.from === "string") {
+                const fromDate = new Date(req.query.from);
+                if (!isNaN(fromDate.getTime())) {
+                    conditions.push("a.created_at >= @fromDate");
+                    request.input("fromDate", sql.DateTimeOffset, fromDate);
+                }
+            }
+
+            if (req.query.to && typeof req.query.to === "string") {
+                const toDate = new Date(req.query.to);
+                if (!isNaN(toDate.getTime())) {
+                    conditions.push("a.created_at <= @toDate");
+                    request.input("toDate", sql.DateTimeOffset, toDate);
+                }
+            }
+
+            const whereClause = conditions.length > 0
+                ? "WHERE " + conditions.join(" AND ")
+                : "";
+
+            // 1. Dem tong so ban ghi thoa man dieu kien loc
+            const countResult = await request.query(`
+                SELECT COUNT_BIG(*) AS total
+                FROM dbo.audit_log a
+                ${whereClause}
+            `);
+
+            const totalItems = Number(countResult.recordset[0].total);
+            const totalPages = Math.ceil(totalItems / limit) || 1;
+
+            // 2. Lay du lieu phan trang
+            request.input("offset", sql.Int, offset);
+            request.input("limit", sql.Int, limit);
+
+            const listResult = await request.query(`
+                SELECT
+                    a.audit_log_id,
+                    a.action_type,
+                    a.performed_by,
+                    u.username AS performed_by_name,
+                    a.requested_by,
+                    a.requested_by_name,
+                    a.academic_year_id,
+                    ay.code AS academic_year_code,
+                    a.class_id,
+                    c.name AS class_name,
+                    a.subject_id,
+                    s.name AS subject_name,
+                    a.component,
+                    a.student_id,
+                    st.student_code,
+                    st.full_name AS student_name,
+                    a.score_record_id,
+                    a.score_component_id,
+                    a.old_value,
+                    a.new_value,
+                    a.old_score_status,
+                    a.new_score_status,
+                    a.reason,
+                    a.related_log_id,
+                    a.result,
+                    a.created_at
+                FROM dbo.audit_log a
+                LEFT JOIN dbo.app_user u
+                    ON u.user_id = a.performed_by
+                LEFT JOIN dbo.academic_year ay
+                    ON ay.academic_year_id = a.academic_year_id
+                LEFT JOIN dbo.[class] c
+                    ON c.class_id = a.class_id
+                LEFT JOIN dbo.subject s
+                    ON s.subject_id = a.subject_id
+                LEFT JOIN dbo.student st
+                    ON st.student_id = a.student_id
+                ${whereClause}
+                ORDER BY a.audit_log_id DESC
+                OFFSET @offset ROWS
+                FETCH NEXT @limit ROWS ONLY
+            `);
+
+            const items = listResult.recordset.map(row => ({
+                auditLogId: String(row.audit_log_id),
+                actionType: row.action_type,
+                performedBy: String(row.performed_by),
+                performedByName: row.performed_by_name || String(row.performed_by),
+                requestedBy: row.requested_by ? String(row.requested_by) : null,
+                requestedByName: row.requested_by_name || null,
+                academicYearId: String(row.academic_year_id),
+                academicYearCode: row.academic_year_code || null,
+                classId: String(row.class_id),
+                className: row.class_name || null,
+                subjectId: String(row.subject_id),
+                subjectName: row.subject_name || null,
+                component: row.component || null,
+                studentId: row.student_id ? String(row.student_id) : null,
+                studentCode: row.student_code || null,
+                studentName: row.student_name || null,
+                scoreRecordId: row.score_record_id ? String(row.score_record_id) : null,
+                scoreComponentId: row.score_component_id ? String(row.score_component_id) : null,
+                oldValue: row.old_value != null ? Number(row.old_value) : null,
+                newValue: row.new_value != null ? Number(row.new_value) : null,
+                oldScoreStatus: row.old_score_status || null,
+                newScoreStatus: row.new_score_status || null,
+                reason: row.reason || null,
+                relatedLogId: row.related_log_id ? String(row.related_log_id) : null,
+                result: row.result,
+                createdAt: row.created_at
+            }));
+
+            return res.status(200).json({
+                success: true,
+                data: {
+                    items,
+                    pagination: {
+                        page,
+                        limit,
+                        totalItems,
+                        totalPages
+                    }
+                }
+            });
+        } catch (error) {
             next(error);
         }
     }

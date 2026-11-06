@@ -1,0 +1,94 @@
+/* Giao dien bo loc tim kiem va bang nhat ky kiem toan */
+
+/* Tag loai thao tac */
+.tag-action {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.2;
+    text-transform: uppercase;
+    font-family: monospace;
+}
+
+.tag-action.action-lock {
+    background-color: #DBEAFE;
+    color: #1E40AF;
+    border: 1px solid #BFDBFE;
+}
+
+.tag-action.action-unlock {
+    background-color: #FEF3C7;
+    color: #92400E;
+    border: 1px solid #FDE68A;
+}
+
+.tag-action.action-relock {
+    background-color: #D1FAE5;
+    color: #065F46;
+    border: 1px solid #A7F3D0;
+}
+
+.tag-action.action-score-edit {
+    background-color: #EDE9FE;
+    color: #5B21B6;
+    border: 1px solid #DDD6FE;
+}
+
+.tag-action.action-score-import {
+    background-color: #E0E7FF;
+    color: #3730A3;
+    border: 1px solid #C7D2FE;
+}
+
+/* Ket qua thao tac */
+.badge-result {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.badge-result.result-success {
+    background-color: #DCFCE7;
+    color: #166534;
+}
+
+.badge-result.result-failed {
+    background-color: #FEE2E2;
+    color: #991B1B;
+}
+
+/* Phan trang */
+.pagination-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 0 0 0;
+    margin-top: 16px;
+    border-top: 1px solid #E2E8F0;
+}
+
+.pagination-btn {
+    padding: 6px 12px;
+    font-size: 13px;
+    background-color: #FFFFFF;
+    border: 1px solid #CBD5E1;
+    border-radius: 6px;
+    color: #334155;
+    cursor: pointer;
+}
+
+.pagination-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: #F1F5F9;
+}
+
+.pagination-info {
+    font-size: 13px;
+    color: #64748B;
+}
+

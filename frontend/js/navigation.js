@@ -1,9 +1,9 @@
 
-/* =====================================================
-   VT2-02 - SHARED NAVIGATION
-   Menu dung chung cho hai vai tro
-   Chua xu ly dang nhap va phan quyen backend
-   ===================================================== */
+
+// Menu dung chung
+
+
+
 
 // Danh sach menu theo tung vai tro
 const NAVIGATION_MENUS = {
@@ -13,8 +13,8 @@ const NAVIGATION_MENUS = {
         { label: "Học sinh / Tài khoản", url: null },
         { label: "Môn học", url: null },
         { label: "Bảng điểm", url: null },
-        { label: "Khóa / Mở khóa", url: null },
-        { label: "Audit Log", url: null },
+        { label: "Khóa / Mở khóa", url: "lock-unlock.html" },
+        { label: "Audit Log", url: "audit-log.html" },
         { label: "Import / Export CSV", url: null }
     ],
 

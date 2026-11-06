@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Khóa & Mở khóa điểm - Quản lý kết quả học tập</title>
+
+    <!-- CSS dung chung -->
+    <link rel="stylesheet" href="../css/style.css">
+    <!-- CSS man hinh khoa va mo khoa -->
+    <link rel="stylesheet" href="../css/lock-unlock.css">
+</head>
+
+<body hidden>
+    <div class="app-layout">
+
+        <!-- THANH MENU BEN TRAI -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-icon">◆</div>
+                <div>
+                    <strong>HỆ THỐNG</strong>
+                    <small>QUẢN LÝ KẾT QUẢ HỌC TẬP</small>
+                </div>
+            </div>
+
+            <!-- Menu duoc render tu JavaScript theo vai tro -->
+            <nav id="sidebarNavigation"
+                 class="sidebar-menu"
+                 aria-label="Menu quản trị">
+            </nav>
+
+            <div class="sidebar-bottom">
+                <a href="#">Cài đặt</a>
+                <a href="#" id="logoutLink">Đăng xuất</a>
+            </div>
+        </aside>
+
+        <!-- KHU VUC NOI DUNG CHINH -->
+        <div class="main-content">
+
+            <!-- HEADER DUNG CHUNG -->
+            <header class="topbar">
+                <strong class="topbar-title">
+                    HỆ THỐNG QUẢN LÝ KẾT QUẢ HỌC TẬP
+                </strong>
+
+                <div class="account-info">
+                    <strong>Phòng Khảo thí</strong>
+                    <span class="avatar">P</span>
+                </div>
+            </header>
+
+            <main class="page-content">
+
+                <h1 class="page-title">
+                    Quản lý Khóa & Mở khóa điểm
+                </h1>
+
+                <p class="page-description">
+                    Theo dõi trạng thái từng cột điểm (QT1, QT2, QT3, GK, CK). Khóa điểm khi đã nhập đủ, mở khóa kèm lý do khi cần sửa và khóa lại sau chỉnh sửa.
+                </p>
+
+                <!-- KHU VUC THONG BAO / ALERT -->
+                <div id="alertContainer"></div>
+
+                <!-- BỘ LỌC PHẠM VI (NIÊN KHÓA - KHỐI - LỚP - MÔN) -->
+                <section class="card" aria-label="Bộ lọc cột điểm">
+                    <h2>Bộ lọc phạm vi</h2>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 16px;">
+
+                        <div class="form-group">
+                            <label for="academicYearSelect">Niên khóa</label>
+                            <select id="academicYearSelect" class="form-control">
+                                <option value="">-- Đang tải niên khóa --</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="gradeSelect">Khối học</label>
+                            <select id="gradeSelect" class="form-control">
+                                <option value="">-- Chọn khối --</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="classSelect">Lớp học</label>
+                            <select id="classSelect" class="form-control">
+                                <option value="">-- Chọn lớp --</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="subjectSelect">Môn học</label>
+                            <select id="subjectSelect" class="form-control">
+                                <option value="">-- Chọn môn --</option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <div style="margin-top: 16px; display: flex; justify-content: flex-end;">
+                        <button type="button" id="loadLocksBtn" class="btn btn-primary">
+                            Xem trạng thái khóa
+                        </button>
+                    </div>
+                </section>
+
+                <!-- BẢNG TRẠNG THÁI KHÓA 5 CỘT ĐIỂM -->
+                <section class="card" style="margin-top: 24px;" aria-label="Bảng trạng thái 5 cột điểm">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <h2 style="margin: 0;">Trạng thái khóa từng cột điểm</h2>
+                        <span id="selectedScopeLabel" style="font-size: 14px; color: #64748B;">
+                            Vui lòng chọn phạm vi bên trên
+                        </span>
+                    </div>
+
+                    <div id="locksTableContainer">
+                        <div class="state-message">
+                            Chọn đầy đủ Niên khóa, Khối, Lớp, Môn học và nhấn "Xem trạng thái khóa" để hiển thị dữ liệu.
+                        </div>
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- MODAL POPUP: MỞ KHÓA CỘT ĐIỂM (NHẬP NGƯỜI YÊU CẦU & LÝ DO) -->
+    <div id="unlockModal" class="modal-backdrop" hidden>
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <h3 class="modal-title">Mở khóa cột điểm</h3>
+                <button type="button" id="closeUnlockModalBtn" class="modal-close-btn" aria-label="Đóng">&times;</button>
+            </div>
+
+            <div class="modal-body">
+                <div class="modal-info-box">
+                    <div><strong>Cột điểm:</strong> <span id="modalComponentLabel">-</span></div>
+                    <div><strong>Phạm vi:</strong> <span id="modalScopeLabel">-</span></div>
+                    <div><strong>Phiên bản hiện tại:</strong> <span id="modalVersionLabel">-</span></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="unlockRequestedByNameInput">
+                        Người yêu cầu mở khóa (nếu có):
+                    </label>
+                    <input type="text"
+                           id="unlockRequestedByNameInput"
+                           class="form-control"
+                           placeholder="Ví dụ: Thầy Nguyễn Văn A - Giáo viên bộ môn"
+                           maxlength="150">
+                    <small style="color: #64748B; font-size: 12px; margin-top: 4px; display: block;">
+                        Người thực hiện sẽ được hệ thống tự động ghi nhận từ tài khoản Khảo thí đang đăng nhập.
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <label for="unlockReasonInput">
+                        Lý do mở khóa giải trình <span style="color: #DC2626;">*</span>:
+                    </label>
+                    <textarea id="unlockReasonInput"
+                              class="form-control"
+                              rows="3"
+                              placeholder="Nhập chi tiết lý do mở khóa điểm (bắt buộc)..."
+                              required></textarea>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" id="cancelUnlockBtn" class="btn btn-secondary">
+                    Hủy bỏ
+                </button>
+                <button type="button" id="confirmUnlockBtn" class="btn btn-action-unlock">
+                    Xác nhận mở khóa
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL POPUP: TỪ CHỐI KHÓA KHI CỘT THIẾU ĐIỂM -->
+    <div id="missingScoreModal" class="modal-backdrop" hidden>
+        <div class="modal-dialog">
+            <div class="modal-header" style="border-bottom-color: #FEE2E2;">
+                <h3 class="modal-title" style="color: #DC2626;">Từ chối khóa cột điểm</h3>
+                <button type="button" id="closeMissingModalBtn" class="modal-close-btn">&times;</button>
+            </div>
+
+            <div class="modal-body" style="text-align: center;">
+                <div style="display: flex; justify-content: center;">
+                    <div class="modal-alert-icon">!</div>
+                </div>
+
+                <h4 style="margin: 0 0 8px 0; color: #0F172A; font-size: 16px;">
+                    Cột điểm chưa đủ điều kiện để khóa!
+                </h4>
+
+                <p id="missingScoreMessage" style="color: #64748B; font-size: 14px; margin: 0 0 16px 0;">
+                    Lớp còn học sinh chưa có điểm. Quy tắc hệ thống yêu cầu phải nhập đầy đủ điểm trước khi khóa.
+                </p>
+
+                <div class="modal-info-box" style="text-align: left;">
+                    <div><strong>Cột điểm:</strong> <span id="missingComponentLabel">-</span></div>
+                    <div><strong>Số học sinh còn thiếu:</strong> <span id="missingCountNumber" style="color: #DC2626; font-weight: bold;">0</span></div>
+                    <div><strong>Quy định:</strong> Chặn tuyệt đối khóa khi còn thiếu dữ liệu, không có ngoại lệ.</div>
+                </div>
+            </div>
+
+            <div class="modal-footer" style="justify-content: center;">
+                <button type="button" id="confirmMissingCloseBtn" class="btn btn-secondary" style="min-width: 120px;">
+                    Đã hiểu & Đóng
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JS dung chung cua he thong -->
+    <script src="../js/api.js"></script>
+    <script src="../js/components.js"></script>
+    <script src="../js/navigation.js"></script>
+    <script src="../js/dashboard-auth.js"></script>
+
+    <!-- JS man hinh khoa va mo khoa -->
+    <script src="../js/lock-unlock.js"></script>
+</body>
+</html>
+
