@@ -31,13 +31,13 @@ const studentSelfEnrollmentRoutes = require(
     "./routes/student-self-enrollment.routes"
 );
 
-// CV2 - Chau: Router quan ly diem
+// Chau: Router quan ly diem
 const scoreRoutes = require("./routes/scoreRoutes");
 
-// CV2 - Chau: Router chi tiet ban ghi diem
+// Chau: Router chi tiet ban ghi diem
 const scoreRecordRoutes = require("./routes/scoreRecordRoutes");
 
-// CV2 - Uyen: Router quan ly khoa diem.
+// Uyen: Router quan ly khoa diem
 const lockRoutes = require("./routes/lockRoutes");
 
  // Chau: Router nhap diem tu tep CSV
@@ -62,12 +62,12 @@ app.use("/api/v1", protectedRoutes);
 app.use("/api/v1/khao-thi/demo-accounts", demoAccountRoutes);
 
 
-// CV2 - Chau: API lay bang diem
+// Chau: API lay bang diem
 // GET /api/v1/scores
 // Yeu cau dang nhap va vai tro KHAO_THI
 app.use("/api/v1/scores", scoreRoutes);
 
-// CV2 - Chau: API lay chi tiet ban ghi diem
+// Chau: API lay chi tiet ban ghi diem
 // GET /api/v1/score-records/:id
 // Yeu cau dang nhap va vai tro KHAO_THI
 app.use("/api/v1/score-records", scoreRecordRoutes);
@@ -99,6 +99,10 @@ app.use(
 
 // 9. Dang ky API truy van va khoa cot diem
 app.use("/api/v1/locks", lockRoutes);
+app.use("/api/v1/audit-logs", (req, res, next) => {
+    req.url = "/audit-logs" + (req.url === "/" ? "" : req.url);
+    lockRoutes(req, res, next);
+});
 
 // 10. API kiem tra trang thai backend
 app.get("/api/v1/health", (req, res) => {
@@ -109,7 +113,7 @@ app.get("/api/v1/health", (req, res) => {
         }
     });
 });
-// VT1-04 - Phuc vu giao dien web cung dia chi voi API
+// Phuc vu giao dien web cung dia chi voi API
 // Chi phuc vu thu muc frontend, khong phuc vu file .env
 app.use(
     express.static(
