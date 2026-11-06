@@ -33,6 +33,16 @@ document.addEventListener("DOMContentLoaded", function () {
     const missingCountNumber = document.getElementById("missingCountNumber");
     const missingScoreMessage = document.getElementById("missingScoreMessage");
 
+    // Khoi tao an modal ban dau
+    if (unlockModal) {
+        unlockModal.hidden = true;
+        unlockModal.style.display = "none";
+    }
+    if (missingScoreModal) {
+        missingScoreModal.hidden = true;
+        missingScoreModal.style.display = "none";
+    }
+
     // State noi bo
     let currentLocksData = [];
     let activeComponentToUnlock = null;
@@ -235,10 +245,12 @@ document.addEventListener("DOMContentLoaded", function () {
             let auditInfo = "-";
             if (isLocked && item.lockedAt) {
                 const dateStr = new Date(item.lockedAt).toLocaleString("vi-VN");
-                auditInfo = `Khóa lúc ${dateStr} (Cán bộ #${item.lockedBy || "1"})`;
+                const actorName = item.lockedByName || (item.lockedBy ? `Cán bộ #${item.lockedBy}` : "Khảo thí");
+                auditInfo = `Khóa lúc ${dateStr} (${actorName})`;
             } else if (!isLocked && item.unlockedAt) {
                 const dateStr = new Date(item.unlockedAt).toLocaleString("vi-VN");
-                auditInfo = `Mở lúc ${dateStr}`;
+                const actorName = item.unlockedByName || (item.unlockedBy ? `Cán bộ #${item.unlockedBy}` : "Khảo thí");
+                auditInfo = `Mở lúc ${dateStr} (${actorName})`;
             }
 
             // Nut hanh dong
@@ -389,11 +401,13 @@ document.addEventListener("DOMContentLoaded", function () {
         unlockReasonInput.value = "";
 
         unlockModal.hidden = false;
+        unlockModal.style.display = "flex";
         unlockReasonInput.focus();
     }
 
     function closeUnlockModal() {
         unlockModal.hidden = true;
+        unlockModal.style.display = "none";
         activeComponentToUnlock = null;
     }
 
@@ -418,11 +432,12 @@ document.addEventListener("DOMContentLoaded", function () {
         confirmUnlockBtn.textContent = "Đang xử lý...";
 
         try {
+            const targetComponent = activeComponentToUnlock.component;
             const res = await apiClient.post("/locks/unlock", {
                 academicYearId: yearId,
                 classId: classId,
                 subjectId: subjectId,
-                component: activeComponentToUnlock.component,
+                component: targetComponent,
                 expectedVersion: activeComponentToUnlock.version,
                 reason: reason
             });
@@ -431,7 +446,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 closeUnlockModal();
                 UIComponents.showAlert(
                     "alertContainer",
-                    `Đã mở khóa thành công cột điểm ${activeComponentToUnlock.component}! Giáo viên hiện có thể sửa điểm.`,
+                    `Đã mở khóa thành công cột điểm ${targetComponent}! Dữ liệu điểm hiện đã có thể điều chỉnh và lý do đã được ghi vào Audit Log.`,
                     "success"
                 );
                 await loadLockStatus();
@@ -450,13 +465,36 @@ document.addEventListener("DOMContentLoaded", function () {
         missingCountNumber.textContent = `${missingCount} học sinh`;
         missingScoreMessage.textContent = message;
         missingScoreModal.hidden = false;
+        missingScoreModal.style.display = "flex";
     }
 
     function closeMissingScoreModal() {
         missingScoreModal.hidden = true;
+        missingScoreModal.style.display = "none";
     }
 
     closeMissingModalBtn.addEventListener("click", closeMissingScoreModal);
     confirmMissingCloseBtn.addEventListener("click", closeMissingScoreModal);
+
+    // Dong modal khi click vao nen xam ben ngoai
+    unlockModal.addEventListener("click", function (event) {
+        if (event.target === unlockModal) {
+            closeUnlockModal();
+        }
+    });
+
+    missingScoreModal.addEventListener("click", function (event) {
+        if (event.target === missingScoreModal) {
+            closeMissingScoreModal();
+        }
+    });
+
+    // Dong modal khi nhan phim ESC
+    document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape") {
+            if (!unlockModal.hidden) closeUnlockModal();
+            if (!missingScoreModal.hidden) closeMissingScoreModal();
+        }
+    });
 });
 

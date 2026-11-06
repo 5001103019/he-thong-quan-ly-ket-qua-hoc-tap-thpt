@@ -55,11 +55,11 @@
             <main class="page-content">
 
                 <h1 class="page-title">
-                    Quản lý Khóa & Mở khóa điểm
+                    Quản lý khóa / mở khóa điểm
                 </h1>
 
                 <p class="page-description">
-                    Theo dõi trạng thái từng cột điểm (QT1, QT2, QT3, GK, CK). Khóa điểm khi đã nhập đủ, mở khóa kèm lý do khi cần sửa và khóa lại sau chỉnh sửa.
+                    Khóa độc lập từng cột điểm. Mở khóa cần lý do và được ghi Audit Log.
                 </p>
 
                 <!-- KHU VUC THONG BAO / ALERT -->
@@ -150,10 +150,10 @@
                     <textarea id="unlockReasonInput"
                               class="form-control"
                               rows="3"
-                              placeholder="Nhập chi tiết lý do mở khóa điểm (bắt buộc)..."
+                              placeholder="Nhập lý do mở khóa tại đây..."
                               required></textarea>
-                    <small style="color: #64748B; font-size: 12px; margin-top: 4px; display: block;">
-                        Tài khoản thực hiện mở khóa sẽ được hệ thống tự động ghi nhận từ phiên đăng nhập vào Audit Log.
+                    <small style="color: #64748B; font-size: 13px; margin-top: 6px; display: block;">
+                        Thao tác sẽ được ghi vào Audit Log.
                     </small>
                 </div>
             </div>
@@ -187,13 +187,13 @@
                 </h4>
 
                 <p id="missingScoreMessage" style="color: #64748B; font-size: 14px; margin: 0 0 16px 0;">
-                    Lớp còn học sinh chưa có điểm. Quy tắc hệ thống yêu cầu phải nhập đầy đủ điểm trước khi khóa.
+                    Lớp còn học sinh chưa nhập điểm. Vui lòng nhập đầy đủ điểm trước khi khóa cột.
                 </p>
 
                 <div class="modal-info-box" style="text-align: left;">
                     <div><strong>Cột điểm:</strong> <span id="missingComponentLabel">-</span></div>
                     <div><strong>Số học sinh còn thiếu:</strong> <span id="missingCountNumber" style="color: #DC2626; font-weight: bold;">0</span></div>
-                    <div><strong>Quy định:</strong> Chặn tuyệt đối khóa khi còn thiếu dữ liệu, không có ngoại lệ.</div>
+                    <div><strong>Quy định:</strong> Cần nhập đầy đủ điểm trước khi khóa.</div>
                 </div>
             </div>
 

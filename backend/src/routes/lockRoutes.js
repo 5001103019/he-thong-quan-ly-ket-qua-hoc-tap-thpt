@@ -93,16 +93,57 @@ router.get(
                 .input("subjectId", sql.BigInt, subjectId)
                 .query(`
                     SELECT
-                        component,
-                        status,
-                        locked_by,
-                        locked_at,
-                        version
-                    FROM dbo.lock_status
-                    WHERE academic_year_id = @yearId
-                      AND class_id = @classId
-                      AND subject_id = @subjectId
+                        ls.component,
+                        ls.status,
+                        ls.locked_by,
+                        u_lock.username AS locked_by_name,
+                        ls.locked_at,
+                        ls.unlocked_by,
+                        u_unlock.username AS unlocked_by_name,
+                        ls.unlocked_at,
+                        ls.unlock_reason,
+                        ls.version
+                    FROM dbo.lock_status ls
+                    LEFT JOIN dbo.app_user u_lock
+                        ON u_lock.user_id = ls.locked_by
+                    LEFT JOIN dbo.app_user u_unlock
+                        ON u_unlock.user_id = ls.unlocked_by
+                    WHERE ls.academic_year_id = @yearId
+                      AND ls.class_id = @classId
+                      AND ls.subject_id = @subjectId
                 `);
+
+            // Tinh so hoc sinh con thieu diem cho tung thanh phan diem
+            const missingStats = await pool.request()
+                .input("yearId", sql.BigInt, academicYearId)
+                .input("classId", sql.BigInt, classId)
+                .input("subjectId", sql.BigInt, subjectId)
+                .query(`
+                    SELECT
+                        comps.component,
+                        COUNT_BIG(CASE WHEN sc.score_component_id IS NULL OR sc.score_status = 'NOT_ENTERED' THEN 1 END) AS missing_count
+                    FROM (
+                        VALUES ('QT1'), ('QT2'), ('QT3'), ('GK'), ('CK')
+                    ) AS comps(component)
+                    CROSS JOIN dbo.enrollment e
+                    LEFT JOIN dbo.score_record sr
+                        ON sr.enrollment_id = e.enrollment_id
+                       AND sr.subject_id = @subjectId
+                    LEFT JOIN dbo.score_component sc
+                        ON sc.score_record_id = sr.score_record_id
+                       AND sc.component_type = comps.component
+                    WHERE e.academic_year_id = @yearId
+                      AND e.class_id = @classId
+                      AND e.end_date IS NULL
+                    GROUP BY comps.component
+                `);
+
+            const missingMap = new Map(
+                missingStats.recordset.map(item => [
+                    item.component,
+                    Number(item.missing_count || 0)
+                ])
+            );
 
             // Neu chua co ban ghi khoa, cot diem duoc xem la UNLOCKED.
             const rows = new Map(
@@ -121,7 +162,15 @@ router.get(
                     lockedBy: item && item.locked_by != null
                         ? String(item.locked_by)
                         : null,
+                    lockedByName: item ? item.locked_by_name : null,
                     lockedAt: item ? item.locked_at : null,
+                    unlockedBy: item && item.unlocked_by != null
+                        ? String(item.unlocked_by)
+                        : null,
+                    unlockedByName: item ? item.unlocked_by_name : null,
+                    unlockedAt: item ? item.unlocked_at : null,
+                    unlockReason: item ? item.unlock_reason : null,
+                    missingCount: missingMap.get(component) || 0,
                     version: item ? item.version : 1
                 };
             });
