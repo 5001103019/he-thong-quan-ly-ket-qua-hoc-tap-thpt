@@ -18,6 +18,7 @@ Tai lieu duoc su dung de ban giao va tich hop giua backend voi giao dien quan ly
 | Phuong thuc | Duong dan | Chuc nang |
 |---|---|---|
 | GET | `/api/v1/scores` | Lay danh sach diem theo nien khoa, lop va mon hoc |
+| POST | `/api/v1/score-records` | Tao hoac lay ban ghi diem ban dau cho hoc sinh |
 | GET | `/api/v1/score-records/:id` | Lay chi tiet mot ban ghi diem |
 | PATCH | `/api/v1/score-records/:id/components/:type` | Nhap hoac cap nhat mot thanh phan diem |
 | GET | `/api/v1/score-records/:id/summary` | Tinh va tra ket qua diem tong ket |
@@ -271,11 +272,74 @@ Luu y: Kiem tra khoa tai giao dien chi phuc vu hien thi. Backend van phai tu kie
 
 ### 9.1. Tao ban ghi diem ban dau
 
-API danh sach co the tra ve `scoreRecordId = null` neu hoc sinh chua co ban ghi diem.
+API `GET /api/v1/scores` co the tra ve `scoreRecordId = null` va `version = null` neu hoc sinh chua co ban ghi diem.
 
-API PATCH hien tai chi cap nhat duoc khi ban ghi diem da ton tai.
+Backend cung cap API `POST /api/v1/score-records` de khoi tao ScoreRecord truoc khi nhap diem lan dau.
 
-Can thong nhat co che khoi tao ban ghi diem truoc khi nhap diem lan dau.
+**Yeu cau:**
+
+- Phuong thuc: `POST`.
+- Duong dan: `/api/v1/score-records`.
+- Quyen truy cap: `KHAO_THI`.
+- Xac thuc bang session cookie.
+
+**Du lieu gui len:**
+
+```json
+{
+  "enrollmentId": 2,
+  "subjectId": 1
+}
+```
+
+`enrollmentId` va `subjectId` phai la so nguyen duong hop le.
+
+**Truong hop tao moi:**
+
+- HTTP `201`.
+- `created = true`.
+- Tao ScoreRecord voi `version = 1`.
+- Tra ve `scoreRecordId` va `version`.
+
+Vi du:
+
+```json
+{
+  "success": true,
+  "data": {
+    "created": true,
+    "scoreRecordId": 41,
+    "version": 1
+  }
+}
+```
+
+**Truong hop da ton tai:**
+
+- HTTP `200`.
+- `created = false`.
+- Tra ve `scoreRecordId` va `version` hien tai.
+- Khong tao ban ghi trung va khong tang version.
+
+**Xu ly loi:**
+
+| HTTP | Ma loi | Truong hop |
+|---|---|---|
+| 400 | `VALIDATION_ERROR` | ID dau vao khong hop le |
+| 401 | Theo middleware xac thuc | Chua dang nhap |
+| 403 | Theo middleware phan quyen | Khong co quyen KHAO_THI |
+| 404 | `NOT_FOUND` | Enrollment hoac Subject khong ton tai |
+
+**Huong dan tich hop giao dien:**
+
+1. Goi `GET /api/v1/scores` de lay danh sach hoc sinh.
+2. Khi luu diem, neu `scoreRecordId = null`, goi API POST de khoi tao ban ghi.
+3. Lay `scoreRecordId` va `version` tu phan hoi POST.
+4. Goi API PATCH hien tai de luu thanh phan diem.
+5. Sau moi lan PATCH thanh cong, cap nhat `version` moi truoc khi luu thanh phan tiep theo.
+6. Neu gap `VERSION_CONFLICT`, tai lai du lieu truoc khi tiep tuc.
+
+API POST chi khoi tao ScoreRecord, khong tu nhap diem. Viec kiem tra gia tri diem, khoa diem, tang version khi sua diem va ghi AuditLog van duoc xu ly boi API PATCH.
 
 ### 9.2. Lich su thay doi trang thai diem
 
