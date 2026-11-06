@@ -18,6 +18,17 @@
     let activePanelId = null;
     let returnFromGrant = "list";
     let pendingAccountCode = null;
+    let savedStudentListFilters = null;
+
+    const studentListFilterIds = [
+        "studentCodeFilter",
+        "studentNameFilter",
+        "studentYearFilter",
+        "studentGradeFilter",
+        "studentClassFilter",
+        "studentStatusFilter",
+        "studentKeywordFilter"
+    ];
 
     const panelIds = [
         "studentFormPanel",
@@ -327,6 +338,7 @@
         );
 
         const grade = el("studentGradeFilter").value;
+        const classId = el("studentClassFilter").value;
 
         const matchesKeyword =
             !keyword ||
@@ -339,7 +351,14 @@
             !grade ||
             String(record.enrollment?.gradeNumber ?? "") === grade;
 
-        return matchesKeyword && matchesGrade;
+        // Loc theo lop duoc chon trong nien khoa.
+        // Khong lay hoc sinh chi tung hoc lop nay
+        // nhung da chuyen sang lop khac.
+        const matchesClass =
+            !classId ||
+            String(record.enrollment?.classId ?? "") === classId;
+
+        return matchesKeyword && matchesGrade && matchesClass;
     }
 
     async function decorateStudentTable(version) {
@@ -349,6 +368,7 @@
         if (!table) {
             displayRecords = [];
             setStats(0, 0, 0, 0);
+            renderMiniList();
             return;
         }
 
@@ -491,11 +511,8 @@
         const container = el("studentMiniTable");
         container.replaceChildren();
 
-        const records = displayRecords.length
-            ? displayRecords
-            : studentsCache.map(function (student) {
-                return { student: student, enrollment: null };
-            });
+        // Danh sach nho phai khop ket qua loc hien tai.
+        const records = displayRecords;
 
         const rows = records.map(function (record) {
             return [
@@ -508,6 +525,14 @@
         container.appendChild(
             makeTable(["Mã HS", "Họ tên", "Lớp"], rows)
         );
+
+        if (records.length === 0) {
+            const empty = document.createElement("p");
+            empty.className = "student-muted-note";
+            empty.textContent =
+                "Không có học sinh phù hợp với bộ lọc hiện tại.";
+            container.appendChild(empty);
+        }
     }
 
     function copySelectOptions(sourceId, destinationId) {
@@ -547,18 +572,23 @@
             el("accountSearchFilter").value.trim()
         );
 
-        return displayRecords.filter(function (record) {
+        return displayRecords.flatMap(function (record) {
+            // Lay thong tin phan lop theo nien khoa
+            // duoc chon tai trang Quan ly tai khoan.
+            const enrollment = selectedEnrollment(
+                record.history,
+                year
+            );
+
             const account = record.accounts?.[0];
 
             const matchesYear =
                 !year ||
-                String(record.enrollment?.academicYearId ?? "") ===
-                    year;
+                String(enrollment?.academicYearId ?? "") === year;
 
             const matchesClass =
                 !classId ||
-                String(record.enrollment?.classId ?? "") ===
-                    classId;
+                String(enrollment?.classId ?? "") === classId;
 
             const matchesKeyword =
                 !keyword ||
@@ -571,7 +601,9 @@
 
             return matchesYear &&
                 matchesClass &&
-                matchesKeyword;
+                matchesKeyword
+                ? [{ ...record, enrollment: enrollment }]
+                : [];
         });
     }
 
@@ -644,17 +676,108 @@
                             account.isActive
                                 ? "Hoạt động"
                                 : "Đã vô hiệu hóa"
-                        ) +
-                        ". Quyền xem điểm: của chính mình.";
+                        ) + ".";
+
+                    const permission = document.createElement("p");
+                    permission.textContent =
+                        "Quyền xem điểm: của chính mình.";
 
                     const note = document.createElement("p");
-                    note.textContent =
-                        "Chức năng thay đổi trạng thái " +
-                        "cần kết nối đúng API quản lý tài khoản " +
-                        "trước khi sử dụng.";
+                    note.textContent = account.isActive
+                        ? "Tài khoản hiện đang hoạt động."
+                        : "Tài khoản đã bị vô hiệu hóa.";
 
-                    detail.append(heading, info, note);
+                    detail.append(heading, info, permission, note);
+
+                    if (account.isActive && account.userId) {
+                        const disableButton = document.createElement("button");
+                        disableButton.type = "button";
+                        disableButton.className = "student-account-disable-btn";
+                        disableButton.textContent = "Vô hiệu hóa tài khoản";
+
+                        disableButton.addEventListener("click", async function () {
+                            const confirmed = window.confirm(
+                                "Bạn có chắc muốn vô hiệu hóa tài khoản " +
+                                account.username +
+                                "?\nTài khoản sẽ bị thu hồi phiên đăng nhập. " +
+                                "Hiện chưa có chức năng kích hoạt lại."
+                            );
+
+                            if (!confirmed) return;
+
+                            disableButton.disabled = true;
+                            let disableSucceeded = false;
+
+                            try {
+                                const response = await apiClient.patch(
+                                    "/khao-thi/demo-accounts/" +
+                                        encodeURIComponent(account.userId) +
+                                        "/disable",
+                                    {}
+                                );
+
+                                if (!response || response.success !== true) {
+                                    throw new Error(
+                                        response?.message ||
+                                        "Không thể vô hiệu hóa tài khoản."
+                                    );
+                                }
+
+                                // API đã xác nhận vô hiệu hóa thành công
+                                disableSucceeded = true;
+
+                                document.getElementById("studentAccountDialog")?.close();
+                                detail.hidden = true;
+                                await loadStudents();
+
+                                el("studentAccountOverviewStatus").textContent =
+                                    "Đã vô hiệu hóa tài khoản " +
+                                    account.username + " thành công.";
+
+                            } catch (error) {
+                                if (disableSucceeded) {
+                                    el("studentAccountOverviewStatus").textContent =
+                                        "Đã vô hiệu hóa tài khoản " +
+                                        account.username +
+                                        " thành công, nhưng chưa tải lại được danh sách. " +
+                                        "Hãy tải lại trang.";
+                                } else {
+                                    note.textContent =
+                                        "Không thể vô hiệu hóa: " + error.message;
+                                    disableButton.disabled = false;
+                                }
+                            }
+                        });
+
+                        detail.appendChild(disableButton);
+                    }
+
+                    let dialog = document.getElementById("studentAccountDialog");
+
+                    if (!dialog) {
+                        dialog = document.createElement("dialog");
+                        dialog.id = "studentAccountDialog";
+                        dialog.className = "student-account-dialog";
+                        dialog.setAttribute(
+                            "aria-label",
+                            "Chi tiết tài khoản học sinh"
+                        );
+
+                        const closeButton = document.createElement("button");
+                        closeButton.type = "button";
+                        closeButton.className = "student-account-dialog-close";
+                        closeButton.textContent = "Đóng";
+
+                        closeButton.addEventListener("click", function () {
+                            dialog.close();
+                        });
+
+                        dialog.append(closeButton, detail);
+                        document.body.appendChild(dialog);
+                    }
+
                     detail.hidden = false;
+                    dialog.showModal();
                 });
             } else {
                 button.textContent = "Cấp tài khoản";
@@ -1019,14 +1142,59 @@
             });
 
         el("manageStudentAccountsButton")
-            .addEventListener("click", function () {
-                prepareAccountFilters();
+            .addEventListener("click", async function () {
+
+                // Ghi nho bo loc trang Danh sach hoc sinh.
+                savedStudentListFilters = {};
+
+                studentListFilterIds.forEach(function (id) {
+                    savedStudentListFilters[id] = el(id).value;
+                    el(id).value = "";
+                });
+
+                // Tai day du hoc sinh va tai khoan,
+                // khong phu thuoc bo loc cua trang 11.
                 activate("accounts", null);
+
+                UIComponents.showLoading(
+                    "studentAccountOverviewStatus"
+                );
+
+                await loadStudentClasses();
+                await loadStudents();
+
+                // Chuan bi bo loc rieng cho trang 13.
+                prepareAccountFilters();
+                renderAccountOverview();
             });
 
         el("closeAccountOverviewButton")
-            .addEventListener("click", function () {
+            .addEventListener("click", async function () {
+
                 activate("list", null);
+
+                if (!savedStudentListFilters) {
+                    return;
+                }
+
+                const oldFilters = savedStudentListFilters;
+                savedStudentListFilters = null;
+
+                // Khoi phuc bo loc trang 11.
+                studentListFilterIds.forEach(function (id) {
+                    if (id !== "studentClassFilter") {
+                        el(id).value = oldFilters[id];
+                    }
+                });
+
+                // Tai lai danh sach lop theo nien khoa cu.
+                await loadStudentClasses();
+
+                el("studentClassFilter").value =
+                    oldFilters.studentClassFilter;
+
+                // Tai lai danh sach hoc sinh dung bo loc cu.
+                await loadStudents();
             });
 
         el("accountFilterForm")

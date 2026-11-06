@@ -1,0 +1,397 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý niên khóa / khối / lớp</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/academic-management.css">
+</head>
+<body>
+    <div class="app-layout">
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-icon">◆</div>
+                <div>
+                    <strong>HỆ THỐNG QUẢN LÝ</strong>
+                    <small>KẾT QUẢ HỌC TẬP THPT</small>
+                </div>
+            </div>
+
+            <nav
+                id="sidebarNavigation"
+                class="sidebar-menu"
+                aria-label="Menu quản trị">
+            </nav>
+
+            <div class="sidebar-bottom">
+                <span class="academic-sidebar-meta">Cài đặt</span>
+                <span class="academic-sidebar-meta">Đăng xuất</span>
+            </div>
+        </aside>
+
+        <div class="main-content">
+            <header class="topbar">
+                <strong class="topbar-title">
+                    HỆ THỐNG QUẢN LÝ KẾT QUẢ HỌC TẬP
+                </strong>
+                <div class="account-info">
+                    <strong>Phòng Khảo thí</strong>
+                    <span class="avatar">P</span>
+                </div>
+            </header>
+
+            <main class="page-content academic-page">
+
+                <h1 class="page-title">
+                    Quản lý niên khóa / khối / lớp
+                </h1>
+
+                <p class="page-description">
+                    Cấu trúc hai niên khóa, mỗi niên khóa gồm
+                    khối 10, 11 và 12.
+                </p>
+
+                <!-- BO LOC DANH SACH LOP -->
+                <form
+                    id="academicClassFilterForm"
+                    class="card academic-filter-card"
+                    role="search">
+
+                    <div class="academic-filter-grid">
+
+                        <div class="form-group">
+                            <label for="academicYearFilter">
+                                Niên khóa
+                            </label>
+                            <select
+                                id="academicYearFilter"
+                                class="form-control">
+                                <option value="">Tất cả</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="gradeFilter">Khối</label>
+                            <select
+                                id="gradeFilter"
+                                class="form-control">
+                                <option value="">Tất cả</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="classFilter">Lớp</label>
+                            <select
+                                id="classFilter"
+                                class="form-control">
+                                <option value="">Tất cả</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="classStatusFilter">
+                                Trạng thái
+                            </label>
+                            <select
+                                id="classStatusFilter"
+                                class="form-control">
+                                <option value="">Tất cả</option>
+                                <option value="ACTIVE">
+                                    Đang sử dụng
+                                </option>
+                                <option value="INACTIVE">
+                                    Ngừng hoạt động
+                                </option>
+                            </select>
+                        </div>
+
+                        <button
+                            type="submit"
+                            id="viewAcademicDataButton"
+                            class="btn btn-primary">
+                            Xem dữ liệu
+                        </button>
+
+                    </div>
+                </form>
+
+                <!-- DANH SACH LOP -->
+                <section
+                    class="academic-class-list"
+                    aria-labelledby="classTitle">
+
+                    <div class="academic-add-row">
+                        <button
+                            type="button"
+                            id="addClassButton"
+                            class="btn btn-primary"
+                            disabled>
+                            + Thêm lớp học
+                        </button>
+                    </div>
+
+                    <h2 id="classTitle">
+                        Danh sách lớp học minh họa
+                    </h2>
+
+                    <div id="classSaveMessage" role="status"></div>
+                    <div id="classStatus" role="status"></div>
+
+                    <div class="academic-table-frame">
+                        <div id="classTable"></div>
+                    </div>
+
+                    <p class="academic-note">
+                        Khi chuyển lớp phải bảo toàn lịch sử phân lớp,
+                        không ghi đè thông tin niên khóa cũ.
+                    </p>
+
+                </section>
+
+                <!-- BIEU MAU THEM / SUA LOP -->
+                <section
+                    id="classFormPanel"
+                    class="card academic-form-panel"
+                    hidden
+                    aria-labelledby="classFormTitle">
+
+                    <h2 id="classFormTitle">Thêm lớp học</h2>
+
+                    <form id="classForm">
+
+                        <div class="academic-form-grid">
+
+                            <div class="form-group">
+                                <label for="classYearSelect">
+                                    Niên khóa *
+                                </label>
+                                <select
+                                    id="classYearSelect"
+                                    class="form-control"
+                                    required>
+                                    <option value="">
+                                        Chọn niên khóa
+                                    </option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="classGradeSelect">
+                                    Khối *
+                                </label>
+                                <select
+                                    id="classGradeSelect"
+                                    class="form-control"
+                                    required>
+                                    <option value="">Chọn khối</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="classCodeInput">
+                                    Mã lớp *
+                                </label>
+                                <input
+                                    type="text"
+                                    id="classCodeInput"
+                                    class="form-control"
+                                    maxlength="20"
+                                    pattern="[A-Za-z0-9_-]+"
+                                    placeholder="Ví dụ: 10A1"
+                                    required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="classNameInput">
+                                    Tên lớp *
+                                </label>
+                                <input
+                                    type="text"
+                                    id="classNameInput"
+                                    class="form-control"
+                                    maxlength="100"
+                                    placeholder="Ví dụ: Lớp 10A1"
+                                    required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="classStatusSelect">
+                                    Trạng thái
+                                </label>
+                                <select
+                                    id="classStatusSelect"
+                                    class="form-control"
+                                    required>
+                                    <option value="ACTIVE">
+                                        Đang sử dụng
+                                    </option>
+                                    <option value="INACTIVE">
+                                        Ngừng hoạt động
+                                    </option>
+                                </select>
+                            </div>
+
+                        </div>
+
+                        <div id="classFormMessage" role="status"></div>
+
+                        <div class="academic-form-actions">
+                            <button
+                                type="button"
+                                id="cancelClassButton"
+                                class="btn btn-secondary">
+                                Hủy
+                            </button>
+                            <button
+                                type="submit"
+                                id="saveClassButton"
+                                class="btn btn-primary">
+                                Lưu lớp học
+                            </button>
+                        </div>
+
+                    </form>
+                </section>
+
+                <!-- QUAN LY DANH MUC GIU LAI CHUC NANG CU -->
+                <details class="academic-maintenance">
+                    <summary>
+                        Quản lý danh mục niên khóa và khối
+                    </summary>
+
+                    <div class="academic-maintenance-grid">
+
+                        <!-- DANH SACH NIEN KHOA -->
+                        <section class="card" aria-labelledby="yearTitle">
+
+                            <div class="academic-subsection-head">
+                                <h2 id="yearTitle">
+                                    Danh sách niên khóa
+                                </h2>
+                                <button
+                                    type="button"
+                                    id="addAcademicYearButton"
+                                    class="btn btn-primary">
+                                    + Thêm niên khóa
+                                </button>
+                            </div>
+
+                            <div
+                                id="academicYearFormPanel"
+                                class="academic-inline-form"
+                                hidden>
+
+                                <h3 id="academicYearFormTitle">
+                                    Thêm niên khóa
+                                </h3>
+
+                                <form id="academicYearForm">
+
+                                    <div class="form-group">
+                                        <label for="yearStart">
+                                            Năm bắt đầu *
+                                        </label>
+                                        <input
+                                            type="number"
+                                            id="yearStart"
+                                            class="form-control"
+                                            min="1000"
+                                            max="9998"
+                                            required>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="yearEnd">
+                                            Năm kết thúc
+                                        </label>
+                                        <input
+                                            type="number"
+                                            id="yearEnd"
+                                            class="form-control"
+                                            readonly>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="yearCode">
+                                            Mã niên khóa
+                                        </label>
+                                        <input
+                                            type="text"
+                                            id="yearCode"
+                                            class="form-control"
+                                            readonly>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="yearStatus">
+                                            Trạng thái *
+                                        </label>
+                                        <select
+                                            id="yearStatus"
+                                            class="form-control"
+                                            required>
+                                            <option value="PLANNED">
+                                                Dự kiến
+                                            </option>
+                                            <option value="ACTIVE">
+                                                Đang hoạt động
+                                            </option>
+                                            <option value="CLOSED">
+                                                Đã kết thúc
+                                            </option>
+                                        </select>
+                                    </div>
+
+                                    <div
+                                        id="academicYearFormMessage"
+                                        role="status">
+                                    </div>
+
+                                    <div class="academic-form-actions">
+                                        <button
+                                            type="button"
+                                            id="cancelAcademicYearButton"
+                                            class="btn btn-secondary">
+                                            Hủy
+                                        </button>
+                                        <button
+                                            type="submit"
+                                            id="saveAcademicYearButton"
+                                            class="btn btn-primary">
+                                            Lưu niên khóa
+                                        </button>
+                                    </div>
+
+                                </form>
+                            </div>
+
+                            <div id="academicYearStatus" role="status"></div>
+                            <div class="academic-table-frame">
+                                <div id="academicYearTable"></div>
+                            </div>
+                        </section>
+
+                        <!-- DANH SACH KHOI -->
+                        <section class="card" aria-labelledby="gradeTitle">
+                            <h2 id="gradeTitle">Danh sách khối</h2>
+                            <div id="gradeStatus" role="status"></div>
+                            <div class="academic-table-frame">
+                                <div id="gradeTable"></div>
+                            </div>
+                        </section>
+
+                    </div>
+                </details>
+
+            </main>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/components.js"></script>
+    <script src="../js/navigation.js"></script>
+    <script src="../js/academic-management.js"></script>
+</body>
+</html>
