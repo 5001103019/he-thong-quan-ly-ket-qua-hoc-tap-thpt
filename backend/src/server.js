@@ -27,6 +27,10 @@ const classRoutes = require("./routes/class.routes");
 const subjectRoutes = require("./routes/subject.routes");
 const studentRoutes = require("./routes/student.routes");
 
+const studentSelfEnrollmentRoutes = require(
+    "./routes/student-self-enrollment.routes"
+);
+
 // CV2 - Chau: Router quan ly diem
 const scoreRoutes = require("./routes/scoreRoutes");
 
@@ -87,6 +91,11 @@ app.use("/api/v1/classes", classRoutes);
 // Chi vai tro KHAO_THI duoc phep truy cap
 app.use("/api/v1/subjects", subjectRoutes);
 app.use("/api/v1/students", studentRoutes);
+
+app.use(
+    "/api/v1/hoc-sinh/enrollments",
+    studentSelfEnrollmentRoutes
+);
 
 // 9. Dang ky API truy van va khoa cot diem
 app.use("/api/v1/locks", lockRoutes);
