@@ -34,6 +34,11 @@ const studentSelfEnrollmentRoutes = require(
 // Chau: Router quan ly diem
 const scoreRoutes = require("./routes/scoreRoutes");
 
+// Ngoc: Router xuat bang diem va thong ke CSV
+const scoreExportRoutes = require(
+    "./routes/score-export.routes"
+);
+
 // Chau: Router chi tiet ban ghi diem
 const scoreRecordRoutes = require("./routes/scoreRecordRoutes");
 
@@ -66,6 +71,9 @@ app.use("/api/v1/khao-thi/demo-accounts", demoAccountRoutes);
 // GET /api/v1/scores
 // Yeu cau dang nhap va vai tro KHAO_THI
 app.use("/api/v1/scores", scoreRoutes);
+
+// Ngoc: API xuat bang diem va thong ke CSV
+app.use("/api/v1/score-export", scoreExportRoutes);
 
 // Chau: API lay chi tiet ban ghi diem
 // GET /api/v1/score-records/:id
