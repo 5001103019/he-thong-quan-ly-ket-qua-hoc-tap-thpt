@@ -150,6 +150,18 @@ router.get(
                 subjectId: selectedSubjectId
             });
 
+            // UC12 - TH1: Khong tao file CSV khi khong co du lieu.
+            if (data.details.length === 0) {
+                return res.status(404).json({
+                    success: false,
+                    error: {
+                        code: "NO_EXPORT_DATA",
+                        message:
+                            "Không có dữ liệu phù hợp với điều kiện xuất đã chọn."
+                    }
+                });
+            }
+
             const csv =
                 type === "details"
                     ? createDetailsCsv(data)
