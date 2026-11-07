@@ -9,7 +9,7 @@ const NAVIGATION_MENUS = {
         { label: "Môn học", url: null },
         { label: "Bảng điểm", url: null },
         { label: "Khóa / Mở khóa", url: "lock-unlock.html" },
-        { label: "Audit Log", url: "audit-log.html" },
+        { label: "Nhật ký thao tác", url: "audit-log.html" },
         { label: "Import / Export CSV", url: null }
     ],
 
@@ -63,4 +63,3 @@ function renderNavigation(role, containerId) {
         container.appendChild(link);
     });
 }
-
