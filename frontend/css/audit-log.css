@@ -1,94 +1,306 @@
-/* Giao dien bo loc tim kiem va bang nhat ky kiem toan */
+/* Giao dien Nhat ky thao tac (Audit Log)  */
 
-/* Tag loai thao tac */
-.tag-action {
-    display: inline-block;
-    padding: 3px 8px;
-    border-radius: 4px;
-    font-size: 12px;
+/* Card bo loc nhat ky */
+.audit-filter-card {
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    padding: 18px 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.audit-filter-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr) auto;
+    gap: 16px;
+    align-items: flex-end;
+}
+
+@media (max-width: 900px) {
+    .audit-filter-row {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.audit-filter-row .form-group {
+    margin-bottom: 0;
+}
+
+.audit-filter-row .form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #475569;
+    margin-bottom: 6px;
+}
+
+.audit-filter-row .form-control {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid #CBD5E1;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #0F172A;
+    background-color: #FFFFFF;
+    box-sizing: border-box;
+}
+
+.audit-filter-row .form-control:focus {
+    outline: none;
+    border-color: #3B82F6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.btn-audit-submit {
+    background-color: #2F54EB;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color 0.15s ease;
+}
+
+.btn-audit-submit:hover {
+    background-color: #1D39C4;
+}
+
+/* 3 KPI Summary Cards   */
+.kpi-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 24px;
+}
+
+@media (max-width: 768px) {
+    .kpi-cards-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.kpi-summary-card {
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    padding: 18px 20px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.kpi-card-total {
+    border-left: 4px solid #2563EB;
+}
+
+.kpi-card-unlock {
+    border-left: 4px solid #16A34A;
+}
+
+.kpi-card-lock {
+    border-left: 4px solid #D97706;
+}
+
+.kpi-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #64748B;
+    margin-bottom: 6px;
+}
+
+.kpi-card-total .kpi-title {
+    color: #2563EB;
+}
+
+.kpi-card-unlock .kpi-title {
+    color: #16A34A;
+}
+
+.kpi-card-lock .kpi-title {
+    color: #D97706;
+}
+
+.kpi-value {
+    font-size: 24px;
     font-weight: 700;
     line-height: 1.2;
-    text-transform: uppercase;
-    font-family: monospace;
 }
 
-.tag-action.action-lock {
-    background-color: #DBEAFE;
-    color: #1E40AF;
-    border: 1px solid #BFDBFE;
+.kpi-card-total .kpi-value {
+    color: #2563EB;
 }
 
-.tag-action.action-unlock {
-    background-color: #FEF3C7;
-    color: #92400E;
-    border: 1px solid #FDE68A;
+.kpi-card-unlock .kpi-value {
+    color: #16A34A;
 }
 
-.tag-action.action-relock {
-    background-color: #D1FAE5;
-    color: #065F46;
-    border: 1px solid #A7F3D0;
+.kpi-card-lock .kpi-value {
+    color: #D97706;
 }
 
-.tag-action.action-score-edit {
-    background-color: #EDE9FE;
-    color: #5B21B6;
-    border: 1px solid #DDD6FE;
-}
-
-.tag-action.action-score-import {
-    background-color: #E0E7FF;
-    color: #3730A3;
-    border: 1px solid #C7D2FE;
-}
-
-/* Ket qua thao tac */
-.badge-result {
-    display: inline-block;
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-size: 11px;
-    font-weight: 600;
-}
-
-.badge-result.result-success {
-    background-color: #DCFCE7;
-    color: #166534;
-}
-
-.badge-result.result-failed {
-    background-color: #FEE2E2;
-    color: #991B1B;
-}
-
-/* Phan trang */
-.pagination-controls {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 16px 0 0 0;
+/* Bang Danh sach lich su thao tac */
+.audit-table-card {
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
     margin-top: 16px;
-    border-top: 1px solid #E2E8F0;
 }
 
-.pagination-btn {
-    padding: 6px 12px;
+.audit-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    text-align: left;
+}
+
+.audit-table thead {
+    background-color: #F8FAFC;
+    border-bottom: 1px solid #E2E8F0;
+}
+
+.audit-table th {
+    padding: 12px 16px;
     font-size: 13px;
-    background-color: #FFFFFF;
-    border: 1px solid #CBD5E1;
-    border-radius: 6px;
-    color: #334155;
+    font-weight: 600;
+    color: #475569;
+    white-space: nowrap;
+}
+
+.audit-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #F1F5F9;
+    color: #1E293B;
+}
+
+.audit-table tbody tr:hover {
+    background-color: #F8FAFC;
+}
+
+.link-view-detail {
+    color: #2F54EB;
+    text-decoration: none;
+    font-weight: 600;
     cursor: pointer;
 }
 
-.pagination-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    background-color: #F1F5F9;
+.link-view-detail:hover {
+    text-decoration: underline;
 }
 
-.pagination-info {
+.audit-table-footer-note {
     font-size: 13px;
     color: #64748B;
+    margin-top: 14px;
+    line-height: 1.5;
 }
 
+/* Modal Chi tiet nhat ky   */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(2px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+.modal-backdrop[hidden] {
+    display: none !important;
+}
+
+.modal-dialog {
+    background: #FFFFFF;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 520px;
+    padding: 24px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.modal-header-custom {
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #F1F5F9;
+}
+
+.modal-title-custom {
+    font-size: 20px;
+    font-weight: 700;
+    color: #0F172A;
+    margin: 0;
+}
+
+.modal-footer-custom {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 20px;
+    padding-top: 14px;
+    border-top: 1px solid #F1F5F9;
+}
+
+.btn-modal-confirm {
+    background-color: #2F54EB;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.btn-modal-confirm:hover {
+    background-color: #1D39C4;
+}
+
+.score-diff-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    background: #F0FDF4;
+    color: #16A34A;
+    border: 1px solid #BBF7D0;
+    border-radius: 6px;
+    padding: 4px 10px;
+}
+
+.detail-modal-body {
+    margin: 20px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    font-size: 14px;
+    color: #1E293B;
+}
+
+.detail-line {
+    display: flex;
+    gap: 8px;
+    line-height: 1.5;
+}
+
+.detail-label {
+    font-weight: 600;
+    color: #0F172A;
+    min-width: 130px;
+    flex-shrink: 0;
+}
+
+.detail-value {
+    color: #334155;
+    word-break: break-word;
+}
