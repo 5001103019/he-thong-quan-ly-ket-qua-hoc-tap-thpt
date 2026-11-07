@@ -1,0 +1,1241 @@
+
+/* =====================================================
+   VT3-04 - GIAO DIEN QUAN LY HOC SINH / TAI KHOAN
+   Giao dien theo Figma da duyet
+   Khong thay doi CSS dung chung cua nhom
+   ===================================================== */
+
+/* 1. TRANG CHINH */
+
+.student-page {
+    max-width: 1600px;
+    padding: 26px 32px 48px;
+}
+
+.student-page [hidden] {
+    display: none !important;
+}
+
+.student-page .page-title {
+    margin: 0 0 8px;
+    color: #123F72;
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.student-page .page-description {
+    margin: 0 0 30px;
+    color: #64748B;
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+.sidebar-bottom span {
+    display: block;
+    padding: 10px 14px;
+    color: #DCEAFF;
+    font-size: 13px;
+}
+
+/* =====================================================
+   2. DANH SACH HOC SINH - FIGMA SO 4
+   ===================================================== */
+
+/* Bo loc chinh */
+
+#studentListScreen .student-filter-card {
+    position: relative;
+    padding: 15px 20px;
+    margin-bottom: 22px;
+    background: #FFFFFF;
+    border: 1px solid #DDE5F0;
+    border-radius: 12px;
+}
+
+.student-filter-grid {
+    display: grid;
+    grid-template-columns:
+        minmax(150px, 1fr)
+        minmax(115px, .75fr)
+        minmax(135px, .95fr)
+        minmax(210px, 1.5fr)
+        minmax(160px, 1.1fr);
+    gap: 16px;
+    align-items: end;
+}
+
+.student-filter-grid .form-group {
+    min-width: 0;
+    margin: 0;
+}
+
+.student-filter-grid label {
+    display: block;
+    color: #17283E;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.student-filter-grid .form-control {
+    width: 100%;
+    min-height: 46px;
+    padding: 11px 14px;
+    border: 1px solid #DDE5F0;
+    border-radius: 8px;
+    background: #FFFFFF;
+    color: #64748B;
+    font-size: 15px;
+    font-weight: 400;
+}
+
+.student-filter-grid .form-control:focus {
+    outline: 2px solid #1463E6;
+    outline-offset: 1px;
+}
+
+.student-filter-grid > .btn {
+    width: 100%;
+    min-height: 46px;
+    padding: 11px 18px;
+    background: #1463E6;
+    color: #FFFFFF;
+    font-size: 14px;
+    font-weight: 700;
+    border-radius: 8px;
+}
+
+/* Bo loc nghiep vu nang cao:
+   Giua nguyen chuc nang, hien thi dang popup
+   de khong keo dai khung bo loc Figma. */
+
+#studentListScreen .student-advanced {
+    position: absolute;
+    top: calc(100% + 3px);
+    right: 4px;
+    z-index: 30;
+    margin: 0;
+    color: #64748B;
+    font-size: 12px;
+}
+
+.student-advanced summary {
+    width: max-content;
+    margin-left: auto;
+    padding: 3px 6px;
+    color: #64748B;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.student-advanced summary:hover {
+    color: #1463E6;
+}
+
+.student-advanced-grid {
+    position: absolute;
+    top: calc(100% + 7px);
+    right: 0;
+    z-index: 40;
+
+    display: grid;
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr)) auto;
+    align-items: end;
+    gap: 14px;
+
+    width: min(850px, calc(100vw - 320px));
+    padding: 20px;
+
+    background: #FFFFFF;
+    border: 1px solid #DDE5F0;
+    border-radius: 12px;
+    box-shadow: 0 12px 30px rgba(18, 63, 114, .15);
+}
+
+.student-advanced:not([open])
+.student-advanced-grid {
+    display: none;
+}
+
+.student-advanced-grid .form-group {
+    margin: 0;
+}
+
+.student-advanced-grid label {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.student-advanced-grid .form-control {
+    min-height: 43px;
+    font-size: 14px;
+}
+
+.student-advanced-grid .btn {
+    min-height: 43px;
+    white-space: nowrap;
+}
+
+/* 3. BA THE THONG KE */
+
+.student-stats-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+    gap: 16px;
+
+    max-width: 920px;
+    margin: 0 0 22px;
+}
+
+.student-stat-card {
+    min-height: 108px;
+    padding: 19px 20px;
+
+    background: #FFFFFF;
+    border: 1px solid #DDE5F0;
+    border-radius: 12px;
+}
+
+.student-stat-card > strong {
+    display: block;
+    margin-bottom: 3px;
+
+    color: #64748B;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.student-stat-card b {
+    margin-right: 28px;
+    color: #123F72;
+    font-size: 30px;
+    line-height: 1.3;
+}
+
+.student-stat-card small {
+    color: #64748B;
+    font-size: 13px;
+}
+
+/* 4. TIEU DE DANH SACH VA HAI NUT */
+
+.student-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.student-list-header h2 {
+    margin: 0;
+    color: #123F72;
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.student-list-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.student-list-actions .btn {
+    min-height: 44px;
+    padding: 10px 17px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.student-list-actions .btn-primary {
+    background: #1463E6;
+    color: #FFFFFF;
+}
+
+/* 5. BANG DANH SACH HOC SINH */
+
+.student-data-table {
+    width: 100%;
+    overflow-x: auto;
+
+    background: #FFFFFF;
+    border: 1px solid #DDE5F0;
+    border-radius: 12px;
+}
+
+.student-data-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.student-data-table th,
+.student-data-table td {
+    padding: 16px 12px;
+    border-bottom: 1px solid #DDE5F0;
+    text-align: left;
+    vertical-align: middle;
+
+    color: #17283E;
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.student-data-table th {
+    background: #E8F1FC;
+    color: #123F72;
+    font-size: 14px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.student-data-table tbody tr:nth-child(even) {
+    background: #F5F8FC;
+}
+
+.student-data-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.student-data-table tr[hidden] {
+    display: none !important;
+}
+
+/* Cot thao tac can de gon, khong tang chieu cao dong */
+
+#studentTable td:last-child {
+    white-space: nowrap;
+}
+
+.student-action-link {
+    padding: 3px 0;
+    border: none;
+    background: transparent;
+
+    color: #17283E;
+    font: inherit;
+    cursor: pointer;
+}
+
+.student-action-link:hover {
+    color: #1463E6;
+    text-decoration: underline;
+}
+
+.student-action-link:focus-visible {
+    outline: 2px solid #1463E6;
+    outline-offset: 3px;
+}
+
+/* Thu gon "Thao tac khac" thanh dau ba cham.
+   Van truy cap duoc cac thao tac nghiep vu cu. */
+
+.student-actions-more {
+    display: inline-block;
+    position: relative;
+    margin-left: 10px;
+    vertical-align: middle;
+}
+
+.student-actions-more summary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 24px;
+    height: 26px;
+    padding: 0;
+
+    color: transparent;
+    font-size: 0;
+    cursor: pointer;
+    list-style: none;
+}
+
+.student-actions-more summary::-webkit-details-marker {
+    display: none;
+}
+
+.student-actions-more summary::after {
+    content: "⋯";
+    color: #64748B;
+    font-size: 21px;
+    line-height: 1;
+}
+
+.student-actions-more summary:hover::after {
+    color: #1463E6;
+}
+
+.student-actions-more summary:focus-visible {
+    outline: 2px solid #1463E6;
+    border-radius: 4px;
+}
+
+/* Menu cac thao tac bo sung */
+
+.student-actions-popup {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    z-index: 40;
+
+    width: 175px;
+    padding: 8px;
+
+    background: #FFFFFF;
+    border: 1px solid #DDE5F0;
+    border-radius: 9px;
+    box-shadow: 0 8px 22px rgba(18, 63, 114, .16);
+
+    white-space: normal;
+}
+
+.student-actions-more:not([open])
+.student-actions-popup {
+    display: none;
+}
+
+.student-actions-popup button {
+    display: block;
+    width: 100%;
+    margin: 2px 0;
+    padding: 8px;
+
+    background: transparent;
+    border: none;
+    border-radius: 5px;
+
+    color: #17283E;
+    font-size: 13px;
+    text-align: left;
+    cursor: pointer;
+}
+
+.student-actions-popup button:hover {
+    background: #ECF4FF;
+}
+
+.student-actions-popup button:disabled {
+    color: #94A3B8;
+    cursor: not-allowed;
+}
+
+@media (min-width: 1024px) {
+    #studentTable {
+        overflow: visible;
+    }
+}
+
+/* Ghi chu duoi bang */
+
+.student-footnote {
+    margin: 40px 3px 0;
+    color: #64748B;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* =====================================================
+   6. CAC MAN HINH KHAC CUA VT3-04
+   Giu lai bo cuc da tao, chua chinh nghiep vu
+   ===================================================== */
+
+.student-two-columns {
+    display: grid;
+    grid-template-columns:
+        minmax(0, 1.15fr)
+        minmax(390px, .95fr);
+    align-items: stretch;
+    gap: 28px;
+}
+
+.student-side-card,
+.student-editor-card {
+    min-width: 0;
+    min-height: 630px;
+    padding: 26px 24px;
+}
+
+.student-side-card h2,
+.student-editor-card h2 {
+    margin: 0 0 22px;
+    color: #123F72;
+    font-size: 23px;
+}
+
+.student-side-card .student-data-table {
+    max-height: 550px;
+    overflow: auto;
+}
+
+.student-panel-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.student-panel-heading h2 {
+    margin: 0;
+}
+
+.student-close {
+    padding: 3px 6px;
+    border: none;
+    background: transparent;
+
+    color: #64748B;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.student-subtitle {
+    margin: 14px 0 20px;
+    color: #1463E6;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.student-editor-card form {
+    display: flex;
+    flex-direction: column;
+    min-height: 515px;
+}
+
+.student-editor-card .form-group label {
+    color: #17283E;
+    font-weight: 700;
+}
+
+.student-editor-card .form-control {
+    min-height: 46px;
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.student-fields-two {
+    display: grid;
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+    gap: 22px;
+}
+
+.student-fields-three {
+    display: grid;
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.student-fields-three .form-control {
+    padding-left: 8px;
+    padding-right: 8px;
+    font-size: 12px;
+}
+
+.student-status-field {
+    max-width: 50%;
+}
+
+.student-check-line {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 30px;
+    margin: 12px 0;
+
+    color: #17283E;
+    font-size: 14px;
+}
+
+.student-check-line input {
+    width: 19px;
+    height: 19px;
+    accent-color: #1463E6;
+    flex-shrink: 0;
+}
+
+.student-muted-note {
+    margin: 24px 0 16px;
+    color: #64748B;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.student-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: auto;
+    padding-top: 28px;
+}
+
+.student-form-actions .btn {
+    min-width: 120px;
+    min-height: 44px;
+    font-weight: 700;
+}
+
+.student-form-actions .btn-secondary,
+.student-list-actions .btn-secondary {
+    border: 1px solid #1463E6;
+    background: #FFFFFF;
+    color: #1463E6;
+}
+
+/* 7. QUAN LY TAI KHOAN */
+
+.account-filter-grid {
+    display: grid;
+    grid-template-columns:
+        minmax(150px, 1fr)
+        minmax(150px, .9fr)
+        minmax(260px, 2fr)
+        minmax(155px, 1.1fr);
+    gap: 18px;
+    align-items: end;
+}
+
+.account-filter-grid .form-group {
+    min-width: 0;
+    margin: 0;
+}
+
+.account-filter-grid .form-control {
+    min-height: 45px;
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.account-filter-grid > .btn {
+    width: 100%;
+    min-height: 45px;
+    font-weight: 700;
+}
+
+.student-permission-note {
+    margin-top: 38px;
+    padding: 22px;
+    border-radius: 12px;
+    background: #E8F1FC;
+}
+
+.student-permission-note strong {
+    color: #123F72;
+    font-size: 19px;
+}
+
+.student-permission-note p {
+    margin: 10px 0 0;
+    color: #64748B;
+    font-size: 15px;
+}
+
+.student-selected-info {
+    margin: 0 0 26px;
+    padding: 16px 18px;
+    border-radius: 9px;
+    background: #E8F1FC;
+
+    color: #123F72;
+    font-weight: 600;
+    line-height: 1.6;
+}
+
+.student-grant-right {
+    min-width: 0;
+}
+
+.student-detail {
+    margin-top: 18px;
+    padding: 18px;
+
+    border: 1px solid #DDE5F0;
+    border-radius: 10px;
+    background: #FFFFFF;
+    line-height: 1.8;
+}
+
+/* 8. HIEN THI LOI DU LIEU TRUNG */
+
+.student-duplicate-error {
+    padding: 16px;
+    border: 1px solid #C62828;
+    border-radius: 9px;
+    background: #FDECEC;
+    color: #B42318;
+}
+
+.student-duplicate-error p {
+    margin: 5px 0 0;
+}
+
+#studentFormPanel.has-duplicate #studentCodeInput,
+#studentAccountPanel.has-duplicate
+#studentAccountUsername {
+    border: 2px solid #C62828;
+    outline-color: #C62828;
+}
+
+/* 9. NGHIEP VU PHAN LOP / CHUYEN LOP */
+
+.student-utility-card {
+    max-width: 900px;
+    padding: 28px;
+}
+
+.student-utility-card h2 {
+    margin: 0 0 18px;
+    color: #123F72;
+    font-size: 24px;
+}
+
+.student-utility-card .form-group {
+    max-width: 700px;
+}
+
+/* 10. RESPONSIVE */
+
+@media (max-width: 1200px) {
+    .student-filter-grid,
+    .account-filter-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    .student-two-columns {
+        grid-template-columns: 1fr;
+    }
+
+    .student-side-card,
+    .student-editor-card {
+        min-height: auto;
+    }
+
+    .student-advanced-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .student-page {
+        padding: 18px 16px;
+    }
+
+    .student-filter-grid,
+    .account-filter-grid,
+    .student-stats-grid,
+    .student-advanced-grid,
+    .student-fields-two,
+    .student-fields-three {
+        grid-template-columns: 1fr;
+    }
+
+    .student-list-header {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .student-list-actions {
+        flex-direction: column;
+    }
+
+    .student-side-card,
+    .student-editor-card {
+        padding: 20px;
+    }
+
+    .student-status-field {
+        max-width: none;
+    }
+
+    .student-advanced-grid {
+        width: min(330px, calc(100vw - 40px));
+    }
+}
+
+/* ==========================================================
+   VT3-04 - HOAN THIEN GIAO DIEN THEO FIGMA (06/11/2026)
+   Pham vi: trang Hoc sinh/Tai khoan.
+   Khong thay doi API, JS nghiep vu, database, shared style.css.
+   Du lieu thuc co the nhieu hon so dong minh hoa trong Figma.
+   ========================================================== */
+
+/* Khoang cach va mau nen dung chung voi UI Kit cua nhom. */
+.student-page {
+    width: 100%;
+    min-width: 0;
+    padding: 26px 32px 48px;
+    background-color: var(--color-background, #F5F8FC);
+}
+
+.student-page .page-title {
+    margin: 0 0 8px;
+    color: var(--color-navy, #123F72);
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1.25;
+}
+
+.student-page .page-description {
+    margin: 0 0 30px;
+    color: var(--color-muted, #64748B);
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+/* Bo loc: can chinh theo ty le 5 cot trong Figma trang 11. */
+#studentListScreen .student-filter-card,
+#studentAccountsScreen .student-filter-card {
+    border: 1px solid var(--color-border, #DDE5F0);
+    border-radius: 12px;
+    padding: 15px 20px;
+    background-color: #FFFFFF;
+    box-shadow: none;
+}
+
+#studentListScreen .student-filter-grid {
+    grid-template-columns:
+        minmax(0, 1.04fr)
+        minmax(0, .78fr)
+        minmax(0, .94fr)
+        minmax(0, 1.56fr)
+        minmax(160px, 1.13fr);
+    gap: 16px;
+}
+
+#studentListScreen .student-filter-grid .form-control,
+#studentAccountsScreen .account-filter-grid .form-control {
+    height: 46px;
+    min-height: 46px;
+    color: #64748B;
+    background-color: #FFFFFF;
+    border: 1px solid #DDE5F0;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 400;
+}
+
+#studentListScreen .student-filter-grid > .btn,
+#studentAccountsScreen .account-filter-grid > .btn {
+    height: 46px;
+    min-height: 46px;
+    border-radius: 8px;
+    background-color: #1463E6;
+    color: #FFFFFF;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+/* Bo loc nang cao giu duoc nghiep vu, khong chen vao hang Figma. */
+#studentListScreen .student-advanced {
+    top: calc(100% + 2px);
+    right: 0;
+    z-index: 50;
+}
+
+#studentListScreen .student-advanced summary {
+    color: #64748B;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+#studentListScreen .student-advanced-grid {
+    right: 0;
+    max-width: calc(100vw - 36px);
+}
+
+/* Ba o thong ke: giu so lieu API, chi sua kich thuoc, khoang cach. */
+.student-stats-grid {
+    max-width: 885px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    margin: 0 0 22px;
+}
+
+.student-stat-card {
+    min-width: 0;
+    min-height: 108px;
+    padding: 19px 20px;
+    border: 1px solid #DDE5F0;
+    border-radius: 12px;
+    background-color: #FFFFFF;
+}
+
+.student-stat-card > strong {
+    color: #64748B;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.student-stat-card b {
+    margin-right: 26px;
+    color: #123F72;
+    font-size: 30px;
+}
+
+/* Tieu de va 2 nut tac vu. */
+.student-list-header {
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.student-list-header h2 {
+    color: #123F72;
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.student-list-actions {
+    gap: 10px;
+}
+
+.student-list-actions .btn {
+    min-height: 44px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+/* Bang 7 cot: cot Ma HS dai trong SQL that khong duoc
+   lam ep cot Nien khoa/Lop/Trang thai/Thao tac. */
+#studentTable {
+    width: 100%;
+    min-width: 0;
+    border: 1px solid #DDE5F0;
+    border-radius: 12px;
+    background: #FFFFFF;
+}
+
+#studentTable table {
+    width: 100%;
+    min-width: 970px;
+    table-layout: fixed;
+    border-collapse: collapse;
+}
+
+#studentTable th:nth-child(1) { width: 19%; }
+#studentTable th:nth-child(2) { width: 23%; }
+#studentTable th:nth-child(3) { width: 12%; }
+#studentTable th:nth-child(4) { width: 11%; }
+#studentTable th:nth-child(5) { width: 12%; }
+#studentTable th:nth-child(6) { width: 12%; }
+#studentTable th:nth-child(7) { width: 11%; }
+
+#studentTable th,
+#studentTable td {
+    height: 57px;
+    padding: 13px 12px;
+    text-align: left;
+    vertical-align: middle;
+    border-bottom: 1px solid #DDE5F0;
+    line-height: 1.45;
+}
+
+#studentTable th {
+    height: 54px;
+    color: #123F72;
+    background-color: #E8F1FC;
+    font-size: 14px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+#studentTable td {
+    color: #17283E;
+    font-size: 13px;
+}
+
+#studentTable tbody tr:nth-child(even) {
+    background-color: #F5F8FC;
+}
+
+#studentTable tbody tr:hover {
+    background-color: #ECF4FF;
+}
+
+#studentTable tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Co dinh be rong cot cho ma dai: van con gia tri day du trong DOM.
+   Khong xoa hay rut gon du lieu lay tu API. */
+#studentTable td:nth-child(1),
+#studentTable td:nth-child(2),
+#studentTable td:nth-child(3),
+#studentTable td:nth-child(4) {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#studentTable td:last-child {
+    overflow: visible;
+    text-overflow: clip;
+    white-space: nowrap;
+}
+
+#studentTable .student-actions-more {
+    margin-left: 6px;
+}
+
+#studentTable .student-actions-popup {
+    z-index: 80;
+}
+
+.student-footnote {
+    margin: 38px 3px 0;
+    color: #64748B;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* Figma trang 12 va 14: hai khung co cung chieu cao toi thieu. */
+.student-two-columns {
+    grid-template-columns: minmax(0, 1.15fr) minmax(390px, .95fr);
+    gap: 28px;
+    align-items: stretch;
+}
+
+.student-side-card,
+.student-editor-card {
+    min-width: 0;
+    min-height: 630px;
+    border: 1px solid #DDE5F0;
+    border-radius: 12px;
+    background: #FFFFFF;
+    box-shadow: none;
+}
+
+.student-editor-card .form-control {
+    border: 1px solid #DDE5F0;
+    border-radius: 8px;
+    background-color: #FFFFFF;
+    color: #17283E;
+}
+
+.student-editor-card .form-control:disabled {
+    color: #64748B;
+    background-color: #F5F8FC;
+    cursor: not-allowed;
+}
+
+.student-editor-card .form-control:focus {
+    outline: 2px solid #1463E6;
+    outline-offset: 1px;
+}
+
+.student-editor-card .student-form-actions .btn,
+.student-utility-card .student-form-actions .btn {
+    border-radius: 8px;
+    min-width: 115px;
+}
+
+/* Tinh trang trung ma HS / username theo Figma trang 27-28.
+   Chi thay doi cach hien thi loi tra ve, khong xu ly validation API. */
+#studentFormPanel.has-duplicate #studentCodeInput,
+#studentAccountPanel.has-duplicate #studentAccountUsername {
+    border: 2px solid #C62828;
+    outline-color: #C62828;
+}
+
+#studentFormPanel.has-duplicate #studentFormMessage .alert,
+#studentAccountPanel.has-duplicate #studentAccountMessage .alert {
+    border: 1px solid #F3A3A3;
+    border-radius: 9px;
+    background-color: #FFF0F1;
+    color: #B42318;
+    line-height: 1.6;
+}
+
+.student-duplicate-error {
+    border: 1px solid #F3A3A3;
+    background: #FFF0F1;
+    color: #B42318;
+    line-height: 1.6;
+}
+
+/* Khung quan ly tai khoan va luu y quyen xem diem theo Figma. */
+#studentAccountsScreen .student-filter-card {
+    margin-bottom: 24px;
+}
+
+.student-permission-note {
+    border-radius: 12px;
+    background-color: #E8F1FC;
+    padding: 22px;
+}
+
+.student-selected-info {
+    border-radius: 9px;
+    background-color: #E8F1FC;
+    color: #123F72;
+}
+
+/* Khong cho cac o input tran khung khi thu nho Chrome tren Mac. */
+.student-page input,
+.student-page select,
+.student-page textarea {
+    max-width: 100%;
+}
+
+@media (max-width: 1200px) {
+    #studentListScreen .student-filter-grid,
+    #studentAccountsScreen .account-filter-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .student-two-columns {
+        grid-template-columns: 1fr;
+    }
+
+    #studentTable {
+        overflow-x: auto;
+    }
+}
+
+@media (max-width: 768px) {
+    .student-page {
+        padding: 18px 16px 32px;
+    }
+
+    #studentListScreen .student-filter-grid,
+    #studentAccountsScreen .account-filter-grid,
+    .student-stats-grid,
+    .student-fields-two,
+    .student-fields-three {
+        grid-template-columns: 1fr;
+    }
+
+    .student-list-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .student-list-actions {
+        flex-direction: column;
+    }
+
+    #studentTable {
+        overflow-x: auto;
+    }
+}
+
+/* =====================================================
+   VT3-04 - HOAN THIEN FIGMA TRANG 14
+   Cap tai khoan hoc sinh
+   Chi ap dung cho man hinh Cap tai khoan.
+   ===================================================== */
+
+/* Vung bang co cuon doc va cuon ngang khi can. */
+#studentGrantScreen #studentUnissuedTable {
+    width: 100%;
+    max-height: 520px;
+    overflow: auto;
+    border: 1px solid #DDE5F0;
+    border-radius: 10px;
+}
+
+/* Co dinh bo cuc bang 3 cot. */
+#studentGrantScreen #studentUnissuedTable table {
+    width: 100%;
+    min-width: 450px;
+    table-layout: fixed;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+#studentGrantScreen #studentUnissuedTable th:nth-child(1),
+#studentGrantScreen #studentUnissuedTable td:nth-child(1) {
+    width: 37%;
+}
+
+#studentGrantScreen #studentUnissuedTable th:nth-child(2),
+#studentGrantScreen #studentUnissuedTable td:nth-child(2) {
+    width: 42%;
+}
+
+#studentGrantScreen #studentUnissuedTable th:nth-child(3),
+#studentGrantScreen #studentUnissuedTable td:nth-child(3) {
+    width: 21%;
+}
+
+/* Giu tieu de cot khi cuon xuong. */
+#studentGrantScreen #studentUnissuedTable thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+
+    background: #E8F1FC;
+    color: #123F72;
+    border-bottom: 1px solid #DDE5F0;
+}
+
+/* Can chinh noi dung bang. */
+#studentGrantScreen #studentUnissuedTable td {
+    padding: 16px 12px;
+    vertical-align: middle;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Chon hoc sinh bang cach nhan vao dong. */
+#studentGrantScreen .student-unissued-row {
+    cursor: pointer;
+}
+
+#studentGrantScreen .student-unissued-row:hover {
+    background: #EDF5FF;
+}
+
+#studentGrantScreen .student-unissued-row:focus-within {
+    background: #EDF5FF;
+}
+
+/* Nut chon hoc sinh hien thi giong van ban Figma. */
+#studentGrantScreen .student-unissued-name-button {
+    display: block;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+
+    border: none;
+    background: transparent;
+    color: #17283E;
+
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#studentGrantScreen .student-unissued-name-button:hover {
+    color: #1463E6;
+}
+
+#studentGrantScreen .student-unissued-name-button:focus-visible {
+    outline: 2px solid #1463E6;
+    outline-offset: 3px;
+    border-radius: 3px;
+}
+
+/* Hien thi lop va nien khoa duoi thong tin hoc sinh. */
+#studentGrantScreen .student-account-class-info {
+    display: block;
+    margin-top: 4px;
+
+    color: #64748B;
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 1.5;
+}

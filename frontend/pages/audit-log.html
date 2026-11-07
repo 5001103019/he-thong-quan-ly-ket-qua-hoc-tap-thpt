@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Nhật ký kiểm toán (Audit Log) - Quản lý kết quả học tập</title>
+    <title>Nhật ký thao tác - Hệ thống quản lý kết quả học tập THPT</title>
 
     <!-- CSS dung chung -->
     <link rel="stylesheet" href="../css/style.css">
-    <!-- CSS man hinh audit log -->
+    <!-- CSS man hinh nhat ky thao tac  -->
     <link rel="stylesheet" href="../css/audit-log.css">
 </head>
 
@@ -20,8 +20,8 @@
             <div class="sidebar-brand">
                 <div class="brand-icon">◆</div>
                 <div>
-                    <strong>HỆ THỐNG</strong>
-                    <small>QUẢN LÝ KẾT QUẢ HỌC TẬP</small>
+                    <strong>HỆ THỐNG QUẢN LÝ</strong>
+                    <small>KẾT QUẢ HỌC TẬP THPT</small>
                 </div>
             </div>
 
@@ -55,7 +55,7 @@
             <main class="page-content">
 
                 <h1 class="page-title">
-                    Nhật ký thao tác (Audit Log)
+                    Nhật ký thao tác
                 </h1>
 
                 <p class="page-description">
@@ -65,116 +65,170 @@
                 <!-- KHU VUC THONG BAO / ALERT -->
                 <div id="alertContainer"></div>
 
-                <!-- BỘ LỌC TÌM KIẾM NÂNG CAO (THỜI GIAN, NGƯỜI, CỘT, THAO TÁC) -->
-                <section class="card" aria-label="Bộ lọc Audit Log">
-                    <h2>Bộ lọc nhật ký</h2>
-
-                    <!-- Dong 1: Thoi gian, Loai thao tac, Cot diem -->
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-top: 16px;">
-
-                        <div class="form-group">
-                            <label for="fromDateInput">Từ ngày</label>
-                            <input type="date" id="fromDateInput" class="form-control">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="toDateInput">Đến ngày</label>
-                            <input type="date" id="toDateInput" class="form-control">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="actionTypeSelect">Loại thao tác</label>
-                            <select id="actionTypeSelect" class="form-control">
-                                <option value="">-- Tất cả thao tác --</option>
-                                <option value="LOCK">LOCK (Khóa điểm)</option>
-                                <option value="UNLOCK">UNLOCK (Mở khóa)</option>
-                                <option value="RELOCK">RELOCK (Khóa lại)</option>
-                                <option value="SCORE_EDIT">SCORE_EDIT (Sửa điểm)</option>
-                                <option value="SCORE_IMPORT">SCORE_IMPORT (Import CSV)</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="componentSelect">Cột điểm</label>
-                            <select id="componentSelect" class="form-control">
-                                <option value="">-- Tất cả cột điểm --</option>
-                                <option value="QT1">QT1 (Điểm quá trình 1)</option>
-                                <option value="QT2">QT2 (Điểm quá trình 2)</option>
-                                <option value="QT3">QT3 (Điểm quá trình 3)</option>
-                                <option value="GK">GK (Điểm giữa kỳ)</option>
-                                <option value="CK">CK (Điểm cuối kỳ)</option>
-                            </select>
-                        </div>
-
-                    </div>
-
-                    <!-- Dong 2: Nien khoa, Lop, Mon, Nguoi thuc hien -->
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-top: 12px;">
+                <!-- BỘ LỌC NHẬT KÝ   -->
+                <section class="audit-filter-card" aria-label="Bộ lọc nhật ký thao tác">
+                    <div class="audit-filter-row">
 
                         <div class="form-group">
                             <label for="academicYearSelect">Niên khóa</label>
                             <select id="academicYearSelect" class="form-control">
-                                <option value="">-- Tất cả niên khóa --</option>
+                                <option value="">2026–2027</option>
                             </select>
                         </div>
 
                         <div class="form-group">
-                            <label for="classSelect">Lớp học</label>
+                            <label for="classSelect">Lớp</label>
                             <select id="classSelect" class="form-control">
-                                <option value="">-- Tất cả lớp --</option>
+                                <option value="">11A1</option>
                             </select>
                         </div>
 
                         <div class="form-group">
                             <label for="subjectSelect">Môn học</label>
                             <select id="subjectSelect" class="form-control">
-                                <option value="">-- Tất cả môn --</option>
+                                <option value="">Toán</option>
                             </select>
                         </div>
 
                         <div class="form-group">
-                            <label for="performedByInput">Người thực hiện</label>
-                            <input type="text" id="performedByInput" class="form-control" placeholder="Tên tài khoản hoặc mã số...">
+                            <label for="actionTypeSelect">Thao tác</label>
+                            <select id="actionTypeSelect" class="form-control">
+                                <option value="">Tất cả</option>
+                                <option value="LOCK">Khóa</option>
+                                <option value="UNLOCK">Mở khóa</option>
+                                <option value="RELOCK">Khóa lại</option>
+                                <option value="SCORE_EDIT">Sửa điểm</option>
+                                <option value="SCORE_IMPORT">Nhập CSV</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <button type="button" id="applyFilterBtn" class="btn-audit-submit">
+                                Xem dữ liệu
+                            </button>
                         </div>
 
                     </div>
 
-                    <div style="margin-top: 16px; display: flex; justify-content: flex-end; gap: 8px;">
-                        <button type="button" id="resetFilterBtn" class="btn btn-secondary">
+                    <!-- Bo loc bo sung ho tro nguoi thuc hien va thoi gian -->
+                    <div style="display: flex; gap: 16px; margin-top: 12px; font-size: 13px; align-items: center; color: #64748B;">
+                        <span>Lọc bổ sung:</span>
+                        <input type="text" id="performedByInput" class="form-control" placeholder="Người thực hiện..." style="width: 180px; padding: 4px 8px; font-size: 13px;">
+                        <input type="date" id="fromDateInput" class="form-control" style="width: 140px; padding: 4px 8px; font-size: 13px;" title="Từ ngày">
+                        <input type="date" id="toDateInput" class="form-control" style="width: 140px; padding: 4px 8px; font-size: 13px;" title="Đến ngày">
+                        <select id="componentSelect" hidden><option value=""></option></select>
+                        <button type="button" id="resetFilterBtn" style="background: none; border: none; color: #2563EB; cursor: pointer; text-decoration: underline; font-size: 13px;">
                             Đặt lại
                         </button>
-                        <button type="button" id="applyFilterBtn" class="btn btn-primary" style="min-width: 120px;">
-                            Tìm kiếm
-                        </button>
                     </div>
                 </section>
 
-                <!-- BẢNG LỊCH SỬ AUDIT LOG -->
-                <section class="card" style="margin-top: 24px;" aria-label="Bảng dữ liệu Audit Log">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                        <h2 style="margin: 0;">Lịch sử kiểm toán</h2>
-                        <span id="logSummaryLabel" style="font-size: 14px; color: #64748B;">
-                            Đang tải dữ liệu...
-                        </span>
+                <!-- 3 KPI SUMMARY CARDS   -->
+                <div class="kpi-cards-grid">
+                    <div class="kpi-summary-card kpi-card-total">
+                        <div class="kpi-title">Tổng số thao tác</div>
+                        <div class="kpi-value" id="kpiTotalActions">0 thao tác</div>
                     </div>
 
-                    <div id="auditLogTableContainer">
-                        <div class="state-message">Đang tải nhật ký...</div>
+                    <div class="kpi-summary-card kpi-card-unlock">
+                        <div class="kpi-title">Mở khóa</div>
+                        <div class="kpi-value" id="kpiUnlockCount">0 sự kiện</div>
                     </div>
 
-                    <!-- ĐIỀU HƯỚNG PHÂN TRANG -->
-                    <div class="pagination-controls">
-                        <button type="button" id="prevPageBtn" class="pagination-btn" disabled>
-                            &larr; Trang trước
-                        </button>
-                        <span id="pageIndicator" class="pagination-info">Trang 1 / 1</span>
-                        <button type="button" id="nextPageBtn" class="pagination-btn" disabled>
-                            Trang sau &rarr;
-                        </button>
+                    <div class="kpi-summary-card kpi-card-lock">
+                        <div class="kpi-title">Khóa điểm</div>
+                        <div class="kpi-value" id="kpiLockCount">0 sự kiện</div>
                     </div>
-                </section>
+                </div>
+
+                <!-- DANH SÁCH LỊCH SỬ THAO TÁC   -->
+                <h2 class="section-heading" style="margin-top: 32px;">Danh sách lịch sử thao tác</h2>
+
+                <div class="audit-table-card">
+                    <table class="audit-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 140px;">Thời gian</th>
+                                <th style="width: 160px;">Người thực hiện</th>
+                                <th style="width: 110px;">Thao tác</th>
+                                <th style="width: 160px;">Đối tượng</th>
+                                <th>Lý do / ghi chú</th>
+                                <th style="width: 80px; text-align: center;">Chi tiết</th>
+                            </tr>
+                        </thead>
+                        <tbody id="auditLogTbody">
+                            <tr>
+                                <td colspan="6" style="text-align: center; padding: 24px;">
+                                    Đang tải nhật ký thao tác...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Dieu huong phan trang -->
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px;">
+                    <span id="logSummaryLabel" style="font-size: 13px; color: #64748B;">0 thao tác</span>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <button type="button" id="prevPageBtn" class="btn btn-secondary" style="padding: 4px 12px; font-size: 13px;" disabled>&larr; Trang trước</button>
+                        <span id="pageIndicator" style="font-size: 13px; color: #475569;">Trang 1 / 1</span>
+                        <button type="button" id="nextPageBtn" class="btn btn-secondary" style="padding: 4px 12px; font-size: 13px;" disabled>Trang sau &rarr;</button>
+                    </div>
+                </div>
 
             </main>
+        </div>
+    </div>
+
+    <!-- MODAL POPUP: CHI TIẾT NHẬT KÝ MỞ KHÓA / THAO TÁC   -->
+    <div id="auditDetailModal" class="modal-backdrop" hidden>
+        <div class="modal-dialog">
+            <div class="modal-header-custom">
+                <h3 class="modal-title-custom" id="detailModalTitle">Chi tiết nhật ký mở khóa</h3>
+            </div>
+
+            <div class="detail-modal-body">
+                <div class="detail-line">
+                    <span class="detail-label">Mã bản ghi:</span>
+                    <span class="detail-value" id="detailLogId">LOG-DEMO-001</span>
+                </div>
+                <div class="detail-line">
+                    <span class="detail-label">Thời gian:</span>
+                    <span class="detail-value" id="detailLogTime">30/10/2026 15:40</span>
+                </div>
+                <div class="detail-line">
+                    <span class="detail-label">Người thực hiện:</span>
+                    <span class="detail-value" id="detailLogActor">Phòng Khảo thí</span>
+                </div>
+                <div class="detail-line">
+                    <span class="detail-label">Thao tác:</span>
+                    <span class="detail-value" id="detailLogAction">Mở khóa</span>
+                </div>
+                <div class="detail-line">
+                    <span class="detail-label">Đối tượng:</span>
+                    <span class="detail-value" id="detailLogScope">QT1 – Toán – Lớp 11A1</span>
+                </div>
+                <div class="detail-line" id="detailScoreChangeRow" style="display: none;">
+                    <span class="detail-label">Thay đổi điểm:</span>
+                    <span class="detail-value" id="detailScoreChangeText">
+                        <span class="score-diff-badge">Sửa từ 8.00 thành 9.00</span>
+                    </span>
+                </div>
+                <div class="detail-line">
+                    <span class="detail-label">Lý do:</span>
+                    <span class="detail-value" id="detailLogReason">Điều chỉnh điểm nhập nhầm</span>
+                </div>
+                <div class="detail-line">
+                    <span class="detail-label">Chi tiết thay đổi:</span>
+                    <span class="detail-value" id="detailLogBeforeAfter">Trước: Đã khóa → Sau: Chưa khóa</span>
+                </div>
+            </div>
+
+            <div class="modal-footer-custom" style="justify-content: flex-end;">
+                <button type="button" id="closeDetailModalBtn" class="btn-modal-confirm">
+                    Đóng
+                </button>
+            </div>
         </div>
     </div>
 
@@ -184,8 +238,7 @@
     <script src="../js/navigation.js"></script>
     <script src="../js/dashboard-auth.js"></script>
 
-    <!-- JS man hinh audit log -->
+    <!-- JS man hinh nhat ky thao tac -->
     <script src="../js/audit-log.js"></script>
 </body>
 </html>
-

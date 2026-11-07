@@ -523,6 +523,309 @@ input:focus-visible {
     cursor: default;
 }
 
-    .sidebar-menu a.menu-placeholder:hover {
-        background-color: transparent;
+.sidebar-menu a.menu-placeholder:hover {
+    background-color: transparent;
+}
+
+/* =====================================
+   VT3-04 - BO LOC QUAN LY MON HOC
+   ===================================== */
+
+.subject-filter-form {
+    margin-bottom: 24px;
+}
+
+.subject-filter-fields {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(180px, 1.1fr) minmax(180px, 1.1fr);
+    gap: 18px;
+    align-items: end;
+}
+
+.subject-filter-fields .form-group {
+    margin-bottom: 0;
+}
+
+.subject-filter-fields .btn {
+    width: 100%;
+    min-height: 44px;
+    white-space: nowrap;
+    font-weight: 600;
+}
+
+/* Man hinh vua */
+@media (max-width: 1100px) {
+    .subject-filter-fields {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
+
+    .subject-filter-fields .btn {
+        justify-self: start;
+    }
+}
+
+/* Man hinh nho */
+@media (max-width: 768px) {
+    .subject-filter-fields {
+        grid-template-columns: 1fr;
+    }
+
+    .subject-filter-fields .btn {
+        width: 100%;
+    }
+}
+/* VT3-04 - TIEU DE DANH MUC MON HOC */
+
+.subject-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.subject-section-header h2 {
+    margin: 0;
+}
+
+.subject-section-header .btn {
+    flex-shrink: 0;
+    min-width: 196px;
+    min-height: 44px;
+    font-weight: 600;
+}
+/* VT3-04 - BO CUC FORM MON HOC */
+
+.subject-form-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+}
+
+@media (max-width: 768px) {
+    .subject-form-row {
+        grid-template-columns: 1fr;
+    }
+}
+/* =====================================
+   VT3-04 - MAN HINH THEM / SUA MON HOC
+   ===================================== */
+
+/* Khung bieu mau trang rieng */
+#subjectFormPanel {
+    width: 100%;
+    min-height: 650px;
+    margin-top: 32px;
+    padding: 32px;
+
+    background-color: #FFFFFF;
+    border: 1px solid #DDE5F0;
+    border-radius: 12px;
+}
+
+/* Dam bao form duoc an khi o man hinh danh sach */
+#subjectFormPanel[hidden] {
+    display: none;
+}
+
+/* Tieu de bieu mau */
+#subjectFormTitle {
+    margin: 0 0 12px;
+    color: #123F72;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+/* Khoang cach giua cac truong */
+#subjectFormPanel .subject-form-row {
+    margin-top: 32px;
+}
+
+/* O trang thai chi chiem nua chieu rong */
+#subjectFormPanel #subjectForm > .form-group {
+    width: calc(50% - 12px);
+}
+
+/* Man hinh nho */
+@media (max-width: 768px) {
+    #subjectFormPanel {
+        min-height: auto;
+        padding: 20px;
+    }
+
+    #subjectFormPanel #subjectForm > .form-group {
+        width: 100%;
+    }
+}
+/* =====================================
+   VT3-04 - HOAN THIEN FORM MON HOC
+   ===================================== */
+
+/* Khung bieu mau */
+#subjectFormPanel {
+    display: flex;
+    flex-direction: column;
+}
+
+#subjectFormPanel[hidden] {
+    display: none;
+}
+
+/* Dong mo ta duoi tieu de */
+.subject-form-description {
+    margin: 0 0 28px;
+    color: #64748B;
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+/* Bo cuc form de dua nut xuong duoi */
+#subjectForm {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 500px;
+}
+
+/* Khung kiem tra du lieu */
+.subject-validation-note {
+    margin-top: 34px;
+    padding: 18px 20px;
+    background-color: #ECF4FF;
+    border-radius: 10px;
+}
+
+.subject-validation-note strong {
+    display: block;
+    margin-bottom: 10px;
+    color: #123F72;
+    font-size: 17px;
+}
+
+.subject-validation-note p {
+    margin: 0;
+    color: #64748B;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* Nhom nut cuoi bieu mau */
+.subject-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+    margin-top: auto;
+    padding-top: 36px;
+}
+
+.subject-form-actions .btn {
+    min-width: 136px;
+    min-height: 45px;
+    font-weight: 600;
+}
+
+/* Nut Huy theo Figma */
+.subject-form-actions .btn-secondary {
+    background-color: #FFFFFF;
+    border: 1px solid #1463E6;
+    color: #1463E6;
+}
+
+/* Man hinh nho */
+@media (max-width: 768px) {
+    #subjectForm {
+        min-height: 0;
+    }
+
+    .subject-form-actions {
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        margin-top: 30px;
+    }
+}
+/* VT3-04 - COT THAO TAC MON HOC THEO FIGMA */
+
+#subjectTable .subject-action-link {
+    padding: 4px 0;
+    border: none;
+    background: transparent;
+    color: #17283E;
+    font-size: 14px;
+    font-weight: 400;
+    cursor: pointer;
+    text-align: left;
+}
+
+#subjectTable .subject-action-link:hover {
+    color: #1463E6;
+    text-decoration: underline;
+}
+
+#subjectTable .subject-action-link:focus-visible {
+    outline: 2px solid #1463E6;
+    outline-offset: 3px;
+    border-radius: 3px;
+}
+/* Hộp thoại chi tiết tài khoản học sinh */
+.student-account-dialog {
+    width: min(560px, calc(100% - 32px));
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 24px;
+    border: 1px solid #dce5f1;
+    border-radius: 14px;
+    background: #ffffff;
+    color: #17375e;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.18);
+}
+
+.student-account-dialog::backdrop {
+    background: rgba(14, 35, 63, 0.48);
+}
+
+.student-account-dialog-close {
+    display: block;
+    margin-left: auto;
+    margin-bottom: 16px;
+    padding: 8px 18px;
+    border: 1px solid #cbd8e8;
+    border-radius: 8px;
+    background: #ffffff;
+    cursor: pointer;
+}
+
+.student-account-dialog #studentAccountDetail {
+    border: 0;
+    padding: 0;
+    box-shadow: none;
+}
+/* Nút vô hiệu hóa trong popup tài khoản */
+.student-account-dialog .student-account-disable-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 12px;
+    padding: 10px 16px;
+    border: 1px solid #d9534f;
+    border-radius: 8px;
+    background-color: #fff5f5;
+    color: #b42318;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.student-account-dialog .student-account-disable-btn:hover {
+    background-color: #ffe4e4;
+}
+
+.student-account-dialog .student-account-disable-btn:focus-visible {
+    outline: 2px solid #b42318;
+    outline-offset: 2px;
+}
+
+.student-account-dialog .student-account-disable-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
