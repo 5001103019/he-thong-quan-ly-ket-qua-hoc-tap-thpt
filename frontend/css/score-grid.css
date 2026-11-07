@@ -1,0 +1,360 @@
+
+/* VT2-03 - Giao dien bang diem theo Figma */
+
+/* Tieu de */
+.score-page-heading {
+    margin-bottom: 20px;
+}
+
+    .score-page-heading h1 {
+        margin: 0 0 8px;
+        color: #123F72;
+        font-size: 24px;
+        font-weight: 700;
+    }
+
+    .score-page-heading p {
+        margin: 0;
+        color: #64748b;
+        font-size: 13px;
+    }
+
+/* Khung bo loc va thong ke */
+.score-filter-card {
+    padding: 20px;
+    margin-bottom: 20px;
+    background: #ffffff;
+    border: 1px solid #dfe7f0;
+    border-radius: 12px;
+}
+
+/* 4 bo loc + nut xem bang diem */
+.score-filters {
+    display: grid;
+    grid-template-columns: 1fr 0.7fr 0.8fr 1fr 1.35fr;
+    align-items: end;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+    .score-filters > div {
+        min-width: 0;
+    }
+
+    .score-filters label {
+        display: block;
+        margin-bottom: 6px;
+        color: #0f172a;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .score-filters .form-control {
+        width: 100%;
+        min-width: 0;
+        height: 38px;
+        padding: 7px 10px;
+        border: 1px solid #dbe5f1;
+        border-radius: 7px;
+        background-color: #ffffff;
+        font-size: 13px;
+        color: #334155;
+    }
+
+/* Nut thao tac */
+.score-primary-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 38px;
+    padding: 9px 18px;
+    border: none;
+    border-radius: 7px;
+    background-color: #1463E6;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+    .score-primary-btn:hover:not(:disabled) {
+        background-color: #0f4fb8;
+    }
+
+    .score-primary-btn:disabled {
+        background-color: #94a3b8;
+        cursor: not-allowed;
+    }
+
+    .score-primary-btn:focus-visible {
+        outline: 3px solid #93c5fd;
+        outline-offset: 2px;
+    }
+
+/* 3 o thong ke */
+.score-summary-grid:not([hidden]) {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.score-summary {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 55px;
+    padding: 10px 14px;
+    border-radius: 8px;
+}
+
+    .score-summary span {
+        font-size: 12px;
+        color: #64748b;
+        font-weight: 600;
+    }
+
+    .score-summary strong {
+        margin-top: 4px;
+        font-size: 17px;
+        color: #123F72;
+    }
+
+.score-summary-complete {
+    background-color: #e7f7ef;
+}
+
+.score-summary-missing {
+    background-color: #fff4e5;
+}
+
+.score-summary-locked {
+    background-color: #eaf2ff;
+}
+
+/* Thong bao */
+.score-message {
+    margin-bottom: 16px;
+    padding: 12px 14px;
+    border-radius: 8px;
+    background-color: #eaf2ff;
+    color: #123F72;
+    font-size: 13px;
+}
+
+    .score-message[hidden] {
+        display: none;
+    }
+
+    .score-message.is-error {
+        background-color: #fef2f2;
+        color: #991b1b;
+    }
+
+    .score-message.is-success {
+        background-color: #ecfdf5;
+        color: #166534;
+    }
+
+    .score-message.is-warning {
+        background-color: #fffbeb;
+        color: #92400e;
+    }
+
+/* Khung bang diem */
+.score-table-section {
+    margin-bottom: 20px;
+    border: 2px solid #1684ff;
+    border-radius: 11px;
+    background: #ffffff;
+    overflow: hidden;
+}
+
+.score-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.score-table {
+    width: 100%;
+    min-width: 750px;
+    border-collapse: collapse;
+    font-size: 13px;
+    text-align: left;
+}
+
+    .score-table th,
+    .score-table td {
+        padding: 14px 12px;
+        border-bottom: 1px solid #e2e8f0;
+        vertical-align: middle;
+    }
+
+    .score-table th {
+        background-color: #eaf2ff;
+        color: #123F72;
+        font-size: 12px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .score-table tbody tr:nth-child(even) {
+        background-color: #f8fafc;
+    }
+
+    .score-table tbody tr:hover {
+        background-color: #f1f7ff;
+    }
+
+    .score-table th:nth-child(n+3):nth-child(-n+8),
+    .score-table td:nth-child(n+3):nth-child(-n+8) {
+        text-align: center;
+    }
+
+    .score-table td:nth-child(2) {
+        min-width: 125px;
+    }
+
+/* Trang thai du diem / thieu diem */
+.score-status-complete {
+    color: #0f172a;
+    font-weight: 600;
+}
+
+.score-status-missing {
+    color: #dc2626;
+    font-weight: 700;
+}
+
+.score-table-caption {
+    margin: 0;
+    padding: 12px 14px;
+    color: #94a3b8;
+    font-size: 12px;
+}
+
+/* O nhap diem se dung o buoc JavaScript */
+.score-input {
+    width: 58px;
+    min-height: 34px;
+    padding: 5px;
+    border: 1px solid #cbd5e1;
+    border-radius: 5px;
+    background: #ffffff;
+    color: #0f172a;
+    font: inherit;
+    text-align: center;
+}
+
+    .score-input:focus {
+        outline: 2px solid #93c5fd;
+        border-color: #1463E6;
+    }
+
+    .score-input:disabled {
+        background-color: #f1f5f9;
+        color: #64748b;
+        cursor: not-allowed;
+    }
+
+    .score-input.is-modified {
+        background-color: #fffbeb;
+        border-color: #d97706;
+    }
+
+/* Trang thai khoa rieng */
+.score-lock-card {
+    margin-bottom: 16px;
+    padding: 15px 20px;
+    background: #ffffff;
+    border: 1px solid #dfe7f0;
+    border-radius: 10px;
+}
+
+    .score-lock-card h2 {
+        margin: 0 0 12px;
+        color: #123F72;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+.score-lock-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 12px;
+}
+
+    .score-lock-grid span {
+        color: #64748b;
+        font-size: 12px;
+    }
+
+/* Cong thuc va nut luu */
+.score-footer:not([hidden]) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-top: 16px;
+}
+
+    .score-footer p {
+        margin: 0;
+        color: #94a3b8;
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    .score-footer .score-primary-btn {
+        min-width: 180px;
+    }
+
+/* Man hinh vua */
+@media (max-width: 1100px) {
+    .score-filters {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+        .score-filters .score-primary-btn {
+            grid-column: 1 / -1;
+        }
+}
+
+/* Man hinh nho */
+@media (max-width: 650px) {
+    .score-page-heading h1 {
+        font-size: 20px;
+    }
+
+    .score-filters {
+        grid-template-columns: 1fr;
+    }
+
+    .score-summary-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .score-lock-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .score-footer {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+        .score-footer .score-primary-btn {
+            width: 100%;
+        }
+    .score-summary-grid[hidden] {
+        display: none;
+    }
+    /* An cac khu vuc chua co du lieu */
+    #scoreSummary[hidden],
+    #scoreResults[hidden],
+    #scoreLockStatus[hidden],
+    #scoreFooter[hidden],
+    #scoreMessage[hidden] {
+        display: none !important;
+    }
+}

@@ -1,0 +1,253 @@
+﻿
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Dashboard - Quản lý kết quả học tập</title>
+
+    <!-- CSS dùng chung theo thiết kế Figma -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/score-grid.css">
+</head>
+
+<body>
+    <div class="app-layout">
+
+        <!-- THANH MENU BÊN TRÁI -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-icon">◆</div>
+
+                <div>
+                    <strong>HỆ THỐNG</strong>
+                    <small>QUẢN LÝ KẾT QUẢ HỌC TẬP</small>
+                </div>
+            </div>
+
+
+            <!-- Menu duoc tao tu JavaScript theo vai tro -->
+            <nav id="sidebarNavigation"
+                 class="sidebar-menu"
+                 aria-label="Menu quản trị">
+            </nav>
+
+
+            <div class="sidebar-bottom">
+                <a href="#">Cài đặt</a>
+                <a href="#">Đăng xuất</a>
+            </div>
+        </aside>
+
+        <!-- KHU VỰC BÊN PHẢI -->
+        <div class="main-content">
+
+            <!-- HEADER -->
+            <header class="topbar">
+                <strong class="topbar-title">
+                    HỆ THỐNG QUẢN LÝ KẾT QUẢ HỌC TẬP
+                </strong>
+
+                <div class="account-info">
+                    <strong>Phòng Khảo thí</strong>
+                    <span class="avatar">P</span>
+                </div>
+            </header>
+
+
+
+            <main class="page-content">
+
+                <!-- TIEU DE -->
+                <section class="score-page-heading">
+                    <h1>Quản lý kết quả học tập</h1>
+                    <p>Xem, nhập và chỉnh sửa điểm theo niên khóa, khối, lớp và môn học.</p>
+                </section>
+
+                <!-- BO LOC VA THONG KE -->
+                <section class="card score-filter-card">
+                    <div class="score-filters">
+
+                        <div>
+                            <label for="scoreAcademicYear">Niên khóa</label>
+                            <select id="scoreAcademicYear" class="form-control">
+                                <option value="2025-2026">2025–2026</option>
+                                <option value="2026-2027" selected>2026–2027</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="scoreGrade">Khối</label>
+                            <select id="scoreGrade" class="form-control">
+                                <option value="10">10</option>
+                                <option value="11" selected>11</option>
+                                <option value="12">12</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="scoreClass">Lớp</label>
+                            <select id="scoreClass" class="form-control">
+                                <option value="11A1">11A1</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="scoreSubject">Môn học</label>
+                            <select id="scoreSubject" class="form-control">
+                                <option value=" ">Chưa tải danh sách môn học</option>
+                    
+                            </select>
+                        </div>
+
+                        <button id="btnLoadScores"
+                                type="button"
+                                class="score-primary-btn">
+                            Xem bảng điểm
+                        </button>
+                    </div>
+
+                    <!-- BA O THONG KE -->
+                    <div id="scoreSummary" class="score-summary-grid" hidden>
+                        <div class="score-summary score-summary-complete">
+                            <span>Đủ điểm</span>
+                            <strong id="completeCount">2</strong>
+                        </div>
+
+                        <div class="score-summary score-summary-missing">
+                            <span>Chưa đủ điểm</span>
+                            <strong id="missingCount">1</strong>
+                        </div>
+
+                        <div class="score-summary score-summary-locked">
+                            <span>Cột đã khóa</span>
+                            <strong id="lockedComponents">QT1, GK</strong>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- THONG BAO TRANG THAI -->
+                <div id="scoreMessage"
+                     class="score-message"
+                     role="status"
+                     aria-live="polite"
+                     hidden></div>
+
+                <!-- BANG DIEM -->
+                <section id="scoreResults" class="score-table-section"
+                         aria-label="Bảng điểm học sinh"
+                         hidden>
+
+                    <div class="score-table-wrapper">
+                        <table class="score-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Mã HS</th>
+                                    <th scope="col">Họ và tên</th>
+                                    <th scope="col">QT1</th>
+                                    <th scope="col">QT2</th>
+                                    <th scope="col">QT3</th>
+                                    <th scope="col">GK</th>
+                                    <th scope="col">CK</th>
+                                    <th scope="col">Tổng kết</th>
+                                    <th scope="col">Trạng thái</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="scoreTableBody">
+                                <tr>
+                                    <td>HS001</td>
+                                    <td>Nguyễn Văn An</td>
+                                    <td>8</td>
+                                    <td>9</td>
+                                    <td>7</td>
+                                    <td>8</td>
+                                    <td>9</td>
+                                    <td><strong>8.38</strong></td>
+                                    <td class="score-status-complete">Đủ điểm</td>
+                                </tr>
+
+                                <tr>
+                                    <td>HS002</td>
+                                    <td>Trần Thị Bình</td>
+                                    <td>0</td>
+                                    <td>8</td>
+                                    <td>7</td>
+                                    <td>6</td>
+                                    <td>8</td>
+                                    <td><strong>6.38</strong></td>
+                                    <td class="score-status-complete">Đủ điểm</td>
+                                </tr>
+
+                                <tr>
+                                    <td>HS003</td>
+                                    <td>Lê Minh Châu</td>
+                                    <td>9</td>
+                                    <td>—</td>
+                                    <td>8</td>
+                                    <td>7</td>
+                                    <td>9</td>
+                                    <td>—</td>
+                                    <td class="score-status-missing">Thiếu QT2</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <p class="score-table-caption">
+                        Dữ liệu minh họa • 3 học sinh mẫu • Điểm 0 là điểm hợp lệ
+                    </p>
+                </section>
+
+                <!-- TRANG THAI KHOA RIENG -->
+                <section id="scoreLockStatus" class="score-lock-card" hidden
+                         aria-label="Trạng thái khóa điểm">
+                    <h2>Trạng thái khóa riêng:</h2>
+
+                    <div class="score-lock-grid">
+                        <span>QT1: Đã khóa</span>
+                        <span>QT2: Chưa khóa</span>
+                        <span>QT3: Chưa khóa</span>
+                        <span>GK: Đã khóa</span>
+                        <span>CK: Chưa khóa</span>
+                    </div>
+                </section>
+
+                <!-- CONG THUC VA NUT LUU -->
+                <div id="scoreFooter" class="score-footer" hidden>
+                    <p>
+                        Công thức ĐTK = (QT1 + QT2 + QT3 + 2×GK + 3×CK) / 8,
+                        làm tròn 2 chữ số.
+                    </p>
+
+                    <button id="btnSaveScores"
+                            type="button"
+                            class="score-primary-btn"
+                            disabled>
+                        Lưu thay đổi
+                    </button>
+                </div>
+
+            </main>
+
+
+        </div>
+    </div>
+
+
+    <!-- Menu dung chung cho hai vai tro -->
+    <script src="../js/navigation.js"></script>
+
+    <!-- Giao dien bang diem -->
+    <script src="../js/score-grid.js"></script>
+
+    <!-- Hien thi menu Khao thi tren Dashboard -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+        renderNavigation("admin", "sidebarNavigation");
+        });
+    </script>
+</body>
+</html>
+
