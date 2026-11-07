@@ -1,8 +1,5 @@
 
-/* =====================================================
-   VT2-02 - SHARED COMPONENTS
-   Cac thanh phan giao dien dung chung
-   ===================================================== */
+   //Cac thanh phan giao dien dung chung
 
 const UIComponents = {
 
@@ -24,9 +21,37 @@ const UIComponents = {
         const alert = document.createElement("div");
         alert.className = "alert alert-" + type;
         alert.setAttribute("role", "alert");
-        alert.textContent = message;
+
+        const msgSpan = document.createElement("span");
+        msgSpan.className = "alert-message";
+        msgSpan.textContent = message;
+
+        const closeBtn = document.createElement("button");
+        closeBtn.type = "button";
+        closeBtn.className = "alert-close-btn";
+        closeBtn.setAttribute("aria-label", "Đóng thông báo");
+        closeBtn.innerHTML = "&times;";
+        closeBtn.addEventListener("click", function () {
+            alert.remove();
+        });
+
+        alert.appendChild(msgSpan);
+        alert.appendChild(closeBtn);
 
         container.replaceChildren(alert);
+
+        // Tu dong an sau 6 giay
+        setTimeout(function () {
+            if (alert.parentElement) {
+                alert.style.transition = "opacity 0.3s ease";
+                alert.style.opacity = "0";
+                setTimeout(function () {
+                    if (alert.parentElement) {
+                        alert.remove();
+                    }
+                }, 300);
+            }
+        }, 6000);
     },
 
     // Hien thi trang thai dang tai du lieu

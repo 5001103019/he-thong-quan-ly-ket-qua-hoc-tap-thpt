@@ -411,7 +411,8 @@ router.post(
                 missingResult.recordset[0].missing_count
             );
 
-            // Con thieu diem: khong cho khoa.
+            // Con thieu diem: neu chua xac nhan canh bao thi tu choi
+
             if (missingCount > 0) {
                 await transaction.rollback();
                 started = false;

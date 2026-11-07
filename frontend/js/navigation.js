@@ -8,6 +8,7 @@
 
 const NAVIGATION_MENUS = {
     admin: [
+
         {
             label: "Trang chủ",
             url: "/pages/dashboard.html"
@@ -30,16 +31,17 @@ const NAVIGATION_MENUS = {
         },
         {
             label: "Khóa / Mở khóa",
-            url: "lock-unlock.html"
+            url: "/pages/lock-unlock.html"
         },
         {
-            label: "Audit Log",
-            url: "audit-log.html"
+            label: "Nhật ký thao tác",
+            url: "/pages/audit-log.html"
         },
         {
             label: "Import / Export CSV",
             url: null
         }
+
     ],
 
     student: [
