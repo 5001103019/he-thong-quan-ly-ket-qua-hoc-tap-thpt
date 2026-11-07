@@ -199,6 +199,10 @@ router.get(
             );
 
         } catch (error) {
+            if (res.headersSent) {
+                return next(error);
+            }
+
             if (
                 Number.isInteger(error.status) &&
                 error.status >= 400 &&
@@ -213,7 +217,16 @@ router.get(
                 });
             }
 
-            next(error);
+            console.error("[score-export] Internal error:", error);
+
+            return res.status(500).json({
+                success: false,
+                error: {
+                    code: "INTERNAL_ERROR",
+                    message:
+                        "Không thể xuất CSV lúc này. Vui lòng thử lại sau."
+                }
+            });
         }
     }
 );
