@@ -1,0 +1,286 @@
+
+/* VT3-04 - Giao dien nien khoa / khoi / lop theo Figma */
+
+.sidebar-bottom .academic-sidebar-meta {
+    display: block;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: #DCEAFF;
+}
+
+.academic-page {
+    max-width: 1600px;
+    padding: 28px 32px 48px;
+}
+
+.academic-page .page-title {
+    margin: 0 0 8px;
+    font-size: 28px;
+    line-height: 1.25;
+}
+
+.academic-page .page-description {
+    margin: 0 0 28px;
+    color: #64748B;
+    font-size: 15px;
+}
+
+.academic-page .academic-filter-card {
+    padding: 18px 22px;
+    margin-bottom: 26px;
+}
+
+.academic-filter-grid {
+    display: grid;
+    grid-template-columns:
+        minmax(175px, 1.2fr)
+        minmax(100px, .8fr)
+        minmax(110px, .85fr)
+        minmax(155px, 1.2fr)
+        minmax(150px, 1fr);
+    gap: 18px;
+    align-items: end;
+}
+
+.academic-filter-grid .form-group {
+    margin: 0;
+    min-width: 0;
+}
+
+.academic-filter-grid .form-control {
+    width: 100%;
+    min-height: 45px;
+    font-size: 15px;
+    font-weight: 400;
+    color: #17283E;
+}
+
+.academic-filter-grid .form-group label {
+    color: #64748B;
+}
+
+.academic-filter-grid .btn {
+    min-height: 45px;
+    width: 100%;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.academic-class-list .academic-add-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 8px;
+}
+
+.academic-class-list #addClassButton {
+    min-width: 210px;
+    min-height: 43px;
+    font-weight: 700;
+}
+
+.academic-class-list #addClassButton:disabled {
+    cursor: not-allowed;
+    opacity: .55;
+}
+
+.academic-class-list h2 {
+    margin: 0 0 18px 6px;
+    color: #123F72;
+    font-size: 22px;
+}
+
+.academic-table-frame {
+    overflow-x: auto;
+    border: 1px solid #DDE5F0;
+    background: #FFFFFF;
+    border-radius: 12px;
+}
+
+.academic-table-frame table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.academic-table-frame th {
+    padding: 17px 13px;
+    background-color: #E8F1FC;
+    color: #123F72;
+    text-align: left;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.academic-table-frame td {
+    padding: 16px 13px;
+    color: #17283E;
+    font-size: 14px;
+    border-bottom: 1px solid #DDE5F0;
+}
+
+.academic-table-frame tbody tr:nth-child(even) {
+    background: #F5F8FC;
+}
+
+.academic-table-frame tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.academic-action-link {
+    padding: 4px 0;
+    border: 0;
+    background: transparent;
+    color: #17283E;
+    font: inherit;
+    cursor: pointer;
+}
+
+.academic-action-link:hover {
+    color: #1463E6;
+    text-decoration: underline;
+}
+
+.academic-action-link:focus-visible {
+    outline: 2px solid #1463E6;
+    outline-offset: 2px;
+}
+
+.academic-note {
+    margin: 54px 0 0 8px;
+    color: #64748B;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.academic-page #classFormPanel[hidden],
+.academic-page #academicYearFormPanel[hidden] {
+    display: none !important;
+}
+
+.academic-page .academic-form-panel {
+    margin-top: 30px;
+    padding: 28px 30px;
+}
+
+.academic-form-panel h2 {
+    margin: 0 0 24px;
+    color: #123F72;
+    font-size: 24px;
+}
+
+.academic-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 22px;
+    row-gap: 6px;
+}
+
+.academic-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 18px;
+}
+
+.academic-form-actions .btn {
+    min-width: 120px;
+}
+
+.academic-form-actions .btn-secondary {
+    border: 1px solid #1463E6;
+    color: #1463E6;
+    background: #FFFFFF;
+}
+
+.academic-page .academic-maintenance {
+    margin-top: 95px;
+    padding: 14px 0;
+    border-top: 1px solid #DDE5F0;
+    color: #64748B;
+}
+
+.academic-maintenance summary {
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.academic-maintenance[open] summary {
+    margin-bottom: 20px;
+}
+
+.academic-maintenance-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(240px, 1fr);
+    gap: 20px;
+    align-items: start;
+}
+
+.academic-maintenance-grid .card {
+    min-width: 0;
+}
+
+.academic-subsection-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 18px;
+}
+
+.academic-subsection-head h2,
+.academic-maintenance-grid .card > h2 {
+    margin: 0 0 14px;
+    font-size: 19px;
+}
+
+.academic-subsection-head h2 {
+    margin: 0;
+}
+
+.academic-inline-form {
+    margin: 18px 0;
+    padding: 18px;
+    border: 1px solid #DDE5F0;
+    border-radius: 10px;
+}
+
+.academic-inline-form h3 {
+    margin: 0 0 14px;
+}
+
+@media (max-width: 1100px) {
+    .academic-filter-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .academic-maintenance-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .academic-page {
+        padding: 18px 16px 32px;
+    }
+
+    .academic-filter-grid,
+    .academic-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .academic-class-list .academic-add-row {
+        justify-content: stretch;
+    }
+
+    .academic-class-list #addClassButton {
+        width: 100%;
+    }
+
+    .academic-note {
+        margin-top: 28px;
+    }
+
+    .academic-page .academic-maintenance {
+        margin-top: 50px;
+    }
+}
