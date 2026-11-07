@@ -299,8 +299,60 @@ async function disableDemoAccount(userIdValue, actorUserIdValue) {
     return result;
 }
 
+ // 4. Tra cuu tai khoan Hoc sinh.
+ // Co the loc theo studentId.
+ // Khong tra mat khau hoac password_hash.
+ async function getDemoAccounts(studentIdValue) {
+     let studentId = null;
+
+     if (studentIdValue !== undefined) {
+         studentId = parseId(studentIdValue, "studentId");
+     }
+
+     const pool = await connectDatabase();
+
+     const result = await pool.request()
+         .input("studentId", sql.BigInt, studentId)
+         .query(`
+             SELECT
+                 u.user_id,
+                 u.username,
+                 r.code AS role_code,
+                 u.student_id,
+                 u.is_active,
+                 s.student_code,
+                 s.full_name
+             FROM dbo.app_user AS u
+             INNER JOIN dbo.[role] AS r
+                 ON r.role_id = u.role_id
+             LEFT JOIN dbo.student AS s
+                 ON s.student_id = u.student_id
+             WHERE r.code = 'HOC_SINH'
+               AND (
+                   @studentId IS NULL
+                   OR u.student_id = @studentId
+               )
+             ORDER BY u.user_id
+         `);
+
+     return result.recordset.map((row) => ({
+         userId: String(row.user_id),
+         username: row.username,
+         roleCode: row.role_code,
+         studentId:
+             row.student_id == null
+                 ? null
+                 : String(row.student_id),
+         studentCode: row.student_code ?? null,
+         fullName: row.full_name ?? null,
+         isActive: Boolean(row.is_active)
+     }));
+ }
+
+
 module.exports = {
     createDemoAccount,
     linkStudentAccount,
-    disableDemoAccount
+    disableDemoAccount,
+    getDemoAccounts
 };

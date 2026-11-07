@@ -11,7 +11,8 @@ const {
 const {
     createDemoAccount,
     linkStudentAccount,
-    disableDemoAccount
+    disableDemoAccount,
+    getDemoAccounts
 } = require("../services/demo-account-service");
 
 const router = express.Router();
@@ -43,7 +44,28 @@ function handleError(error, res) {
     });
 }
 
-// 1. Tao tai khoan demo.
+// 1. Tra cuu danh sach tai khoan Hoc sinh.
+// GET /api/v1/khao-thi/demo-accounts
+// GET /api/v1/khao-thi/demo-accounts?studentId=22
+router.get("/", async (req, res) => {
+    try {
+        const accounts = await getDemoAccounts(
+            req.query.studentId
+        );
+
+        return res.status(200).json({
+            success: true,
+            data: {
+                accounts,
+                total: accounts.length
+            }
+        });
+    } catch (error) {
+        return handleError(error, res);
+    }
+});
+
+// 2. Tao tai khoan demo.
 // POST /api/v1/khao-thi/demo-accounts
 router.post("/", async (req, res) => {
     try {
@@ -67,7 +89,7 @@ router.post("/", async (req, res) => {
     }
 });
 
-// 2. Lien ket tai khoan voi ho so Hoc sinh.
+// 3. Lien ket tai khoan voi ho so Hoc sinh.
 // PATCH /api/v1/khao-thi/demo-accounts/:userId/link-student
 router.patch("/:userId/link-student", async (req, res) => {
     try {
@@ -86,7 +108,7 @@ router.patch("/:userId/link-student", async (req, res) => {
     }
 });
 
-// 3. Vo hieu hoa tai khoan demo.
+// 4. Vo hieu hoa tai khoan demo.
 // PATCH /api/v1/khao-thi/demo-accounts/:userId/disable
 router.patch("/:userId/disable", async (req, res) => {
     try {

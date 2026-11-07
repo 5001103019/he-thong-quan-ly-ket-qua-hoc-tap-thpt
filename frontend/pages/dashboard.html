@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="../css/style.css">
 </head>
 
-<body>
+<body hidden>
     <div class="app-layout">
 
         <!-- THANH MENU BÊN TRÁI -->
@@ -35,7 +35,7 @@
 
             <div class="sidebar-bottom">
                 <a href="#">Cài đặt</a>
-                <a href="#">Đăng xuất</a>
+                <a href="#" id="logoutLink">Đăng xuất</a>
             </div>
         </aside>
 
@@ -187,18 +187,19 @@
     </div>
 
 
-    <!-- Menu dung chung cho hai vai tro -->
+
+    <!-- API client dung chung -->
+    <script src="../js/api.js"></script>
+
+    <!-- Menu theo vai tro -->
     <script src="../js/navigation.js"></script>
 
-    <!-- Bo loc Dashboard -->
+    <!-- Bo loc Dashboard cua Yen -->
     <script src="../js/dashboard.js"></script>
 
-    <!-- Hien thi menu Khao thi tren Dashboard -->
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-        renderNavigation("admin", "sidebarNavigation");
-        });
-    </script>
+    <!-- Kiem tra phien va dang xuat -->
+    <script src="../js/dashboard-auth.js"></script>
+
 </body>
 </html>
 

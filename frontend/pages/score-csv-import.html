@@ -1,0 +1,326 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Import điểm CSV - Quản lý kết quả học tập</title>
+
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/score-csv-import.css">
+</head>
+
+<body>
+    <div class="app-layout">
+
+        <!-- Khung menu dùng chung của nhóm -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-icon">◆</div>
+                <div>
+                    <strong>HỆ THỐNG</strong>
+                    <small>QUẢN LÝ KẾT QUẢ HỌC TẬP</small>
+                </div>
+            </div>
+
+            <nav id="sidebarNavigation"
+                 class="sidebar-menu"
+                 aria-label="Menu quản trị">
+            </nav>
+
+            <div class="sidebar-bottom">
+                <a href="#">Cài đặt</a>
+                <a href="#">Đăng xuất</a>
+            </div>
+        </aside>
+
+        <div class="main-content">
+
+            <header class="topbar">
+                <strong class="topbar-title">
+                    HỆ THỐNG QUẢN LÝ KẾT QUẢ HỌC TẬP
+                </strong>
+
+                <div class="account-info">
+                    <strong>Phòng Khảo thí</strong>
+                    <span class="avatar">P</span>
+                </div>
+            </header>
+
+            <main class="page-content csv-page">
+
+                <h1 class="page-title">
+                    Import điểm từ CSV
+                </h1>
+
+                <p class="page-description">
+                    Tải tệp điểm lên để kiểm tra trước khi ghi dữ liệu.
+                </p>
+
+                <!-- TRANG 17: CHỌN TỆP CSV -->
+                <section class="card csv-import-card">
+
+                    <h2>Bước 1 – Chọn tệp CSV</h2>
+
+                    <div class="csv-filter-grid">
+
+                        <div class="form-group">
+                            <label for="academicYear">
+                                Niên khóa
+                            </label>
+                            <select id="academicYear"
+                                    class="form-control">
+                                <option value="2026-2027" selected>
+                                    2026–2027
+                                </option>
+                                <option value="2025-2026">
+                                    2025–2026
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="grade">
+                                Khối
+                            </label>
+                            <select id="grade" class="form-control">
+                                <option value="10">10</option>
+                                <option value="11" selected>11</option>
+                                <option value="12">12</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="classroom">
+                                Lớp
+                            </label>
+                            <select id="classroom"
+                                    class="form-control">
+                                <option value="11A1">11A1</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="subject">
+                                Môn học
+                            </label>
+                            <select id="subject"
+                                    class="form-control">
+                                <option value="TOAN" selected>
+                                    Toán
+                                </option>
+                                <option value="NGUVAN">
+                                    Ngữ văn
+                                </option>
+                                <option value="TINHOC">
+                                    Tin học
+                                </option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <div class="csv-upload-area">
+
+                        <h3>Chọn tệp .csv để nhập điểm</h3>
+
+                        <p class="csv-upload-description">
+                            Hỗ trợ các cột:
+                            Mã HS, QT1, QT2, QT3, GK, CK
+                        </p>
+
+                        <input type="file"
+                               id="csvFile"
+                               accept=".csv,text/csv"
+                               hidden>
+
+                        <button type="button"
+                                id="selectCsvButton"
+                                class="btn btn-primary">
+                            Chọn tệp CSV
+                        </button>
+
+                        <p id="selectedFileName"
+                           aria-live="polite"></p>
+
+                    </div>
+
+                    <div class="alert alert-warning csv-import-warning">
+                        <strong>Kiểm tra trước khi nhập</strong>
+
+                        <p>
+                            Dữ liệu bị khóa không được ghi đè;
+                            mọi lỗi phải được hiển thị theo dòng.
+                        </p>
+                    </div>
+
+                    <p id="csvMessage"
+                       class="csv-status"
+                       role="status"
+                       aria-live="polite"></p>
+
+                </section>
+
+                <div class="csv-actions">
+                    <button type="button"
+                            id="nextButton"
+                            class="btn btn-primary"
+                            disabled>
+                        Tiếp tục
+                    </button>
+                </div>
+
+                <!-- TRANG 18: XEM TRƯỚC DỮ LIỆU CSV -->
+                <section id="csvPreviewStep"
+                         class="card csv-preview-card"
+                         hidden>
+
+                    <div class="csv-preview-info">
+
+                        <h3 id="csvPreviewFileName">
+                            Xem trước dữ liệu CSV
+                        </h3>
+
+                        <p id="csvPreviewScope">
+                            Niên khóa • Lớp • Môn học
+                        </p>
+
+                    </div>
+
+                    <div class="csv-table-wrapper">
+                        <table class="csv-preview-table">
+
+                            <thead>
+                                <tr>
+                                    <th>Dòng</th>
+                                    <th>Mã HS</th>
+                                    <th>QT1</th>
+                                    <th>QT2</th>
+                                    <th>QT3</th>
+                                    <th>GK</th>
+                                    <th>CK</th>
+                                    <th>Kiểm tra</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="csvPreviewBody"></tbody>
+
+                        </table>
+                    </div>
+
+                    <div class="alert alert-warning csv-preview-warning">
+
+                        <strong>Kiểm tra dữ liệu CSV</strong>
+
+                        <p>
+                            Chỉ những dòng đủ điều kiện mới được nhập.
+                            Dữ liệu bị khóa không được ghi đè.
+                        </p>
+
+                        <p id="csvPreviewStatus"
+                           class="csv-status"
+                           role="status"
+                           aria-live="polite"></p>
+
+                        <button type="button"
+                                id="showCsvErrorsButton"
+                                class="csv-detail-link"
+                                hidden>
+                            Xem chi tiết lỗi/cảnh báo
+                        </button>
+
+                    </div>
+
+                    <div class="csv-preview-actions">
+
+                        <button type="button"
+                                id="backToImportButton"
+                                class="btn btn-secondary">
+                            Quay lại
+                        </button>
+
+                        <button type="button"
+                                id="confirmImportButton"
+                                class="btn btn-primary"
+                                disabled>
+                            Xác nhận nhập
+                        </button>
+
+                    </div>
+
+                </section>
+
+                <!-- TRANG 19: KIỂM TRA LỖI CSV -->
+                <section id="csvErrorStep"
+                         class="card csv-error-card"
+                         hidden>
+
+                    <div class="csv-error-content">
+
+                        <h3>Chi tiết lỗi theo dòng</h3>
+
+                        <div class="csv-table-wrapper">
+                            <table class="csv-error-table">
+
+                                <thead>
+                                    <tr>
+                                        <th>Dòng</th>
+                                        <th>Mã HS</th>
+                                        <th>Cột</th>
+                                        <th>Giá trị</th>
+                                        <th>Vấn đề / kết quả</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="csvErrorBody"></tbody>
+
+                            </table>
+                        </div>
+
+                        <div class="csv-error-alert">
+
+                            <strong>
+                                Không thể nhập toàn bộ dữ liệu
+                            </strong>
+
+                            <p>
+                                Bản ghi đã khóa phải được bỏ qua;
+                                dữ liệu lỗi phải được xử lý rõ ràng.
+                            </p>
+
+                        </div>
+
+                        <p class="csv-error-note">
+                            Các dòng hợp lệ chỉ được nhập theo
+                            quy tắc nhóm đã thống nhất.
+                        </p>
+
+                        <div class="csv-error-actions">
+
+                            <button type="button"
+                                    id="chooseAnotherCsvButton"
+                                    class="btn btn-secondary">
+                                Chọn tệp khác
+                            </button>
+
+                            <button type="button"
+                                    id="backToPreviewButton"
+                                    class="btn btn-primary">
+                                Quay lại xem trước
+                            </button>
+
+                        </div>
+
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <script src="../js/navigation.js"></script>
+    <script src="../js/score-csv-import.js?v=cv5-20261105-02"></script>
+
+</body>
+</html>
+không có được
