@@ -1,24 +1,58 @@
-// Menu dung chung
 
-// Danh sach menu theo tung vai tro
+/* =====================================================
+   VT2-02 - SHARED NAVIGATION
+   Menu dung chung cho hai vai tro.
+   File nay chi phu trach hien thi va dieu huong.
+   Phan quyen API do Backend kiem tra.
+   ===================================================== */
+
 const NAVIGATION_MENUS = {
     admin: [
-        { label: "Trang chủ", url: "dashboard.html" },
-        { label: "Niên khóa / Khối / Lớp", url: null },
-        { label: "Học sinh / Tài khoản", url: null },
-        { label: "Môn học", url: null },
-        { label: "Bảng điểm", url: null },
-        { label: "Khóa / Mở khóa", url: "lock-unlock.html" },
-        { label: "Nhật ký thao tác", url: "audit-log.html" },
-        { label: "Import / Export CSV", url: null }
+
+        {
+            label: "Trang chủ",
+            url: "/pages/dashboard.html"
+        },
+        {
+            label: "Niên khóa / Khối / Lớp",
+            url: "/pages/academic-management.html"
+        },
+        {
+            label: "Học sinh / Tài khoản",
+            url: "/pages/student-management.html"
+        },
+        {
+            label: "Môn học",
+            url: "/pages/subject-management.html"
+        },
+        {
+            label: "Bảng điểm",
+            url: null
+        },
+        {
+            label: "Khóa / Mở khóa",
+            url: "/pages/lock-unlock.html"
+        },
+        {
+            label: "Nhật ký thao tác",
+            url: "/pages/audit-log.html"
+        },
+        {
+            label: "Import / Export CSV",
+            url: null
+        }
+
     ],
 
     student: [
-        { label: "Kết quả học tập", url: null }
+        {
+            label: "Kết quả học tập",
+            url: null
+        }
     ]
 };
 
-// Hien thi menu theo vai tro duoc truyen vao
+// Hien thi menu theo vai tro duoc truyen vao.
 function renderNavigation(role, containerId) {
     const container = document.getElementById(containerId);
 
@@ -27,7 +61,6 @@ function renderNavigation(role, containerId) {
         return;
     }
 
-    // Khong hien menu neu vai tro khong hop le
     const menuItems = NAVIGATION_MENUS[role];
 
     if (!menuItems) {
@@ -38,26 +71,29 @@ function renderNavigation(role, containerId) {
 
     container.replaceChildren();
 
+    const currentPath = window.location.pathname;
+
     menuItems.forEach(function (item) {
         const link = document.createElement("a");
+
         link.textContent = item.label;
 
         if (item.url) {
             link.href = item.url;
 
-            // Danh dau menu cua trang hien tai
-            const currentPage = window.location.pathname
-                .split("/")
-                .pop();
-
-            if (currentPage === item.url) {
+            // Danh dau trang dang duoc mo.
+            if (currentPath === new URL(item.url, window.location.href).pathname) {
                 link.classList.add("active");
+                link.setAttribute("aria-current", "page");
             }
         } else {
-            // Chua co trang dich, khong dieu huong gia
-            link.removeAttribute("href");
+            // Chua co trang dich, khong dieu huong gia.
             link.classList.add("menu-placeholder");
             link.setAttribute("aria-disabled", "true");
+            link.setAttribute(
+                "title",
+                "Chuc nang chua duoc ket noi giao dien."
+            );
         }
 
         container.appendChild(link);

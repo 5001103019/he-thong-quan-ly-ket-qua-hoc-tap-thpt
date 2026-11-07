@@ -20,6 +20,11 @@ const {
     saveScoreEntry
 } = require("../services/scoreEntryService");
 
+// Khoi tao ban ghi diem cho hoc sinh chua co diem.
+const {
+    ensureScoreRecord
+} = require("../services/scoreRecordInitService");
+
 // Ham tinh diem tong ket.
 const {
     calculateScoreSummary
@@ -42,6 +47,64 @@ function parsePositiveId(value) {
 
     return number;
 }
+
+// ============================================
+// API KHOI TAO BAN GHI DIEM
+// POST /api/v1/score-records
+// ============================================
+router.post(
+    "/",
+    requireAuth,
+    requireRole("KHAO_THI"),
+    async (req, res, next) => {
+        try {
+            const {
+                enrollmentId,
+                subjectId
+            } = req.body || {};
+
+            // Kiem tra ID la so nguyen duong.
+            if (
+                !Number.isSafeInteger(enrollmentId) ||
+                enrollmentId <= 0 ||
+                !Number.isSafeInteger(subjectId) ||
+                subjectId <= 0
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    error: {
+                        code: "VALIDATION_ERROR",
+                        message: "Ma phan lop hoac mon hoc khong hop le"
+                    }
+                });
+            }
+
+            // Tao moi neu chua co, tra lai neu da ton tai.
+            const data = await ensureScoreRecord({
+                enrollmentId,
+                subjectId
+            });
+
+            return res.status(data.created ? 201 : 200).json({
+                success: true,
+                data
+            });
+
+        } catch (error) {
+            if (error.status && error.code) {
+                return res.status(error.status).json({
+                    success: false,
+                    error: {
+                        code: error.code,
+                        message: error.message
+                    }
+                });
+            }
+
+            next(error);
+        }
+    }
+);
 
 // ============================================
 // 1. API LAY CHI TIET BAN GHI DIEM

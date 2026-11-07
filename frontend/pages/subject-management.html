@@ -1,0 +1,274 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Quản lý môn học</title>
+
+    <!-- CSS dung chung cua nhom -->
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+    <div class="app-layout">
+
+        <!-- MENU BEN TRAI -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-icon">◆</div>
+
+                <div>
+                    <strong>HỆ THỐNG</strong>
+                    <small>QUẢN LÝ KẾT QUẢ HỌC TẬP</small>
+                </div>
+            </div>
+
+            <nav
+                id="sidebarNavigation"
+                class="sidebar-menu"
+                aria-label="Menu quản trị">
+            </nav>
+        </aside>
+
+        <!-- NOI DUNG BEN PHAI -->
+        <div class="main-content">
+
+            <header class="topbar">
+                <strong class="topbar-title">
+                    HỆ THỐNG QUẢN LÝ KẾT QUẢ HỌC TẬP
+                </strong>
+
+                <div class="account-info">
+                    <strong>Phòng Khảo thí</strong>
+                    <span class="avatar">P</span>
+                </div>
+            </header>
+
+            <main class="page-content">
+
+                <h1 class="page-title">Quản lý môn học</h1>
+
+                <p class="page-description">
+                    Theo dõi danh mục môn học phục vụ nhập và hiển thị
+                    kết quả học tập.
+                </p>
+
+                <!-- BO LOC MON HOC THEO FIGMA -->
+                <form
+                    id="subjectFilterForm"
+                    class="card subject-filter-form"
+                    role="search">
+
+                    <div class="subject-filter-fields">
+
+                        <!-- TIM THEO MA HOAC TEN MON -->
+                        <div class="form-group">
+                            <label for="subjectSearchFilter">
+                                Tìm môn học
+                            </label>
+
+                            <input
+                                type="search"
+                                id="subjectSearchFilter"
+                                class="form-control"
+                                placeholder="Mã môn hoặc tên môn"
+                                maxlength="100">
+                        </div>
+
+                        <!-- LOC THEO TRANG THAI -->
+                        <div class="form-group">
+                            <label for="subjectStatusFilter">
+                                Trạng thái
+                            </label>
+
+                            <select
+                                id="subjectStatusFilter"
+                                class="form-control">
+
+                                <option value="">
+                                    Tất cả
+                                </option>
+
+                                <option value="ACTIVE">
+                                    Đang sử dụng
+                                </option>
+
+                                <option value="INACTIVE">
+                                    Ngừng hoạt động
+                                </option>
+
+                            </select>
+                        </div>
+
+                        <!-- NUT TIM KIEM -->
+                        <button
+                            type="submit"
+                            id="searchSubjectButton"
+                            class="btn btn-primary">
+                            Tìm kiếm
+                        </button>
+
+                    </div>
+
+                </form>
+
+                <!-- DANH SACH MON HOC -->
+                <section
+                    class="card"
+                    aria-labelledby="subjectTitle">
+
+                    <!-- TIEU DE VA NUT THEM MON HOC -->
+                    <div class="subject-section-header">
+
+                        <h2 id="subjectTitle">
+                            Danh mục môn học
+                        </h2>
+
+                        <button
+                            type="button"
+                            id="addSubjectButton"
+                            class="btn btn-primary">
+                            + Thêm môn
+                        </button>
+
+                    </div>
+
+                    <!-- THONG BAO THAO TAC -->
+                    <div
+                        id="subjectSaveMessage"
+                        role="status">
+                    </div>
+
+                    <!-- THONG BAO TAI DU LIEU -->
+                    <div
+                        id="subjectListStatus"
+                        role="status">
+                    </div>
+
+                    <!-- BANG DANH SACH MON HOC -->
+                    <div id="subjectTable"></div>
+
+                </section>
+
+                <!-- FORM THEM / SUA MAC DINH AN -->
+                    <div id="subjectFormPanel" hidden>
+
+                        <h3 id="subjectFormTitle">
+                            Thêm môn học
+                        </h3>
+
+                        <p class="subject-form-description">
+                        Thông tin bắt buộc được đánh dấu *.
+                        </p>
+
+                        <form id="subjectForm">
+
+                            <!-- MA MON VA TEN MON NAM CUNG HANG -->
+                            <div class="subject-form-row">
+
+                                <!-- MA MON HOC -->
+                                <div class="form-group">
+                                    <label for="subjectCode">
+                                        Mã môn *
+                                    </label>
+
+                                    <input
+                                        type="text"
+                                        id="subjectCode"
+                                        class="form-control"
+                                        placeholder="Nhập mã môn"
+                                        required>
+                                </div>
+
+                                <!-- TEN MON HOC -->
+                                <div class="form-group">
+                                    <label for="subjectName">
+                                        Tên môn học *
+                                    </label>
+
+                                    <input
+                                        type="text"
+                                        id="subjectName"
+                                        class="form-control"
+                                        placeholder="Nhập tên môn học"
+                                        required>
+                                </div>
+
+                            </div>
+
+                            <!-- TRANG THAI -->
+                            <div class="form-group">
+                                <label for="subjectStatus">
+                                    Trạng thái
+                                </label>
+
+                                <select
+                                    id="subjectStatus"
+                                    class="form-control"
+                                    required>
+
+                                    <option value="ACTIVE">
+                                        Đang sử dụng
+                                    </option>
+
+                                    <option value="INACTIVE">
+                                        Ngừng hoạt động
+                                    </option>
+                                </select>
+                            </div>
+
+                            <!-- THONG TIN KIEM TRA DU LIEU -->
+                            <div class="subject-validation-note">
+
+                                <strong>Kiểm tra dữ liệu</strong>
+
+                                <p>
+                                    Mã môn không được trùng với môn đã tồn tại
+                                    trong hệ thống.
+                                </p>
+
+                            </div>
+
+                            <!-- THONG BAO CUA FORM -->
+                            <div
+                                id="subjectFormMessage"
+                                role="status">
+                            </div>
+
+                            <!-- CAC NUT THAO TAC CUOI FORM -->
+                            <div class="subject-form-actions">
+
+                                <button
+                                    type="button"
+                                    id="cancelSubjectButton"
+                                    class="btn btn-secondary">
+                                    Hủy
+                                </button>
+
+                                <button
+                                    type="submit"
+                                    id="saveSubjectButton"
+                                    class="btn btn-primary">
+                                    Lưu môn học
+                                </button>
+
+                            </div>
+
+                        </form>
+                    </div>
+                </main>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT DUNG CHUNG -->
+    <script src="../js/api.js"></script>
+    <script src="../js/components.js"></script>
+    <script src="../js/navigation.js"></script>
+
+    <!-- JAVASCRIPT QUAN LY MON HOC -->
+    <script src="../js/subject-management.js"></script>
+
+</body>
+</html>
