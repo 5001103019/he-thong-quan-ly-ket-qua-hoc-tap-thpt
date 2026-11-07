@@ -73,6 +73,10 @@ async function getAllStudents(filters = {}) {
                               @classId IS NULL
                               OR e.class_id = @classId
                           )
+                          AND (
+                              @classId IS NULL
+                              OR e.end_date IS NULL
+                          )
                     )
                 )
             ORDER BY
