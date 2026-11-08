@@ -29,8 +29,7 @@
             </nav>
 
             <div class="sidebar-bottom">
-                <a href="#">Cài đặt</a>
-                <a href="#">Đăng xuất</a>
+                <a href="#" id="logoutLink">Đăng xuất</a>
             </div>
         </aside>
 
@@ -56,6 +55,19 @@
                 <p class="page-description">
                     Tải tệp điểm lên để kiểm tra trước khi ghi dữ liệu.
                 </p>
+
+                <!-- Chuyen doi Import / Export -->
+                <div class="csv-mode-tabs">
+                    <button type="button" id="csvImportTab"
+                            class="active" aria-pressed="true">
+                        Nhập điểm CSV
+                    </button>
+
+                    <button type="button" id="csvExportTab"
+                            aria-pressed="false">
+                        Xuất điểm CSV
+                    </button>
+                </div>
 
                 <!-- TRANG 17: CHỌN TỆP CSV -->
                 <section class="card csv-import-card">
@@ -314,13 +326,97 @@
                     </div>
                 </section>
 
+                <!-- Chuc nang Export CSV -->
+                <section id="csvExportPanel"
+                         class="card csv-import-card csv-export-card"
+                         hidden>
+
+                    <h2>Cấu hình xuất dữ liệu</h2>
+
+                    <form id="exportForm">
+                        <div class="csv-filter-grid">
+
+                            <div class="form-group">
+                                <label for="exportYear">Niên khóa</label>
+                                <select id="exportYear"
+                                        class="form-control" required>
+                                    <option value="">Đang tải...</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="exportGrade">Khối</label>
+                                <select id="exportGrade"
+                                        class="form-control" required>
+                                    <option value="10">Khối 10</option>
+                                    <option value="11">Khối 11</option>
+                                    <option value="12">Khối 12</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="exportClass">Lớp</label>
+                                <select id="exportClass"
+                                        class="form-control"
+                                        required disabled>
+                                    <option value="">Chưa có lớp học</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="exportSubject">Môn học</label>
+                                <select id="exportSubject"
+                                        class="form-control">
+                                    <option value="">Tất cả</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="exportType">Loại dữ liệu</label>
+                                <select id="exportType" class="form-control">
+                                    <option value="details">
+                                        Bảng điểm chi tiết
+                                    </option>
+                                    <option value="statistics">
+                                        Thống kê theo môn
+                                    </option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="exportFormat">Định dạng</label>
+                                <select id="exportFormat" class="form-control">
+                                    <option value="csv">CSV</option>
+                                </select>
+                            </div>
+
+                        </div>
+
+                        <p class="csv-status">
+                            Dữ liệu xuất theo quyền truy cập và bộ lọc đã chọn.
+                        </p>
+
+                        <p id="exportMessage" class="csv-status"
+                           role="status" aria-live="polite"></p>
+
+                        <div class="csv-actions">
+                            <button id="exportButton" type="submit"
+                                    class="btn btn-primary">
+                                Xuất CSV
+                            </button>
+                        </div>
+                    </form>
+                </section>
+
             </main>
         </div>
     </div>
 
     <script src="../js/navigation.js"></script>
     <script src="../js/score-csv-import.js?v=cv5-20261105-02"></script>
+    <script src="../js/score-csv-export.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/dashboard-auth.js"></script>
 
 </body>
 </html>
-không có được

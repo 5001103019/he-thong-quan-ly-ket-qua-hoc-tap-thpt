@@ -27,7 +27,7 @@ const NAVIGATION_MENUS = {
         },
         {
             label: "Bảng điểm",
-            url: null
+            url: "/pages/score-grid.html"
         },
         {
             label: "Khóa / Mở khóa",
@@ -39,9 +39,8 @@ const NAVIGATION_MENUS = {
         },
         {
             label: "Import / Export CSV",
-            url: null
-        }
-
+            url: "/pages/score-csv-import.html"
+        },
     ],
 
     student: [

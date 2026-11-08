@@ -14,7 +14,9 @@ document.addEventListener("DOMContentLoaded", function () {
     const alertContainer = document.getElementById("alertContainer");
     const locksCardsContainer = document.getElementById("locksCardsContainer");
     const referenceScoresTbody = document.getElementById("referenceScoresTbody");
-
+    // Khong hien thi du lieu mau khi chua co lop va mon hoc
+locksCardsContainer.replaceChildren();
+referenceScoresTbody?.replaceChildren();
     // Thiet lap thoi han tu dong khoa (ngan gon)
     const autoLockCompSelect = document.getElementById("autoLockCompSelect");
     const autoLockDateTimeInput = document.getElementById("autoLockDateTimeInput");
@@ -57,13 +59,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Thoi han tu dong khoa mac dinh
     // QT3: dat gio qua khu de nguoi dung kiem thu ngay tinh nang tu dong khoa voi cot da du diem
-    const DEFAULT_DEADLINES = {
-        QT3: "2026-11-06T17:00",
-        QT2: "2026-11-06T17:00",
-        QT1: "2026-11-15T23:59",
-        GK: "2026-12-05T23:59",
-        CK: "2026-12-25T23:59"
-    };
+    const DEFAULT_DEADLINES = {};
     let currentDeadlines = Object.assign({}, DEFAULT_DEADLINES);
 
     // Kiem tra bo loc dropdown co bi nguoi dung thay doi ma chua bam Xem du lieu
@@ -89,12 +85,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Ham loc bo chu "demo" khoi ten lop hoc
     function cleanClassName(rawName) {
-        if (!rawName) return "11A1";
-        return String(rawName)
-            .replace(/lớp demo\s*/gi, "")
-            .replace(/demo[_\s-]*/gi, "")
-            .trim() || "11A1";
-    }
+    return String(rawName ?? "").trim();
+}
 
     // Dinh dang chuoi datetime ISO sang dd/MM HH:mm (ngan gon)
     function formatDeadlineDisplay(isoStr) {
@@ -193,12 +185,13 @@ document.addEventListener("DOMContentLoaded", function () {
             const timeStr = `${day}/${month} ${hours}:${mins}`;
             const fullTimeStr = `${day}/${month}/${year} ${hours}:${mins}`;
 
-            const subName = subjectSelect && subjectSelect.selectedOptions && subjectSelect.selectedOptions[0]
-                ? subjectSelect.selectedOptions[0].textContent
-                : "Toán";
-            const clsName = classSelect && classSelect.selectedOptions && classSelect.selectedOptions[0]
-                ? cleanClassName(classSelect.selectedOptions[0].textContent)
-                : "11A1";
+            const subName = subjectSelect.value
+    ? subjectSelect.selectedOptions[0].textContent
+    : "";
+
+const clsName = classSelect.value
+    ? cleanClassName(classSelect.selectedOptions[0].textContent)
+    : "";
 
             const newLog = {
                 id: `LOG-KT-${Date.now().toString().slice(-4)}`,
@@ -295,7 +288,25 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // 2. Khoi tao danh muc khi vao trang
-    initCatalogDropdowns();
+
+// Xoa cac lua chon cu trong HTML truoc khi tai API
+academicYearSelect.replaceChildren(
+    new Option("Đang tải niên khóa...", "")
+);
+
+gradeSelect.replaceChildren(
+    new Option("Đang tải khối...", "")
+);
+
+classSelect.replaceChildren(
+    new Option("Chưa có lớp học", "")
+);
+
+subjectSelect.replaceChildren(
+    new Option("Chưa có môn học", "")
+);
+
+initCatalogDropdowns();
 
     async function initCatalogDropdowns() {
         // Tai danh sach nien khoa
@@ -311,10 +322,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 });
                 academicYearSelect.selectedIndex = 0;
             } else {
-                academicYearSelect.innerHTML = '<option value="1">2026–2027</option>';
+                academicYearSelect.innerHTML = '<option value="">Chưa có niên khóa</option>';
             }
         } catch (e) {
-            academicYearSelect.innerHTML = '<option value="1">2026–2027</option>';
+            academicYearSelect.innerHTML = '<option value="">Chưa có niên khóa</option>';
         }
 
         // Tai danh sach khoi
@@ -325,16 +336,15 @@ document.addEventListener("DOMContentLoaded", function () {
                 gradesRes.data.forEach(grade => {
                     const opt = document.createElement("option");
                     opt.value = grade.gradeId || grade.grade_id || grade.id;
-                    opt.textContent = grade.gradeNumber || grade.code || "11";
+                    opt.textContent = grade.gradeNumber ?? grade.code ?? "Chưa xác định";
                     gradeSelect.appendChild(opt);
                 });
-                const idx11 = Array.from(gradeSelect.options).findIndex(o => o.textContent === "11");
-                gradeSelect.selectedIndex = idx11 >= 0 ? idx11 : 0;
+                gradeSelect.selectedIndex = 0;
             } else {
-                gradeSelect.innerHTML = '<option value="2">11</option>';
+                gradeSelect.innerHTML = '<option value="">Chưa có khối</option>';
             }
         } catch (e) {
-            gradeSelect.innerHTML = '<option value="2">11</option>';
+            gradeSelect.innerHTML = '<option value="">Chưa có khối</option>';
         }
 
         // Tai danh sach mon hoc
@@ -350,10 +360,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 });
                 subjectSelect.selectedIndex = 0;
             } else {
-                subjectSelect.innerHTML = '<option value="1">Toán</option><option value="2">Tin học</option>';
+                subjectSelect.innerHTML = '<option value="">Chưa có môn học</option>';
             }
         } catch (e) {
-            subjectSelect.innerHTML = '<option value="1">Toán</option><option value="2">Tin học</option>';
+            subjectSelect.innerHTML = '<option value="">Chưa có môn học</option>';
         }
 
         // Khoi phuc lua chon bo loc truoc do cua nguoi dung neu co
@@ -379,8 +389,26 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
 
-        // Luon luon tai trang thai khoa ban dau
-        await loadLockStatus();
+        
+        // Chi tai trang thai khoa khi co du danh muc that
+        if (
+            academicYearSelect.value &&
+            gradeSelect.value &&
+            classSelect.value &&
+            subjectSelect.value
+        ) {
+            await loadLockStatus();
+        } else {
+            loadedFilterContext = null;
+            currentLocksData = [];
+            currentReferenceStudents = [];
+
+            locksCardsContainer.replaceChildren();
+            referenceScoresTbody?.replaceChildren();
+
+            UIComponents.clear("alertContainer");
+        }
+
     }
 
     async function updateClassesDropdown() {
@@ -388,7 +416,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const gradeId = gradeSelect.value;
 
         if (!yearId || !gradeId) {
-            classSelect.innerHTML = '<option value="1">11A1</option>';
+            classSelect.innerHTML = '<option value="">Chưa có lớp học</option>';
             return;
         }
 
@@ -399,24 +427,44 @@ document.addEventListener("DOMContentLoaded", function () {
                 res.data.forEach(cls => {
                     const opt = document.createElement("option");
                     opt.value = cls.classId || cls.class_id || cls.id;
-                    opt.textContent = cleanClassName(cls.name || cls.code);
+                    opt.textContent = `${cls.name || cls.code} (${cls.code})`;
                     classSelect.appendChild(opt);
                 });
                 classSelect.selectedIndex = 0;
             } else {
-                classSelect.innerHTML = '<option value="1">11A1</option>';
+                classSelect.innerHTML = '<option value="">Chưa có lớp học</option>';
             }
         } catch (error) {
-            classSelect.innerHTML = '<option value="1">11A1</option>';
+            classSelect.innerHTML = '<option value="">Chưa có lớp học</option>';
         }
     }
 
+    
+    // Xoa du lieu khoa diem cu khi thay doi bo loc
+    function clearOldLockResults() {
+        loadedFilterContext = null;
+        currentLocksData = [];
+        currentReferenceStudents = [];
+
+        locksCardsContainer.replaceChildren();
+        referenceScoresTbody?.replaceChildren();
+
+        UIComponents.clear("alertContainer");
+    }
+
     academicYearSelect.addEventListener("change", async () => {
+        clearOldLockResults();
         await updateClassesDropdown();
     });
+
     gradeSelect.addEventListener("change", async () => {
+        clearOldLockResults();
         await updateClassesDropdown();
     });
+
+    classSelect.addEventListener("change", clearOldLockResults);
+    subjectSelect.addEventListener("change", clearOldLockResults);
+
 
     // 3. Su kien Xem du lieu (Xem trang thai khoa)
     loadLocksBtn.addEventListener("click", loadLockStatus);
@@ -774,7 +822,7 @@ document.addEventListener("DOMContentLoaded", function () {
     function renderLiveReferenceScores(scoreList) {
         if (!Array.isArray(scoreList) || scoreList.length === 0) {
             currentReferenceStudents = [];
-            referenceScoresTbody.replaceChildren();
+            referenceScoresTbody?.replaceChildren();
 
             const tr = document.createElement("tr");
             const td = document.createElement("td");
@@ -823,7 +871,7 @@ document.addEventListener("DOMContentLoaded", function () {
     function renderReferenceTableRows(students) {
         if (!referenceScoresTbody) return;
         currentReferenceStudents = Array.isArray(students) ? students : [];
-        referenceScoresTbody.replaceChildren();
+        referenceScoresTbody?.replaceChildren();
 
         students.forEach(student => {
             const tr = document.createElement("tr");

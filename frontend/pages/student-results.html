@@ -1,0 +1,132 @@
+﻿
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kết quả học tập của tôi - Hệ thống THPT</title>
+    <link rel="stylesheet" href="../css/student-results.css">
+</head>
+
+<body hidden>
+    <div class="student-shell">
+
+        <!-- MENU BEN TRAI -->
+        <aside class="student-sidebar">
+            <div class="student-brand">
+                <strong>HỆ THỐNG QUẢN LÝ</strong>
+                <small>KẾT QUẢ HỌC TẬP THPT</small>
+            </div>
+
+            <nav class="student-nav">
+                <a href="student-results.html" class="active">
+                    Kết quả của tôi
+                </a>
+                <a href="#" id="studentLogoutLink">
+                    Đăng xuất
+                </a>
+            </nav>
+        </aside>
+
+        <!-- NOI DUNG BEN PHAI -->
+        <div class="student-workspace">
+
+            <header class="student-topbar">
+                <strong>
+                    HỆ THỐNG QUẢN LÝ KẾT QUẢ HỌC TẬP
+                </strong>
+                <span id="studentTopName">Học sinh</span>
+            </header>
+
+            <main class="student-main">
+
+                <h1>Kết quả học tập của tôi</h1>
+
+                <p class="student-subtitle">
+                    Chỉ hiển thị kết quả được phép xem
+                    của tài khoản đang đăng nhập.
+                </p>
+
+                <section class="student-card">
+
+                    <!-- BO LOC -->
+                    <form id="studentScoreFilter" class="student-filter">
+
+                        <label>
+                            Niên khóa
+                            <select id="studentYear" required>
+                                <option value="">
+                                    Đang tải niên khóa...
+                                </option>
+                            </select>
+                        </label>
+
+                        <label>
+                            Học kỳ
+                            <select id="studentTerm">
+                                <option value="HK1">Học kỳ 1</option>
+                                <option value="HK2">Học kỳ 2</option>
+                                <option value="YEAR">Cả năm</option>
+                            </select>
+                        </label>
+
+                        <button type="submit" id="studentViewButton">
+                            Xem kết quả
+                        </button>
+                    </form>
+
+                    <!-- BANG DIEM -->
+                    <h2 id="studentScoresTitle">
+                        Bảng điểm của tôi
+                    </h2>
+
+                    <div class="student-table-scroll">
+                        <table class="student-table">
+                            <thead>
+                                <tr>
+                                    <th>Mã môn</th>
+                                    <th>Môn học</th>
+                                    <th>QT1</th>
+                                    <th>QT2</th>
+                                    <th>QT3</th>
+                                    <th>GK</th>
+                                    <th>CK</th>
+                                    <th>Tổng kết</th>
+                                    <th>Trạng thái</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="studentScoreRows">
+                                <tr>
+                                    <td colspan="9" class="student-empty">
+                                        Chọn niên khóa và học kỳ,
+                                        sau đó nhấn Xem kết quả.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <p id="studentScoreMessage"
+                       class="student-message"
+                       role="status">
+                    </p>
+
+                    <!-- QUYEN TRUY CAP -->
+                    <div class="student-access-note">
+                        <strong>Quyền truy cập</strong>
+                        <p>
+                            Chỉ được xem điểm của chính mình
+                            và các điểm đã đến thời gian công bố.
+                        </p>
+                    </div>
+
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/student-results.js"></script>
+</body>
+</html>

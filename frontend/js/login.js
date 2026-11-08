@@ -67,14 +67,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
 
-            if (roleCode === "HOC_SINH") {
-                passwordInput.value = "";
-                showMessage(
-                    "Đăng nhập thành công. Trang Học sinh chưa được tích hợp.",
-                    false
-                );
-                return;
-            }
+            
+if (roleCode === "HOC_SINH") {
+    window.location.replace("student-results.html");
+    return;
+}
+
 
             showMessage("Vai trò không hợp lệ.");
         } catch (error) {

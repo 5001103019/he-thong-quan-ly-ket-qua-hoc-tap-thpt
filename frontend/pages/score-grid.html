@@ -34,10 +34,11 @@
             </nav>
 
 
+
             <div class="sidebar-bottom">
-                <a href="#">Cài đặt</a>
-                <a href="#">Đăng xuất</a>
+                <a href="#" id="logoutLink">Đăng xuất</a>
             </div>
+
         </aside>
 
         <!-- KHU VỰC BÊN PHẢI -->
@@ -97,7 +98,7 @@
                             <label for="scoreSubject">Môn học</label>
                             <select id="scoreSubject" class="form-control">
                                 <option value=" ">Chưa tải danh sách môn học</option>
-                    
+
                             </select>
                         </div>
 
@@ -237,17 +238,20 @@
 
 
     <!-- Menu dung chung cho hai vai tro -->
+    <!-- API dung chung -->
+    <script src="../js/api.js"></script>
+
+    <!-- Menu dung chung -->
     <script src="../js/navigation.js"></script>
 
-    <!-- Giao dien bang diem -->
+    <!-- Chuc nang bang diem -->
     <script src="../js/score-grid.js"></script>
 
-    <!-- Hien thi menu Khao thi tren Dashboard -->
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-        renderNavigation("admin", "sidebarNavigation");
-        });
-    </script>
+    <!-- Chinh sua diem truc tiep -->
+    <script src="../js/score-grid-inline-edit.js"></script>
+
+    <!-- Kiem tra dang nhap va xu ly dang xuat -->
+    <script src="../js/dashboard-auth.js"></script>
+
 </body>
 </html>
-

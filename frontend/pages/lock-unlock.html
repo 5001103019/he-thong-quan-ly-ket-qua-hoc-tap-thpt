@@ -32,7 +32,6 @@
             </nav>
 
             <div class="sidebar-bottom">
-                <a href="#">Cài đặt</a>
                 <a href="#" id="logoutLink">Đăng xuất</a>
             </div>
         </aside>
@@ -150,6 +149,7 @@
                     </div>
                 </div>
 
+
                 <!-- BẢNG ĐIỂM THAM CHIẾU -->
                 <h2 class="section-heading">Bảng điểm tham chiếu</h2>
 
@@ -168,82 +168,87 @@
                                 <th style="width: 130px;">Trạng thái</th>
                             </tr>
                         </thead>
+
+                        <!-- Du lieu diem duoc nap tu JavaScript -->
+                        <tbody id="referenceScoresTbody">
+                            <tr>
+                                <td colspan="9" style="text-align: center; padding: 24px;">
+                                    Đang tải bảng điểm...
+                                </td>
+                            </tr>
+                        </tbody>
                     </table>
                 </div>
+
+
+                <!-- MODAL POPUP: MỞ KHÓA CỘT ĐIỂM -->
+                <div id="unlockModal" class="modal-backdrop" hidden>
+                    <div class="modal-dialog">
+                        <div class="modal-header-custom">
+                            <h3 class="modal-title-custom" id="unlockModalTitle">Mở khóa QT1 – nhập lý do</h3>
+                            <p class="modal-subtitle-custom" id="unlockModalSubtitle">Trạng thái hiện tại: QT1 đã khóa.</p>
+                        </div>
+
+                        <div class="modal-body-custom">
+                            <label for="unlockReasonInput" class="modal-label-custom">
+                                Lý do mở khóa *
+                            </label>
+                            <textarea id="unlockReasonInput"
+                                      class="modal-textarea-custom"
+                                      rows="4"
+                                      placeholder="Nhập lý do mở khóa tại đây..."
+                                      required></textarea>
+                            <div class="modal-note-custom">
+                                Thao tác sẽ được ghi vào Nhật ký thao tác.
+                            </div>
+                        </div>
+
+                        <div class="modal-footer-custom">
+                            <button type="button" id="cancelUnlockBtn" class="btn-modal-cancel">
+                                Hủy
+                            </button>
+                            <button type="button" id="confirmUnlockBtn" class="btn-modal-confirm">
+                                Xác nhận
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
-            </main>
-        </div>
-    </div>
+                <!-- MODAL POPUP: CẢNH BÁO / XÁC NHẬN KHÓA CỘT ĐIỂM -->
+                <div id="missingScoreModal" class="modal-backdrop" hidden>
+                    <div class="modal-dialog">
+                        <div class="modal-header-custom">
+                            <h3 class="modal-title-custom" id="missingModalTitle">Cảnh báo: cột QT2 còn thiếu điểm</h3>
+                        </div>
 
-    <!-- MODAL POPUP: MỞ KHÓA CỘT ĐIỂM -->
-    <div id="unlockModal" class="modal-backdrop" hidden>
-        <div class="modal-dialog">
-            <div class="modal-header-custom">
-                <h3 class="modal-title-custom" id="unlockModalTitle">Mở khóa QT1 – nhập lý do</h3>
-                <p class="modal-subtitle-custom" id="unlockModalSubtitle">Trạng thái hiện tại: QT1 đã khóa.</p>
-            </div>
+                        <div class="modal-body-custom">
+                            <div class="warning-box-red" id="missingWarningRedText">
+                                Có 1 học sinh chưa có điểm QT2: HS003 – Lê Minh Châu.
+                            </div>
 
-            <div class="modal-body-custom">
-                <label for="unlockReasonInput" class="modal-label-custom">
-                    Lý do mở khóa *
-                </label>
-                <textarea id="unlockReasonInput"
-                          class="modal-textarea-custom"
-                          rows="4"
-                          placeholder="Nhập lý do mở khóa tại đây..."
-                          required></textarea>
-                <div class="modal-note-custom">
-                    Thao tác sẽ được ghi vào Nhật ký thao tác.
-                </div>
-            </div>
+                            <div class="warning-box-desc" id="missingWarningDescText">
+                                Bạn vẫn có thể khóa cột, nhưng cần xác nhận cảnh báo.
+                            </div>
+                        </div>
 
-            <div class="modal-footer-custom">
-                <button type="button" id="cancelUnlockBtn" class="btn-modal-cancel">
-                    Hủy
-                </button>
-                <button type="button" id="confirmUnlockBtn" class="btn-modal-confirm">
-                    Xác nhận
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL POPUP: CẢNH BÁO / XÁC NHẬN KHÓA CỘT ĐIỂM -->
-    <div id="missingScoreModal" class="modal-backdrop" hidden>
-        <div class="modal-dialog">
-            <div class="modal-header-custom">
-                <h3 class="modal-title-custom" id="missingModalTitle">Cảnh báo: cột QT2 còn thiếu điểm</h3>
-            </div>
-
-            <div class="modal-body-custom">
-                <div class="warning-box-red" id="missingWarningRedText">
-                    Có 1 học sinh chưa có điểm QT2: HS003 – Lê Minh Châu.
+                        <div class="modal-footer-custom">
+                            <button type="button" id="closeMissingModalBtn" class="btn-modal-cancel">
+                                Hủy
+                            </button>
+                            <button type="button" id="confirmMissingActionBtn" class="btn-modal-confirm">
+                                Vẫn khóa
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="warning-box-desc" id="missingWarningDescText">
-                    Bạn vẫn có thể khóa cột, nhưng cần xác nhận cảnh báo.
-                </div>
-            </div>
+                <!-- JS dung chung cua he thong -->
+                <script src="../js/api.js"></script>
+                <script src="../js/components.js"></script>
+                <script src="../js/navigation.js"></script>
+                <script src="../js/dashboard-auth.js"></script>
 
-            <div class="modal-footer-custom">
-                <button type="button" id="closeMissingModalBtn" class="btn-modal-cancel">
-                    Hủy
-                </button>
-                <button type="button" id="confirmMissingActionBtn" class="btn-modal-confirm">
-                    Vẫn khóa
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- JS dung chung cua he thong -->
-    <script src="../js/api.js"></script>
-    <script src="../js/components.js"></script>
-    <script src="../js/navigation.js"></script>
-    <script src="../js/dashboard-auth.js"></script>
-
-    <!-- JS man hinh khoa va mo khoa -->
-    <script src="../js/lock-unlock.js"></script>
+                <!-- JS man hinh khoa va mo khoa -->
+                <script src="../js/lock-unlock.js"></script>
 </body>
 </html>

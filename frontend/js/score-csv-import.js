@@ -115,7 +115,7 @@ document.addEventListener("DOMContentLoaded", function () {
             classSelect,
             classes,
             item => item.code,
-            item => item.name + " (" + item.code + ")"
+            item => item.name
         );
     }
 

@@ -212,7 +212,7 @@ textarea {
 /* 8. BON O THONG TIN TONG QUAN */
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 18px;
     margin-bottom: 16px;
 }
@@ -829,3 +829,21 @@ input:focus-visible {
     opacity: 0.6;
     cursor: not-allowed;
 }
+
+/* Hinh minh hoa Trang chu */
+.dashboard-illustration {
+    width: 100%;
+    max-width: 100%;
+    margin-top: 24px;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid #d9e4f4;
+    box-sizing: border-box;
+}
+
+    .dashboard-illustration img {
+        display: block;
+        width: 100%;
+        height: auto;
+    }
+
