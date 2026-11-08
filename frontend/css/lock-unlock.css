@@ -9,12 +9,24 @@
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
-.filter-grid-row {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr) auto;
-    gap: 16px;
-    align-items: flex-end;
-}
+
+    .filter-grid-row {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr)) auto;
+        gap: 12px;
+        align-items: flex-end;
+    }
+
+    .filter-grid-row > div {
+        min-width: 0;
+    }
+
+    .filter-grid-row .form-control {
+        width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+    }
+
 
 @media (max-width: 900px) {
     .filter-grid-row {
