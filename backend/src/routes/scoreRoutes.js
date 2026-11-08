@@ -3,22 +3,18 @@
 
 const express = require("express");
 
-// Su dung middleware xac thuc cua Giang (VT1-04).
 const {
     requireAuth,
     requireRole
 } = require("../middlewares/auth-middleware");
 
-// Su dung ham truy van diem cua Chau.
 const {
     getScores
 } = require("../repositories/scoreRepository");
 
 const router = express.Router();
 
-// GET /api/v1/scores
-// Lay bang diem theo nien khoa, lop va mon hoc.
-// Chi Phong Khao thi duoc xem bang diem cua ca lop.
+// API lay bang diem theo hoc ky
 router.get(
     "/",
     requireAuth,
@@ -31,46 +27,67 @@ router.get(
                 subjectId
             } = req.query;
 
-            // Kiem tra cac ma duoc cung cap.
+            const term = req.query.term ?? "HK1";
+
+            // Chi HK1 va HK2 co 5 cot diem rieng
+            if (!["HK1", "HK2", "YEAR"].includes(term)) {
+                return res.status(400).json({
+                    success: false,
+                    error: {
+                        code: "INVALID_TERM",
+                        message: "Hoc ky khong hop le."
+                    }
+                });
+            }
+
+            // Ca nam se tinh sau tu HK1 va HK2
+            if (term === "YEAR") {
+                return res.status(422).json({
+                    success: false,
+                    error: {
+                        code: "YEAR_NOT_READY",
+                        message:
+                            "Hien chua co du lieu tong ket ca nam."
+                    }
+                });
+            }
+
+            // Kiem tra ID
             const ids = [
                 academicYearId,
                 classId,
                 subjectId
             ];
 
-            const valid = ids.every(id => {
-                if (typeof id !== "string") {
-                    return false;
-                }
-
-                if (!/^[1-9][0-9]*$/.test(id)) {
-                    return false;
-                }
-
-                return Number.isSafeInteger(Number(id));
-            });
+            const valid = ids.every(id =>
+                typeof id === "string" &&
+                /^[1-9][0-9]*$/.test(id) &&
+                Number.isSafeInteger(Number(id))
+            );
 
             if (!valid) {
                 return res.status(400).json({
                     success: false,
                     error: {
                         code: "VALIDATION_ERROR",
-                        message: "Ma nien khoa, lop hoac mon khong hop le"
+                        message: "Bo loc khong hop le."
                     }
                 });
             }
 
-            // Lay du lieu diem tu SQL Server.
+            // Doc du lieu dung theo HK1 hoac HK2
             const data = await getScores({
                 academicYearId: Number(academicYearId),
                 classId: Number(classId),
-                subjectId: Number(subjectId)
+                subjectId: Number(subjectId),
+                term
             });
 
-            // Tra ket qua cho frontend.
+            res.set("Cache-Control", "no-store");
+
             return res.status(200).json({
                 success: true,
-                data: data
+                data
             });
 
         } catch (error) {

@@ -133,7 +133,8 @@ document.addEventListener("DOMContentLoaded", function () {
         return new URLSearchParams({
             academicYearId: year.value,
             classId: classroom.value,
-            subjectId: subject.value
+            subjectId: subject.value,
+            term: document.getElementById("scoreTerm")?.value || "HK1"
         }).toString();
     }
 
@@ -146,6 +147,13 @@ document.addEventListener("DOMContentLoaded", function () {
             editing ||
             event.target.closest("button,input,select")
         ) {
+            return;
+        }
+
+        const selectedTerm =
+            document.getElementById("scoreTerm")?.value;
+
+        if (selectedTerm !== "HK1") {
             return;
         }
 
@@ -166,6 +174,15 @@ document.addEventListener("DOMContentLoaded", function () {
             ?.textContent.trim().toUpperCase();
 
         if (!TYPES.includes(type)) return;
+
+        if (get("scoreTerm")?.value !== "HK1") {
+            show(
+                "Hien tai chi ho tro sua diem HK1. " +
+                "Chuc nang sua HK2 dang duoc ket noi.",
+                true
+            );
+            return;
+        }
 
         const studentCode =
             tr.cells[0]?.textContent.trim();

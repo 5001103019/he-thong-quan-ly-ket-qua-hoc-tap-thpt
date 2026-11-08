@@ -12,6 +12,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     const academicYear = document.getElementById("scoreAcademicYear");
+    const term = document.getElementById("scoreTerm");
     const grade = document.getElementById("scoreGrade");
     const classroom = document.getElementById("scoreClass");
     const subject = document.getElementById("scoreSubject");
@@ -259,6 +260,17 @@ document.addEventListener("DOMContentLoaded", function () {
         hideResults();
         clearMessage();
 
+        const selectedTerm =
+            document.getElementById("scoreTerm")?.value;
+
+        if (selectedTerm !== "HK1") {
+            showMessage(
+                "Chưa có dữ liệu điểm để hiển thị.",
+                true
+            );
+            return;
+        }
+
         if (
             !academicYear.value ||
             !grade.value ||
@@ -278,7 +290,8 @@ document.addEventListener("DOMContentLoaded", function () {
             const query = new URLSearchParams({
                 academicYearId: academicYear.value,
                 classId: classroom.value,
-                subjectId: subject.value
+                subjectId: subject.value,
+                term: term?.value || "HK1"
             });
 
             const students = await getData(
@@ -410,18 +423,34 @@ document.addEventListener("DOMContentLoaded", function () {
 
             summary.hidden = false;
             results.hidden = false;
-            lockStatus.hidden = false;
+
+            lockStatus.hidden = term.value !== "HK1";
+
+            if (term.value === "HK2") {
+                document.getElementById(
+                    "lockedComponents"
+                ).textContent = "Chưa kết nối khóa HK2";
+            }
 
             showMessage(
                 "Đã tải " + students.length +
                 " học sinh từ SQL Server."
             );
 
-            await showSummaries(
-                students,
-                totalCells,
-                request
-            );
+            if (term.value === "HK2") {
+                students.forEach((student, index) => {
+                    totalCells[index].textContent =
+                        student.finalScore == null
+                            ? "—"
+                            : Number(student.finalScore).toFixed(2);
+                });
+            } else {
+                await showSummaries(
+                    students,
+                    totalCells,
+                    request
+                );
+            }
 
         } catch (error) {
             if (request === scoreRequest) {
@@ -446,6 +475,15 @@ document.addEventListener("DOMContentLoaded", function () {
                 ?.textContent;
 
         hideResults();
+
+        if (term.value === "YEAR") {
+            showMessage(
+                "Bang diem ca nam chua duoc ket noi.",
+                true
+            );
+            return;
+        }
+
         loadButton.disabled = true;
 
         try {
@@ -507,7 +545,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-    [classroom, subject].forEach(select => {
+    [classroom, subject, term].forEach(select => {
         select.addEventListener("change", () => {
             scoreRequest++;
             hideResults();
@@ -516,6 +554,13 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     // Nhan nut Xem bang diem.
+    if (term) {
+        term.addEventListener("change", () => {
+            scoreRequest++;
+            hideResults();
+            clearMessage();
+        });
+    }
     loadButton.addEventListener("click", loadScores);
 
     // Giu nut Luu vo hieu hoa.
