@@ -556,3 +556,51 @@
             width: 100%;
         }
 }
+
+/* Hai tab Import / Export */
+.csv-mode-tabs {
+    display: flex;
+    gap: 12px;
+    margin: -12px 0 24px;
+    flex-wrap: wrap;
+}
+
+    .csv-mode-tabs button {
+        padding: 12px 24px;
+        border: 1px solid #dce5f0;
+        border-radius: 8px;
+        background: #fff;
+        color: #174375;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+        .csv-mode-tabs button.active {
+            background: #1463e8;
+            color: #fff;
+            border-color: #1463e8;
+        }
+
+/* Khi chon Export, an phan Import */
+.csv-page.csv-show-export > .csv-import-card:not(#csvExportPanel),
+.csv-page.csv-show-export > .csv-actions,
+.csv-page.csv-show-export > #csvPreviewStep,
+.csv-page.csv-show-export > #csvErrorStep {
+    display: none !important;
+}
+
+/* Dung lai giao dien Import cho Export */
+.csv-export-card .csv-filter-grid {
+    margin-bottom: 24px;
+}
+
+.csv-export-card .csv-actions {
+    margin-top: 32px;
+}
+
+@media (max-width: 640px) {
+    .csv-mode-tabs button {
+        flex: 1;
+    }
+}

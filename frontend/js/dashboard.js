@@ -22,21 +22,6 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
     }
 
-    // Du lieu demo: 2 nien khoa, moi nien khoa co 3 khoi
-    // Moi khoi co 1 lop hoc mau
-    const demoClasses = {
-        "2025-2026": {
-            "10": ["10A1"],
-            "11": ["11A1"],
-            "12": ["12A1"]
-        },
-        "2026-2027": {
-            "10": ["10A1"],
-            "11": ["11A1"],
-            "12": ["12A1"]
-        }
-    };
-
     // Cap nhat thong tin lua chon hien tai
     function updateSelectionSummary() {
         selectedYear.textContent =
@@ -46,48 +31,71 @@ document.addEventListener("DOMContentLoaded", function () {
             "Khối " + grade.value;
 
         selectedClass.textContent =
-            classroom.value || "Chưa có lớp";
+            classroom.value || "Chưa có lớp học";
     }
 
     // Cap nhat danh sach lop khi thay doi nien khoa hoac khoi
-    function updateClassOptions() {
-
+    async function updateClassOptions() {
         const yearValue = academicYear.value;
         const gradeValue = grade.value;
 
-        let classList = [];
+        classroom.replaceChildren(
+            new Option("Đang tải lớp học...", "")
+        );
+        classroom.disabled = true;
+        updateSelectionSummary();
 
-        // Lay danh sach lop tu du lieu demo
-        if (
-            demoClasses[yearValue] &&
-            demoClasses[yearValue][gradeValue]
-        ) {
-            classList = demoClasses[yearValue][gradeValue];
-        }
+        try {
+            // Lay danh sach lop that tu SQL Server
+            const res = await apiClient.get("/classes");
 
-        // Xoa danh sach lop cu
-        classroom.innerHTML = "";
+            if (!res || res.success !== true ||
+                !Array.isArray(res.data)) {
+                throw new Error("API lớp học không hợp lệ");
+            }
 
-        // Neu khong co lop thi hien thong bao
-        if (classList.length === 0) {
-            const option = document.createElement("option");
-            option.value = "";
-            option.textContent = "Chưa có lớp";
+            // Khong hien thi ket qua cua bo loc da thay doi
+            if (academicYear.value !== yearValue ||
+                grade.value !== gradeValue) {
+                return;
+            }
 
-            classroom.appendChild(option);
+            const classList = res.data.filter(cls =>
+                String(cls.academicYearCode) === yearValue &&
+                String(cls.gradeNumber) === gradeValue
+            );
+
+            classroom.replaceChildren();
+
+            if (classList.length === 0) {
+                classroom.add(
+                    new Option("Chưa có lớp học", "")
+                );
+                classroom.disabled = true;
+            } else {
+                classList.forEach(cls => {
+                    classroom.add(
+                        new Option(
+                            cls.name || cls.code,
+                            cls.code
+                        )
+                    );
+                });
+
+                classroom.disabled = false;
+            }
+
+        } catch (error) {
+            if (academicYear.value !== yearValue ||
+                grade.value !== gradeValue) {
+                return;
+            }
+
+            classroom.replaceChildren(
+                new Option("Không tải được lớp học", "")
+            );
             classroom.disabled = true;
-        } else {
-            classroom.disabled = false;
-
-            // Tao tung lua chon lop hoc
-            classList.forEach(function (className) {
-                const option = document.createElement("option");
-
-                option.value = className;
-                option.textContent = className;
-
-                classroom.appendChild(option);
-            });
+            console.error("Lỗi tải lớp học:", error);
         }
 
         updateSelectionSummary();

@@ -25,11 +25,13 @@
                 </div>
             </div>
 
-            <nav
-                id="sidebarNavigation"
-                class="sidebar-menu"
-                aria-label="Menu quản trị">
+            <nav id="sidebarNavigation"
+                 class="sidebar-menu"
+                 aria-label="Menu quản trị">
             </nav>
+            <div class="sidebar-bottom">
+                <a href="#" id="logoutLink">Đăng xuất</a>
+            </div>
         </aside>
 
         <!-- NOI DUNG BEN PHAI -->
@@ -56,10 +58,9 @@
                 </p>
 
                 <!-- BO LOC MON HOC THEO FIGMA -->
-                <form
-                    id="subjectFilterForm"
-                    class="card subject-filter-form"
-                    role="search">
+                <form id="subjectFilterForm"
+                      class="card subject-filter-form"
+                      role="search">
 
                     <div class="subject-filter-fields">
 
@@ -69,12 +70,11 @@
                                 Tìm môn học
                             </label>
 
-                            <input
-                                type="search"
-                                id="subjectSearchFilter"
-                                class="form-control"
-                                placeholder="Mã môn hoặc tên môn"
-                                maxlength="100">
+                            <input type="search"
+                                   id="subjectSearchFilter"
+                                   class="form-control"
+                                   placeholder="Mã môn hoặc tên môn"
+                                   maxlength="100">
                         </div>
 
                         <!-- LOC THEO TRANG THAI -->
@@ -83,9 +83,8 @@
                                 Trạng thái
                             </label>
 
-                            <select
-                                id="subjectStatusFilter"
-                                class="form-control">
+                            <select id="subjectStatusFilter"
+                                    class="form-control">
 
                                 <option value="">
                                     Tất cả
@@ -103,10 +102,9 @@
                         </div>
 
                         <!-- NUT TIM KIEM -->
-                        <button
-                            type="submit"
-                            id="searchSubjectButton"
-                            class="btn btn-primary">
+                        <button type="submit"
+                                id="searchSubjectButton"
+                                class="btn btn-primary">
                             Tìm kiếm
                         </button>
 
@@ -115,9 +113,8 @@
                 </form>
 
                 <!-- DANH SACH MON HOC -->
-                <section
-                    class="card"
-                    aria-labelledby="subjectTitle">
+                <section class="card"
+                         aria-labelledby="subjectTitle">
 
                     <!-- TIEU DE VA NUT THEM MON HOC -->
                     <div class="subject-section-header">
@@ -126,25 +123,22 @@
                             Danh mục môn học
                         </h2>
 
-                        <button
-                            type="button"
-                            id="addSubjectButton"
-                            class="btn btn-primary">
+                        <button type="button"
+                                id="addSubjectButton"
+                                class="btn btn-primary">
                             + Thêm môn
                         </button>
 
                     </div>
 
                     <!-- THONG BAO THAO TAC -->
-                    <div
-                        id="subjectSaveMessage"
-                        role="status">
+                    <div id="subjectSaveMessage"
+                         role="status">
                     </div>
 
                     <!-- THONG BAO TAI DU LIEU -->
-                    <div
-                        id="subjectListStatus"
-                        role="status">
+                    <div id="subjectListStatus"
+                         role="status">
                     </div>
 
                     <!-- BANG DANH SACH MON HOC -->
@@ -153,114 +147,109 @@
                 </section>
 
                 <!-- FORM THEM / SUA MAC DINH AN -->
-                    <div id="subjectFormPanel" hidden>
+                <div id="subjectFormPanel" hidden>
 
-                        <h3 id="subjectFormTitle">
-                            Thêm môn học
-                        </h3>
+                    <h3 id="subjectFormTitle">
+                        Thêm môn học
+                    </h3>
 
-                        <p class="subject-form-description">
+                    <p class="subject-form-description">
                         Thông tin bắt buộc được đánh dấu *.
-                        </p>
+                    </p>
 
-                        <form id="subjectForm">
+                    <form id="subjectForm">
 
-                            <!-- MA MON VA TEN MON NAM CUNG HANG -->
-                            <div class="subject-form-row">
+                        <!-- MA MON VA TEN MON NAM CUNG HANG -->
+                        <div class="subject-form-row">
 
-                                <!-- MA MON HOC -->
-                                <div class="form-group">
-                                    <label for="subjectCode">
-                                        Mã môn *
-                                    </label>
-
-                                    <input
-                                        type="text"
-                                        id="subjectCode"
-                                        class="form-control"
-                                        placeholder="Nhập mã môn"
-                                        required>
-                                </div>
-
-                                <!-- TEN MON HOC -->
-                                <div class="form-group">
-                                    <label for="subjectName">
-                                        Tên môn học *
-                                    </label>
-
-                                    <input
-                                        type="text"
-                                        id="subjectName"
-                                        class="form-control"
-                                        placeholder="Nhập tên môn học"
-                                        required>
-                                </div>
-
-                            </div>
-
-                            <!-- TRANG THAI -->
+                            <!-- MA MON HOC -->
                             <div class="form-group">
-                                <label for="subjectStatus">
-                                    Trạng thái
+                                <label for="subjectCode">
+                                    Mã môn *
                                 </label>
 
-                                <select
-                                    id="subjectStatus"
+                                <input type="text"
+                                       id="subjectCode"
+                                       class="form-control"
+                                       placeholder="Nhập mã môn"
+                                       required>
+                            </div>
+
+                            <!-- TEN MON HOC -->
+                            <div class="form-group">
+                                <label for="subjectName">
+                                    Tên môn học *
+                                </label>
+
+                                <input type="text"
+                                       id="subjectName"
+                                       class="form-control"
+                                       placeholder="Nhập tên môn học"
+                                       required>
+                            </div>
+
+                        </div>
+
+                        <!-- TRANG THAI -->
+                        <div class="form-group">
+                            <label for="subjectStatus">
+                                Trạng thái
+                            </label>
+
+                            <select id="subjectStatus"
                                     class="form-control"
                                     required>
 
-                                    <option value="ACTIVE">
-                                        Đang sử dụng
-                                    </option>
+                                <option value="ACTIVE">
+                                    Đang sử dụng
+                                </option>
 
-                                    <option value="INACTIVE">
-                                        Ngừng hoạt động
-                                    </option>
-                                </select>
-                            </div>
+                                <option value="INACTIVE">
+                                    Ngừng hoạt động
+                                </option>
+                            </select>
+                        </div>
 
-                            <!-- THONG TIN KIEM TRA DU LIEU -->
-                            <div class="subject-validation-note">
+                        <!-- THONG TIN KIEM TRA DU LIEU -->
+                        <div class="subject-validation-note">
 
-                                <strong>Kiểm tra dữ liệu</strong>
+                            <strong>Kiểm tra dữ liệu</strong>
 
-                                <p>
-                                    Mã môn không được trùng với môn đã tồn tại
-                                    trong hệ thống.
-                                </p>
+                            <p>
+                                Mã môn không được trùng với môn đã tồn tại
+                                trong hệ thống.
+                            </p>
 
-                            </div>
+                        </div>
 
-                            <!-- THONG BAO CUA FORM -->
-                            <div
-                                id="subjectFormMessage"
-                                role="status">
-                            </div>
+                        <!-- THONG BAO CUA FORM -->
+                        <div id="subjectFormMessage"
+                             role="status">
+                        </div>
 
-                            <!-- CAC NUT THAO TAC CUOI FORM -->
-                            <div class="subject-form-actions">
+                        <!-- CAC NUT THAO TAC CUOI FORM -->
+                        <div class="subject-form-actions">
 
-                                <button
-                                    type="button"
+                            <button type="button"
                                     id="cancelSubjectButton"
                                     class="btn btn-secondary">
-                                    Hủy
-                                </button>
+                                Hủy
+                            </button>
 
-                                <button
-                                    type="submit"
+                            <button type="submit"
                                     id="saveSubjectButton"
                                     class="btn btn-primary">
-                                    Lưu môn học
-                                </button>
+                                Lưu môn học
+                            </button>
 
-                            </div>
+                        </div>
 
-                        </form>
-                    </div>
-                </main>
+                    </form>
+                </div>
+            </main>
         </div>
     </div>
+    </script>
 
     <!-- JAVASCRIPT DUNG CHUNG -->
     <script src="../js/api.js"></script>
@@ -269,6 +258,9 @@
 
     <!-- JAVASCRIPT QUAN LY MON HOC -->
     <script src="../js/subject-management.js"></script>
+
+    <!-- XU LY DANG XUAT -->
+    <script src="../js/dashboard-auth.js"></script>
 
 </body>
 </html>

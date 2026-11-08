@@ -112,8 +112,9 @@ document.addEventListener("DOMContentLoaded", function () {
             // Tai nien khoa
             const yearsRes = await apiClient.get("/academic-years");
             if (yearsRes && yearsRes.success && Array.isArray(yearsRes.data)) {
-                academicYearSelect.innerHTML = '<option value="">2026–2027</option>';
-                yearsRes.data.forEach(year => {
+                academicYearSelect.replaceChildren();
+
+                yearsRes.data.forEach(year => {              
                     const opt = document.createElement("option");
                     opt.value = year.academicYearId || year.academic_year_id || year.id;
                     opt.textContent = year.code || year.name;
@@ -124,7 +125,7 @@ document.addEventListener("DOMContentLoaded", function () {
             // Tai lop hoc (khong chua chu demo)
             const classRes = await apiClient.get("/classes");
             if (classRes && classRes.success && Array.isArray(classRes.data)) {
-                classSelect.innerHTML = '<option value="">11A1</option>';
+                classSelect.innerHTML = '<option value="">Chưa có lớp học</option>';
                 classRes.data.forEach(cls => {
                     const opt = document.createElement("option");
                     opt.value = cls.classId || cls.class_id || cls.id;
@@ -136,7 +137,7 @@ document.addEventListener("DOMContentLoaded", function () {
             // Tai mon hoc
             const subjectsRes = await apiClient.get("/subjects");
             if (subjectsRes && subjectsRes.success && Array.isArray(subjectsRes.data)) {
-                subjectSelect.innerHTML = '<option value="">Toán</option>';
+                subjectSelect.innerHTML = '<option value="">Chưa có môn học</option>';
                 subjectsRes.data.forEach(sub => {
                     const opt = document.createElement("option");
                     opt.value = sub.subjectId || sub.subject_id || sub.id;

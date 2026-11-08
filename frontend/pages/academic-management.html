@@ -19,16 +19,16 @@
                 </div>
             </div>
 
-            <nav
-                id="sidebarNavigation"
-                class="sidebar-menu"
-                aria-label="Menu quản trị">
+            <nav id="sidebarNavigation"
+                 class="sidebar-menu"
+                 aria-label="Menu quản trị">
             </nav>
 
+
             <div class="sidebar-bottom">
-                <span class="academic-sidebar-meta">Cài đặt</span>
-                <span class="academic-sidebar-meta">Đăng xuất</span>
+                <a href="#" id="logoutLink">Đăng xuất</a>
             </div>
+
         </aside>
 
         <div class="main-content">
@@ -54,10 +54,9 @@
                 </p>
 
                 <!-- BO LOC DANH SACH LOP -->
-                <form
-                    id="academicClassFilterForm"
-                    class="card academic-filter-card"
-                    role="search">
+                <form id="academicClassFilterForm"
+                      class="card academic-filter-card"
+                      role="search">
 
                     <div class="academic-filter-grid">
 
@@ -65,27 +64,24 @@
                             <label for="academicYearFilter">
                                 Niên khóa
                             </label>
-                            <select
-                                id="academicYearFilter"
-                                class="form-control">
+                            <select id="academicYearFilter"
+                                    class="form-control">
                                 <option value="">Tất cả</option>
                             </select>
                         </div>
 
                         <div class="form-group">
                             <label for="gradeFilter">Khối</label>
-                            <select
-                                id="gradeFilter"
-                                class="form-control">
+                            <select id="gradeFilter"
+                                    class="form-control">
                                 <option value="">Tất cả</option>
                             </select>
                         </div>
 
                         <div class="form-group">
                             <label for="classFilter">Lớp</label>
-                            <select
-                                id="classFilter"
-                                class="form-control">
+                            <select id="classFilter"
+                                    class="form-control">
                                 <option value="">Tất cả</option>
                             </select>
                         </div>
@@ -94,9 +90,8 @@
                             <label for="classStatusFilter">
                                 Trạng thái
                             </label>
-                            <select
-                                id="classStatusFilter"
-                                class="form-control">
+                            <select id="classStatusFilter"
+                                    class="form-control">
                                 <option value="">Tất cả</option>
                                 <option value="ACTIVE">
                                     Đang sử dụng
@@ -107,10 +102,9 @@
                             </select>
                         </div>
 
-                        <button
-                            type="submit"
-                            id="viewAcademicDataButton"
-                            class="btn btn-primary">
+                        <button type="submit"
+                                id="viewAcademicDataButton"
+                                class="btn btn-primary">
                             Xem dữ liệu
                         </button>
 
@@ -118,16 +112,14 @@
                 </form>
 
                 <!-- DANH SACH LOP -->
-                <section
-                    class="academic-class-list"
-                    aria-labelledby="classTitle">
+                <section class="academic-class-list"
+                         aria-labelledby="classTitle">
 
                     <div class="academic-add-row">
-                        <button
-                            type="button"
-                            id="addClassButton"
-                            class="btn btn-primary"
-                            disabled>
+                        <button type="button"
+                                id="addClassButton"
+                                class="btn btn-primary"
+                                disabled>
                             + Thêm lớp học
                         </button>
                     </div>
@@ -151,11 +143,10 @@
                 </section>
 
                 <!-- BIEU MAU THEM / SUA LOP -->
-                <section
-                    id="classFormPanel"
-                    class="card academic-form-panel"
-                    hidden
-                    aria-labelledby="classFormTitle">
+                <section id="classFormPanel"
+                         class="card academic-form-panel"
+                         hidden
+                         aria-labelledby="classFormTitle">
 
                     <h2 id="classFormTitle">Thêm lớp học</h2>
 
@@ -167,10 +158,9 @@
                                 <label for="classYearSelect">
                                     Niên khóa *
                                 </label>
-                                <select
-                                    id="classYearSelect"
-                                    class="form-control"
-                                    required>
+                                <select id="classYearSelect"
+                                        class="form-control"
+                                        required>
                                     <option value="">
                                         Chọn niên khóa
                                     </option>
@@ -181,10 +171,9 @@
                                 <label for="classGradeSelect">
                                     Khối *
                                 </label>
-                                <select
-                                    id="classGradeSelect"
-                                    class="form-control"
-                                    required>
+                                <select id="classGradeSelect"
+                                        class="form-control"
+                                        required>
                                     <option value="">Chọn khối</option>
                                 </select>
                             </div>
@@ -193,37 +182,34 @@
                                 <label for="classCodeInput">
                                     Mã lớp *
                                 </label>
-                                <input
-                                    type="text"
-                                    id="classCodeInput"
-                                    class="form-control"
-                                    maxlength="20"
-                                    pattern="[A-Za-z0-9_-]+"
-                                    placeholder="Ví dụ: 10A1"
-                                    required>
+                                <input type="text"
+                                       id="classCodeInput"
+                                       class="form-control"
+                                       maxlength="20"
+                                       pattern="[A-Za-z0-9_-]+"
+                                       placeholder="Ví dụ: 10A1"
+                                       required>
                             </div>
 
                             <div class="form-group">
                                 <label for="classNameInput">
                                     Tên lớp *
                                 </label>
-                                <input
-                                    type="text"
-                                    id="classNameInput"
-                                    class="form-control"
-                                    maxlength="100"
-                                    placeholder="Ví dụ: Lớp 10A1"
-                                    required>
+                                <input type="text"
+                                       id="classNameInput"
+                                       class="form-control"
+                                       maxlength="100"
+                                       placeholder="Ví dụ: Lớp 10A1"
+                                       required>
                             </div>
 
                             <div class="form-group">
                                 <label for="classStatusSelect">
                                     Trạng thái
                                 </label>
-                                <select
-                                    id="classStatusSelect"
-                                    class="form-control"
-                                    required>
+                                <select id="classStatusSelect"
+                                        class="form-control"
+                                        required>
                                     <option value="ACTIVE">
                                         Đang sử dụng
                                     </option>
@@ -238,16 +224,14 @@
                         <div id="classFormMessage" role="status"></div>
 
                         <div class="academic-form-actions">
-                            <button
-                                type="button"
-                                id="cancelClassButton"
-                                class="btn btn-secondary">
+                            <button type="button"
+                                    id="cancelClassButton"
+                                    class="btn btn-secondary">
                                 Hủy
                             </button>
-                            <button
-                                type="submit"
-                                id="saveClassButton"
-                                class="btn btn-primary">
+                            <button type="submit"
+                                    id="saveClassButton"
+                                    class="btn btn-primary">
                                 Lưu lớp học
                             </button>
                         </div>
@@ -270,18 +254,16 @@
                                 <h2 id="yearTitle">
                                     Danh sách niên khóa
                                 </h2>
-                                <button
-                                    type="button"
-                                    id="addAcademicYearButton"
-                                    class="btn btn-primary">
+                                <button type="button"
+                                        id="addAcademicYearButton"
+                                        class="btn btn-primary">
                                     + Thêm niên khóa
                                 </button>
                             </div>
 
-                            <div
-                                id="academicYearFormPanel"
-                                class="academic-inline-form"
-                                hidden>
+                            <div id="academicYearFormPanel"
+                                 class="academic-inline-form"
+                                 hidden>
 
                                 <h3 id="academicYearFormTitle">
                                     Thêm niên khóa
@@ -293,45 +275,41 @@
                                         <label for="yearStart">
                                             Năm bắt đầu *
                                         </label>
-                                        <input
-                                            type="number"
-                                            id="yearStart"
-                                            class="form-control"
-                                            min="1000"
-                                            max="9998"
-                                            required>
+                                        <input type="number"
+                                               id="yearStart"
+                                               class="form-control"
+                                               min="1000"
+                                               max="9998"
+                                               required>
                                     </div>
 
                                     <div class="form-group">
                                         <label for="yearEnd">
                                             Năm kết thúc
                                         </label>
-                                        <input
-                                            type="number"
-                                            id="yearEnd"
-                                            class="form-control"
-                                            readonly>
+                                        <input type="number"
+                                               id="yearEnd"
+                                               class="form-control"
+                                               readonly>
                                     </div>
 
                                     <div class="form-group">
                                         <label for="yearCode">
                                             Mã niên khóa
                                         </label>
-                                        <input
-                                            type="text"
-                                            id="yearCode"
-                                            class="form-control"
-                                            readonly>
+                                        <input type="text"
+                                               id="yearCode"
+                                               class="form-control"
+                                               readonly>
                                     </div>
 
                                     <div class="form-group">
                                         <label for="yearStatus">
                                             Trạng thái *
                                         </label>
-                                        <select
-                                            id="yearStatus"
-                                            class="form-control"
-                                            required>
+                                        <select id="yearStatus"
+                                                class="form-control"
+                                                required>
                                             <option value="PLANNED">
                                                 Dự kiến
                                             </option>
@@ -344,22 +322,19 @@
                                         </select>
                                     </div>
 
-                                    <div
-                                        id="academicYearFormMessage"
-                                        role="status">
+                                    <div id="academicYearFormMessage"
+                                         role="status">
                                     </div>
 
                                     <div class="academic-form-actions">
-                                        <button
-                                            type="button"
-                                            id="cancelAcademicYearButton"
-                                            class="btn btn-secondary">
+                                        <button type="button"
+                                                id="cancelAcademicYearButton"
+                                                class="btn btn-secondary">
                                             Hủy
                                         </button>
-                                        <button
-                                            type="submit"
-                                            id="saveAcademicYearButton"
-                                            class="btn btn-primary">
+                                        <button type="submit"
+                                                id="saveAcademicYearButton"
+                                                class="btn btn-primary">
                                             Lưu niên khóa
                                         </button>
                                     </div>
@@ -389,9 +364,15 @@
         </div>
     </div>
 
+
     <script src="../js/api.js"></script>
     <script src="../js/components.js"></script>
     <script src="../js/navigation.js"></script>
     <script src="../js/academic-management.js"></script>
+
+    <!-- Kiem tra phien va xu ly dang xuat -->
+    <script src="../js/dashboard-auth.js"></script>
+
 </body>
 </html>
+

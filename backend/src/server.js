@@ -31,6 +31,9 @@ const studentSelfEnrollmentRoutes = require(
     "./routes/student-self-enrollment.routes"
 );
 
+ // API xem ket qua hoc tap cua hoc sinh
+
+
 // Chau: Router quan ly diem
 const scoreRoutes = require("./routes/scoreRoutes");
 
@@ -103,6 +106,11 @@ app.use("/api/v1/students", studentRoutes);
 app.use(
     "/api/v1/hoc-sinh/enrollments",
     studentSelfEnrollmentRoutes
+);
+// API xem ket qua hoc tap cua hoc sinh
+app.use(
+    "/api/v1/hoc-sinh/results",
+    require("./routes/student-results.routes")
 );
 
 // 9. Dang ky API truy van va khoa cot diem

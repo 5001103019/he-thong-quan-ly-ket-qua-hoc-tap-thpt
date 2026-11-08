@@ -34,7 +34,6 @@
 
 
             <div class="sidebar-bottom">
-                <a href="#">Cài đặt</a>
                 <a href="#" id="logoutLink">Đăng xuất</a>
             </div>
         </aside>
@@ -97,18 +96,10 @@
                         </label>
 
                         <select id="classroom" class="form-control">
-                            <option value="10A1">10A1</option>
+                            <option value="">Chưa có lớp học</option>
                         </select>
                     </article>
 
-                    <!-- Học sinh -->
-                    <article class="stat-card">
-                        <div class="stat-label">Học sinh</div>
-
-                        <div class="stat-value">
-                            Theo dữ liệu thực tế
-                        </div>
-                    </article>
                 </section>
 
                 <!-- THÔNG TIN LỰA CHỌN -->
@@ -118,70 +109,16 @@
                     –
                     <strong id="selectedGrade">Khối 10</strong>
                     –
-                    <strong id="selectedClass">10A1</strong>
+                    <strong id="selectedClass">Chưa có lớp học</strong>
+
+                    <!-- Hình minh họa Trang chủ -->
+                    <section class="dashboard-illustration">
+                        <img src="../images/dashboard-education-banner.png"
+                             alt="Hệ thống quản lý kết quả học tập THPT">
+                    </section>
+
                 </div>
 
-                <!-- KHU VỰC TRUY CẬP NHANH VÀ LƯU Ý -->
-                <section class="dashboard-grid">
-
-                    <!-- TRUY CẬP NHANH -->
-                    <div class="card quick-access">
-                        <h2>Truy cập nhanh</h2>
-
-                        <div class="quick-links">
-
-                            <button type="button" class="quick-link">
-                                <span class="quick-link-content">
-                                    <strong>Quản lý học sinh</strong>
-                                    <small>Hồ sơ và phân lớp</small>
-                                </span>
-                                <span class="quick-arrow">›</span>
-                            </button>
-
-                            <button type="button" class="quick-link">
-                                <span class="quick-link-content">
-                                    <strong>Quản lý bảng điểm</strong>
-                                    <small>Nhập, sửa, tra cứu điểm</small>
-                                </span>
-                                <span class="quick-arrow">›</span>
-                            </button>
-
-                            <button type="button" class="quick-link">
-                                <span class="quick-link-content">
-                                    <strong>Khóa / Mở khóa</strong>
-                                    <small>Theo từng cột điểm</small>
-                                </span>
-                                <span class="quick-arrow">›</span>
-                            </button>
-
-                            <button type="button" class="quick-link">
-                                <span class="quick-link-content">
-                                    <strong>Nhập dữ liệu CSV</strong>
-                                    <small>Xem trước và kiểm tra lỗi</small>
-                                </span>
-                                <span class="quick-arrow">›</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- LƯU Ý NGHIỆP VỤ -->
-                    <div class="card business-notes">
-                        <h2>Lưu ý nghiệp vụ</h2>
-
-                        <p>Khóa điểm theo từng cột.</p>
-
-                        <p>Thiếu điểm: không tính tổng kết.</p>
-
-                        <p>
-                            Khóa và công bố là hai trạng thái độc lập.
-                        </p>
-
-                        <p>
-                            Học sinh chỉ xem điểm của chính mình
-                            đã được công bố.
-                        </p>
-                    </div>
-                </section>
             </main>
         </div>
     </div>

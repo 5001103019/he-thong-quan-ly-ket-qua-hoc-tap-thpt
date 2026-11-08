@@ -1,12 +1,12 @@
 
 "use strict";
 
-// Quy tac tinh diem tong ket da duoc thong nhat:
+// Cong thuc tinh diem tong ket:
 // QT1, QT2, QT3: he so 1
 // GK: he so 2
 // CK: he so 3
 // Tong he so: 8
-// Ket qua lam tron 2 chu so thap phan.
+// Lam tron 2 chu so thap phan.
 
 const WEIGHTS = {
     QT1: 1,
@@ -21,15 +21,18 @@ const TOTAL_WEIGHT = 8;
 const FORMULA =
     "(QT1 + QT2 + QT3 + 2 * GK + 3 * CK) / 8";
 
-// Tinh tong ket tu du lieu diem hien tai.
-// Ham nay khong ghi du lieu vao database.
+// Tinh diem tong ket tu du lieu hien tai.
+// Khong ghi du lieu vao SQL Server.
+// Giu tham so formulaPolicy de tuong thich code cu.
 function calculateScoreSummary(scoreRecord, formulaPolicy) {
 
     if (
         !scoreRecord ||
         !Array.isArray(scoreRecord.components)
     ) {
-        throw new Error("Du lieu ban ghi diem khong hop le");
+        throw new Error(
+            "Du lieu ban ghi diem khong hop le"
+        );
     }
 
     const components = [];
@@ -37,7 +40,7 @@ function calculateScoreSummary(scoreRecord, formulaPolicy) {
 
     let weightedSum = 0;
 
-    // Xu ly tung thanh phan diem.
+    // Duyet qua 5 cot diem
     for (const componentType of Object.keys(WEIGHTS)) {
 
         const weight = WEIGHTS[componentType];
@@ -54,8 +57,7 @@ function calculateScoreSummary(scoreRecord, formulaPolicy) {
             ? current.scoreValue
             : null;
 
-        // Chi tinh khi thanh phan co diem hop le.
-        // Diem 0 duoc chap nhan.
+        // Kiem tra diem hop le
         const isValid =
             scoreStatus === "SCORED" &&
             typeof scoreValue === "number" &&
@@ -81,25 +83,8 @@ function calculateScoreSummary(scoreRecord, formulaPolicy) {
             weightedSum += weightedValue;
         }
     }
-        // Khong tinh tong ket khi cong thuc chua duoc phe duyet.
-    // Khong co cong thuc cung duoc xem la chua duyet.
-    if (
-        !formulaPolicy ||
-        formulaPolicy.approvalStatus !== "APPROVED"
-    ) {
-        return {
-            scoreRecordId: scoreRecord.scoreRecordId,
-            version: scoreRecord.version,
-            calculationStatus: "FORMULA_NOT_APPROVED",
-            finalScore: null,
-            formula: FORMULA,
-            totalWeight: TOTAL_WEIGHT,
-            weightedSum: null,
-            components: components,
-            missingComponents: missingComponents
-        };
-    }
-    // Chua du 5 thanh phan hop le thi khong tinh DTK.
+
+    // Thieu diem thi chua tinh tong ket
     if (missingComponents.length > 0) {
         return {
             scoreRecordId: scoreRecord.scoreRecordId,
@@ -114,7 +99,7 @@ function calculateScoreSummary(scoreRecord, formulaPolicy) {
         };
     }
 
-    // Tinh DTK va lam tron 2 chu so thap phan.
+    // Du 5 cot diem thi tinh tong ket tu dong
     const finalScore = Math.round(
         (weightedSum / TOTAL_WEIGHT) * 100
     ) / 100;

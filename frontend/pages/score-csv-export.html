@@ -1,0 +1,66 @@
+﻿<!doctype html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Xuất dữ liệu CSV - Quản lý kết quả học tập</title>
+    <link rel="stylesheet" href="../css/score-csv-export.css">
+</head>
+<body>
+    <div class="app-shell">
+        <aside class="sidebar">
+            <div class="brand"><strong>HỆ THỐNG QUẢN LÝ</strong><small>KẾT QUẢ HỌC TẬP THPT</small></div>
+            <nav aria-label="Điều hướng chính">
+                <a href="./dashboard.html">Trang chủ</a>
+                <a href="./academic-management.html">Niên khóa / Khối / Lớp</a>
+                <a href="./student-management.html">Học sinh / Tài khoản</a>
+                <a href="./subject-management.html">Môn học</a>
+                <a href="./score-grid.html">Bảng điểm</a>
+                <a href="./lock-unlock.html">Khóa / Mở khóa</a>
+                <a href="./audit-log.html">Nhật ký thao tác</a>
+                <a href="./score-csv-import.html">Import điểm CSV</a>
+                <a href="./score-csv-export.html"
+                   class="active"
+                   aria-current="page">Xuất CSV</a>
+            </nav>
+            <div class="sidebar-bottom"><a href="#" id="logoutLink">Đăng xuất</a></div>
+        </aside>
+
+        <div class="workspace">
+            <header class="topbar"><strong>HỆ THỐNG QUẢN LÝ KẾT QUẢ HỌC TẬP</strong><span>Phòng Khảo thí</span></header>
+            <main class="content">
+                <h1>Xuất dữ liệu CSV</h1>
+                <p class="subtitle">Lựa chọn phạm vi dữ liệu cần xuất phục vụ thống kê và báo cáo.</p>
+                <section class="export-card" aria-labelledby="exportTitle">
+                    <h2 id="exportTitle">Cấu hình xuất dữ liệu</h2>
+                    <form id="exportForm">
+                        <div class="filters first-row">
+                            <label>Niên khóa<select id="exportYear" required><option value="">Chọn niên khóa</option></select></label>
+                            <label>Khối<select id="exportGrade" required><option value="">Chọn khối</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select></label>
+                            <label>Lớp<select id="exportClass" required disabled><option value="">Chọn lớp</option></select></label>
+                            <label>Môn học<select id="exportSubject"><option value="">Tất cả</option></select></label>
+                        </div>
+                        <div class="filters second-row">
+
+                            <label>
+                                Loại dữ liệu
+                                <select id="exportType">
+                                    <option value="details">Bảng điểm chi tiết</option>
+                                    <option value="statistics">Thống kê theo môn</option>
+                                </select>
+                            </label>
+
+                            <label>Định dạng<select id="exportFormat"><option value="csv">CSV</option></select></label>
+                        </div>
+                        <div class="scope-note"><strong>Phạm vi dữ liệu</strong><p>Chỉ xuất thông tin theo quyền được cấp và bộ lọc đã chọn.</p></div>
+                        <div id="exportMessage" class="message" role="status" aria-live="polite" hidden></div>
+                        <div class="actions"><button type="submit" id="exportButton">Xuất CSV</button></div>
+                    </form>
+                </section>
+            </main>
+        </div>
+    </div>
+    <script src="../js/api.js"></script>
+    <script src="../js/score-csv-export.js"></script>
+</body>
+</html>

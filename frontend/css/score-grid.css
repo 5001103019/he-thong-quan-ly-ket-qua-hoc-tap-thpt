@@ -358,3 +358,40 @@
         display: none !important;
     }
 }
+
+/* CHINH SUA DIEM TRUC TIEP */
+
+.score-edit-hint {
+    margin: 12px 0;
+    color: #607998;
+    font-size: 13px;
+}
+
+.score-inline-input {
+    width: 70px;
+    height: 34px;
+    padding: 5px;
+    border: 1px solid #2563eb;
+    border-radius: 6px;
+    text-align: center;
+    font-size: 14px;
+}
+
+.score-inline-save,
+.score-inline-cancel {
+    padding: 7px 10px;
+    margin: 3px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+}
+
+.score-inline-save {
+    background: #1763e5;
+    color: white;
+}
+
+.score-inline-cancel {
+    background: #e8edf4;
+    color: #334155;
+}
